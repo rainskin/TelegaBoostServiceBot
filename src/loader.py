@@ -11,4 +11,5 @@ bot = Bot(BOT_TOKEN, default=default)
 
 db_client = pymongo.MongoClient(MONGO_URL)
 db = db_client[MONGO_DB_NAME]
+users = db['users']
 
