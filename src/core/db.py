@@ -40,4 +40,5 @@ class Users():
         self.collection.update_one({'id': _id}, {'$set': {'lang': lang}})
 
 
+
 users = Users()

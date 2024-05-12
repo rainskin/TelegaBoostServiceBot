@@ -1,5 +1,5 @@
 lang_codes = ['ru', 'en']
-lang_names = ['Русский', 'English']
+lang_names = ['🇷🇺 Русский', '🇬🇧 English']
 
 
 def default_language(user_lang_code: str):

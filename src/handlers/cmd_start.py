@@ -1,11 +1,12 @@
 from aiogram import types
 from aiogram.filters import Command
 
-from loader import dp
 from core.db import users
-from utils import texts, kb
+from loader import dp
+from utils import kb
 from utils.lang import default_language
 from utils.navigation import return_to_menu
+from utils.texts import messages
 
 
 @dp.message(Command('start'))
@@ -17,6 +18,8 @@ async def _(msg: types.Message):
         name = msg.from_user.full_name
         await users.register(_id, name, lang)
 
-        await msg.answer(texts.select_lang[lang], reply_markup=kb.select_lang(lang).as_markup())
+        await msg.answer(messages.welcome[lang])
+        await msg.answer(messages.change_lang[lang], reply_markup=kb.select_lang().as_markup())
     else:
-        await return_to_menu(_id)
+        lang = users.get_user_lang(_id)
+        await return_to_menu(_id, lang)
