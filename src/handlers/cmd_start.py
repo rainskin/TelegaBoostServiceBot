@@ -4,9 +4,9 @@ from aiogram.filters import Command
 from core.db import users
 from loader import dp
 from utils import kb
-from utils.lang import default_language
+from core.localisation.lang import default_language
 from utils.navigation import return_to_menu
-from utils.texts import messages
+from core.localisation.texts import messages
 
 
 @dp.message(Command('start'))
@@ -21,5 +21,4 @@ async def _(msg: types.Message):
         await msg.answer(messages.welcome[lang])
         await msg.answer(messages.change_lang[lang], reply_markup=kb.select_lang().as_markup())
     else:
-        lang = users.get_user_lang(_id)
-        await return_to_menu(_id, lang)
+        await return_to_menu(_id)

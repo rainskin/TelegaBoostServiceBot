@@ -1,3 +1,5 @@
 def setup():
     from . import cmd_start
-    from . import switch_lang
+    from . import callback_handlers
+    from . import select_plan
+
