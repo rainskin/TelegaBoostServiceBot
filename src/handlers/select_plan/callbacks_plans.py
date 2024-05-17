@@ -18,7 +18,7 @@ async def _(query: types.CallbackQuery):
     lang = users.get_user_lang(user_id)
 
     plan_id = query.data.replace(callback_template, '')
-    plan = api.get_plan(int(plan_id))
+    plan = api.get_plan(int(plan_id), user_id)
 
     plan_info: str = plan['description']
 

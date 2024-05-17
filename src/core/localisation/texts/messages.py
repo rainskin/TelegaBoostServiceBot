@@ -13,6 +13,12 @@ plans = {'ru': "Выбери, что тебя интересует:",
 main_menu = {'ru': "🏠 <b>Главное меню:</b>",
              'en': '🏠 <b>Main menu:</b>'}
 
+active_orders = {'ru': 'Ваши текущие заказы',
+                 'en': 'Your current orders'}
+
+no_active_orders = {'ru': "Нет активных заказов",
+                    'en': "No active orders"}
+
 get_plans = {'ru': "Доступные тарифы:",
              'en': "Available rates:"}
 
@@ -40,11 +46,21 @@ plan_info = {
 }
 
 
-def get_plan_info_text(lang: str, name, description, rate, min_count, max_count, canceling_is_available):
+def get_plan_info_text(lang: str, name, description: str, rate, min_count, max_count, canceling_is_available):
     currency = 'RUB'
-    canceling_is_available = plan_info['canceling_is_available'][lang] if canceling_is_available else plan_info['canceling_is_not_available'][lang]
-    msg = (f'<b>{name}</b>\n\n'
-           f'{description}\n\n'
+    canceling_is_available = plan_info['canceling_is_available'][lang] if canceling_is_available else \
+        plan_info['canceling_is_not_available'][lang]
+    print(name, '\n' in name)
+    print(description.startswith('\n'), description)
+
+    if description.startswith('\n'):
+        description = description[1:]
+
+    name += '\n\n' if description else '\n'
+    description += '\n\n' if description else '\n'
+
+    msg = (f'<b>{name}</b>'
+           f'{description}'
            f'<b>{plan_info["price_rate"][lang]}:</b> {rate} {currency}\n\n'
            f'<b>{plan_info["min_count"][lang]}:</b> {min_count}\n'
            f'<b>{plan_info["max_count"][lang]}:</b> {max_count}\n\n'
