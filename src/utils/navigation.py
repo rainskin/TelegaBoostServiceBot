@@ -13,4 +13,3 @@ async def get_categories(_id: int):
     lang = users.get_user_lang(_id)
     await bot.send_message(_id, messages.plans[lang], reply_markup=kb.get_categories(lang).as_markup())
 
-

@@ -2,7 +2,7 @@ def categories():
     return f'categories_'
 
 
-def plans():
+def services():
     return f'list_of_plans_'
 
 

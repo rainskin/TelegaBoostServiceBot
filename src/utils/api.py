@@ -55,7 +55,7 @@ def get_tariffs(category_name, user_id: int):
     return tariffs
 
 
-def get_plan(tariff_id: int, user_id: int):
+def get_service(tariff_id: int, user_id: int):
     method = 'services'
     url = f'{BASE_URL}{method}&key={API_TOKEN}'
     services = make_request(url, user_id)
@@ -75,6 +75,20 @@ def get_orders_status(order_ids: List[int], user_id: int) -> Dict[str, dict]:
     filtered_statuses = {str(order_id): status for order_id, status in orders.items() if 'error' not in status}
     return filtered_statuses
 
+
+def create_new_order(user_id: int, service_id: int, link: str, quantity: int):
+    method = 'add'
+    service_id = str(service_id)
+    quantity = str(quantity)
+    url = (f'{BASE_URL}{method}&'
+           f'service={service_id}&'
+           f'link={link}'
+           f'&quantity={quantity}&'
+           f'key={API_TOKEN}')
+
+    response_json = make_request(url, user_id)
+    print(f'Ответ: {response_json}, тип: {type(response_json)}')
+    return response_json
 
 # order_ids = [70117436, 111]
 # print(f'{type(get_orders_status(order_ids, 1111123))}, {get_orders_status(order_ids, 1111123)}')

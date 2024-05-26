@@ -56,6 +56,33 @@ def current_orders_button(lang: str):
     return builder
 
 
+def continue_button(lang: str):
+    builder = InlineKeyboardBuilder()
+    text = buttons.to_continue[lang]
+    callback = buttons.to_continue['callback']
+
+    builder.button(text=text, callback_data=callback)
+    return builder
+
+
+def make_order_button(lang: str):
+    builder = InlineKeyboardBuilder()
+    text = buttons.make_order_button[lang]
+    callback = buttons.make_order_button['callback']
+
+    builder.button(text=text, callback_data=callback)
+    return builder
+
+
+def back_to_categories(lang: str):
+    builder = InlineKeyboardBuilder()
+    text = buttons.back_to_categories[lang]
+    callback = buttons.back_to_categories['callback']
+
+    builder.button(text=text, callback_data=callback)
+    return builder
+
+
 def change_language(lang: str):
     builder = InlineKeyboardBuilder()
     text = buttons.change_language[lang]
@@ -95,6 +122,7 @@ def orders(lang: str):
 
     return builder
 
+
 def navigation(lang: str, menu_button=False, back_button=False):
     builder = InlineKeyboardBuilder()
     texts = buttons.navigation_menu[lang]
@@ -111,13 +139,28 @@ def navigation(lang: str, menu_button=False, back_button=False):
     return builder.adjust(2)
 
 
-def get_plans(lang: str, category_name: str, user_id: int):
+def order_navigation(lang, make_order_btn=False):
+    builder = InlineKeyboardBuilder()
+
+    if make_order_btn:
+        builder.attach(make_order_button(lang))
+    else:
+        builder.attach(continue_button(lang))
+
+    builder.attach(back_to_categories(lang))
+    builder.attach(navigation(lang, menu_button=True))
+    builder.adjust(1, 2)
+
+    return builder
+
+
+def get_services(lang: str, category_name: str, user_id: int):
     builder = InlineKeyboardBuilder()
     tariffs = api.get_tariffs(category_name, user_id)
     for tariff in tariffs:
         text = tariff['name']
         _id = tariff['service']
-        callback = f'{callback_templates.plans()}{_id}'
+        callback = f'{callback_templates.services()}{_id}'
 
         builder.button(text=text, callback_data=callback)
 

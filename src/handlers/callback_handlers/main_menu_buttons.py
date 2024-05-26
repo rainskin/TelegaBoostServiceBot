@@ -31,7 +31,7 @@ async def _(query: types.CallbackQuery):
     await query.message.delete()
 
 
-@dp.callback_query(F.data.startswith('new_order'))
+@dp.callback_query(F.data == 'new_order')
 async def _(query: types.CallbackQuery):
     user_id = query.from_user.id
     await navigation.get_categories(user_id)

@@ -25,3 +25,15 @@ change_language = {'callbacks': ['change_language'],
 navigation_menu = {'callbacks': ['back_to_menu', 'back'],
                    'ru': ['🏠 Вернуться в меню', '⬅️ Назад'],
                    'en': ['🏠 Back to menu', '⬅️ Back']}
+
+to_continue = {'callback': 'to_continue',
+               'ru': 'Продолжить ➡️',
+               'en': 'Continue ➡️'}
+
+make_order_button = {'callback': 'make_new_order',
+                     'ru': '☑️ ОФОРМИТЬ ЗАКАЗ',
+                     'en': '☑️ CREATE ORDER'}
+
+back_to_categories = {'callback': 'back_to_categories',
+                      'ru': '⬅️ Назад к категориям',
+                      'en': '⬅️ Back to categories'}

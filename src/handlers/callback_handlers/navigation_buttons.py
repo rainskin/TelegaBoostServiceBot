@@ -12,6 +12,14 @@ async def _(query: types.CallbackQuery):
     await query.message.delete()
 
 
+@dp.callback_query(F.data == 'back_to_categories')
+async def _(query: types.CallbackQuery):
+    user_id = query.from_user.id
+    await navigation.get_categories(user_id)
+    await query.answer()
+    await query.message.delete()
+
+
 @dp.callback_query(F.data == 'back')
 async def _(query: types.CallbackQuery):
-    await query.answer('эта кнопка пока не работает')
+    await query.answer('the button does not work')
