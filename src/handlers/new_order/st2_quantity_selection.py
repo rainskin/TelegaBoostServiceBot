@@ -6,7 +6,8 @@ from core.db import users
 from core.localisation.texts import messages
 from core.storage import storage
 from loader import dp, bot
-from utils import states, kb
+from utils import states
+from utils.keyboards import navigation_kb
 
 
 @dp.message(states.NewOrder.choosing_quantity)
@@ -36,10 +37,10 @@ async def _(msg: types.Message, state: FSMContext):
         service_msg_ids.append(service_msg.message_id)
 
     else:
-        total_amount = value * rate / 1000
+        total_amount = round((value * rate / 1000), 2)
         currency = 'RUB'
         service_msg = await msg.answer(messages.valid_quantity[lang].format(total_cost=total_amount, currency=currency),
-                                       reply_markup=kb.order_navigation(lang).as_markup())
+                                       reply_markup=navigation_kb.order_navigation(lang).as_markup())
         if service_msg_ids:
             await bot.delete_messages(chat_id, service_msg_ids)
             service_msg_ids = []

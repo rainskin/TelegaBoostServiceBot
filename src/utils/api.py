@@ -10,8 +10,8 @@ API_TOKEN = config.API_TOKEN
 BASE_URL = config.BASE_URL
 
 
-def make_request(url: str, user_id: int) -> Any:
-    # lang = users.get_user_lang(user_id)
+async def make_request(url: str, user_id: int) -> Any:
+    lang = users.get_user_lang(user_id)
     try:
         response = requests.get(url)
         response.raise_for_status()
@@ -19,19 +19,28 @@ def make_request(url: str, user_id: int) -> Any:
     except requests.RequestException as e:
         error_message = "HTTP request failed: An error occurred while processing your request. Обратитесь в поддержку, пожалуйста"
         print(error_message)
-        bot.send_message(chat_id=user_id, text=error_message)
+        await bot.send_message(chat_id=user_id, text=error_message)
         return None
     except ValueError as e:
         error_message = "Failed to decode JSON response: An error occurred while processing the response. Обратитесь в поддержку, пожалуйста"
         print(error_message)
-        bot.send_message(chat_id=user_id, text=error_message)
+        await bot.send_message(chat_id=user_id, text=error_message)
         return None
 
 
-def get_services(user_id: int):
+async def get_balance():
+    method = 'balance'
+    url = f'{BASE_URL}{method}&key={API_TOKEN}'
+    response = await make_request(url, config.ADMIN_ID)
+    current_balance: str = response['balance']
+
+    return round(float(current_balance), 2)
+
+
+async def get_services(user_id: int):
     method = 'services'
     url = f'{BASE_URL}{method}&key={API_TOKEN}'
-    services = make_request(url, user_id)
+    services = await make_request(url, user_id)
 
     categories = []
     for i in services:
@@ -42,10 +51,10 @@ def get_services(user_id: int):
     return categories
 
 
-def get_tariffs(category_name, user_id: int):
+async def get_tariffs(category_name, user_id: int):
     method = 'services'
     url = f'{BASE_URL}{method}&key={API_TOKEN}'
-    services = make_request(url, user_id)
+    services = await make_request(url, user_id)
 
     tariffs = []
     for service in services:
@@ -55,10 +64,10 @@ def get_tariffs(category_name, user_id: int):
     return tariffs
 
 
-def get_service(tariff_id: int, user_id: int):
+async def get_service(tariff_id: int, user_id: int):
     method = 'services'
     url = f'{BASE_URL}{method}&key={API_TOKEN}'
-    services = make_request(url, user_id)
+    services = await make_request(url, user_id)
 
     for service in services:
         service_id = service['service']
@@ -66,19 +75,20 @@ def get_service(tariff_id: int, user_id: int):
             return service
 
 
-def get_orders_status(order_ids: List[int], user_id: int) -> Dict[str, dict]:
+async def get_orders_status(order_ids: List[int], user_id: int) -> Dict[str, dict]:
     method = 'status'
     orders_ids = ','.join(map(str, order_ids))
     url = f'{BASE_URL}{method}&orders={orders_ids}&key={API_TOKEN}'
-    orders: Dict[str, dict] = make_request(url, user_id)
+    orders: Dict[str, dict] = await make_request(url, user_id)
+    print(f'заказы {orders}')
 
     filtered_statuses = {str(order_id): status for order_id, status in orders.items() if 'error' not in status}
     return filtered_statuses
 
 
-def create_new_order(user_id: int, service_id: int, link: str, quantity: int):
+async def create_new_order(user_id: int, service_id: str, link: str, quantity: int):
     method = 'add'
-    service_id = str(service_id)
+    service_id = service_id
     quantity = str(quantity)
     url = (f'{BASE_URL}{method}&'
            f'service={service_id}&'
@@ -86,9 +96,11 @@ def create_new_order(user_id: int, service_id: int, link: str, quantity: int):
            f'&quantity={quantity}&'
            f'key={API_TOKEN}')
 
-    response_json = make_request(url, user_id)
-    print(f'Ответ: {response_json}, тип: {type(response_json)}')
-    return response_json
+    response = await make_request(url, user_id)
+    order_id: int = response['order']
+    print(f'оформил заказик')
+    return order_id
+
 
 # order_ids = [70117436, 111]
 # print(f'{type(get_orders_status(order_ids, 1111123))}, {get_orders_status(order_ids, 1111123)}')

@@ -7,3 +7,5 @@ MONGO_DB_NAME = env.get('MONGO_DB_NAME')
 
 API_TOKEN = env.get('API_TOKEN')
 BASE_URL = env.get('BASE_URL')
+
+ADMIN_ID = env.get_int('ADMIN_ID')

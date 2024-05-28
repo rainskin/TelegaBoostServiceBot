@@ -6,7 +6,8 @@ from core.localisation.texts import messages
 from handlers.new_order import create
 from loader import dp, bot
 from core.db import users
-from utils import kb, callback_templates, api, states
+from utils import callback_templates, api
+from utils.keyboards import navigation_kb
 
 callback_template = callback_templates.services()
 
@@ -21,7 +22,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     lang = users.get_user_lang(user_id)
 
     service_id = query.data.replace(callback_template, '')
-    service = api.get_service(int(service_id), user_id)
+    service = await api.get_service(int(service_id), user_id)
 
     plan_info: str = service['description']
 
@@ -33,7 +34,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     rate = service['rate']
 
     if type(rate) == float:
-        rate = round(rate, 2)
+        rate = round(rate)
 
     min_count = service['min']
     max_count = service['max']
@@ -41,7 +42,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 
     service_info = messages.get_plan_info_text(lang, name, description, rate, min_count, max_count,
                                                canceling_is_available)
-    await query.message.answer(service_info, reply_markup=kb.navigation(lang, menu_button=True).as_markup(),
+    await query.message.answer(service_info, reply_markup=navigation_kb.navigation(lang, menu_button=True).as_markup(),
                                disable_web_page_preview=True)
 
     storage_key = StorageKey(bot.id, query.message.chat.id, user_id)

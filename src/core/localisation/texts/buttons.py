@@ -30,10 +30,18 @@ to_continue = {'callback': 'to_continue',
                'ru': 'Продолжить ➡️',
                'en': 'Continue ➡️'}
 
-make_order_button = {'callback': 'make_new_order',
+make_order_button = {'callback': 'make_order',
                      'ru': '☑️ ОФОРМИТЬ ЗАКАЗ',
-                     'en': '☑️ CREATE ORDER'}
+                     'en': '☑️ MAKE ORDER'}
 
 back_to_categories = {'callback': 'back_to_categories',
                       'ru': '⬅️ Назад к категориям',
                       'en': '⬅️ Back to categories'}
+
+payment_method_card = {'callback': 'payment_method_card',
+                       'ru': '💳 Банковская карта',
+                       'en': '💳 Bank card'}
+
+payment_method_internal_balance = {'callback': 'payment_method_internal_balance',
+                                   'ru': '💲 Оплатить с баланса',
+                                   'en': '💲 Pay from balance'}

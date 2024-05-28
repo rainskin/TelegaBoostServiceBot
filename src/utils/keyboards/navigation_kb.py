@@ -1,22 +1,9 @@
-from typing import List
 
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from . import api, callback_templates
 from core.localisation.lang import lang_names, lang_codes
 from core.localisation.texts import buttons
-
-
-def get_categories(lang: str):
-    builder = InlineKeyboardBuilder()
-
-    for name, callback in zip(buttons.categories[lang], buttons.categories['callbacks']):
-        callback_data = f"{callback_templates.categories()}{callback}"
-        builder.button(text=name, callback_data=callback_data)
-
-    builder.adjust(1)
-    builder.attach(navigation(lang, menu_button=True))
-    return builder
+from utils import callback_templates
 
 
 def select_lang():
@@ -154,17 +141,4 @@ def order_navigation(lang, make_order_btn=False):
     return builder
 
 
-def get_services(lang: str, category_name: str, user_id: int):
-    builder = InlineKeyboardBuilder()
-    tariffs = api.get_tariffs(category_name, user_id)
-    for tariff in tariffs:
-        text = tariff['name']
-        _id = tariff['service']
-        callback = f'{callback_templates.services()}{_id}'
 
-        builder.button(text=text, callback_data=callback)
-
-    builder.adjust(1)
-    builder.attach(navigation(lang, menu_button=True))
-
-    return builder

@@ -1,12 +1,10 @@
-from aiogram import types, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.base import StorageKey
 
-from core.db import users
 from core.localisation.texts import messages
 from core.storage import storage
-from loader import dp, bot
-from utils import navigation, callback_templates, states, kb
+from loader import bot
+from utils import callback_templates, states
 
 template = callback_templates.services()
 

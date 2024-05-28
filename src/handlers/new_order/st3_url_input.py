@@ -6,7 +6,7 @@ from core.db import users
 from core.localisation.texts import messages
 from core.storage import storage
 from loader import dp, bot
-from utils import kb
+from utils.keyboards import navigation_kb
 from utils.states import NewOrder
 
 
@@ -69,10 +69,10 @@ async def _(msg: types.Message, state: FSMContext):
 
     msg_text = messages.correct_url[lang].format(url=url, quantity=quantity, total_amount=total_amount,
                                                  currency=currency)
-    service_msg = await msg.answer(msg_text, reply_markup=kb.order_navigation(lang, make_order_btn=True).as_markup())
+    service_msg = await msg.answer(msg_text, reply_markup=navigation_kb.order_navigation(lang, make_order_btn=True).as_markup())
     service_msg_ids.append(service_msg.message_id)
-
     await storage.update_data(key, service_msg_ids=service_msg_ids, url=url)
+    await state.set_state(NewOrder.check_details)
 
 
 def _get_url_from_text(text, entities) -> list | None:

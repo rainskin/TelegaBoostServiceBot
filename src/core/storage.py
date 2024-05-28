@@ -60,12 +60,10 @@ class MongoStorage(BaseStorage):
         )
 
     async def close(self):
-        await self.collection.delete_one()
         self.client.close()
 
-    async def delete_data_and_close_connection(self, key: StorageKey):
+    async def delete_data(self, key: StorageKey):
         await self.collection.delete_one({'chat_id': key.chat_id, 'user_id': key.user_id})
-        await self.close()
 
 
 async def get_valid_data(**data) -> dict:

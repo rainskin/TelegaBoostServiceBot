@@ -13,6 +13,21 @@ plans = {'ru': "Выбери, что тебя интересует:",
 main_menu = {'ru': "🏠 <b>Главное меню:</b>",
              'en': '🏠 <b>Main menu:</b>'}
 
+your_balance = {'ru': "💰 <b>Ваш баланс:</b> {amount} {currency}",
+                'en': '💰 <b>Current balance:</b> {amount} {currency}'}
+
+not_enough_money = {'ru': "Недостаточно средств на балансе\n"
+                          "Доступно {current_balance} {currency}",
+                    'en': "Insufficient funds on balance\n"
+                          "Available {current_balance} {currency}"}
+order_is_created = {'ru': "✅ <b>Заказ {order_id} оформлен</b>\n\n"
+                          "<b>Списано:</b> {total_amount} {currency}\n"
+                          "<b>Остаток</b>: {current_balance} {currency}",
+
+                    'en': "✅ <b>Order {order_id} has been placed</b>\n\n"
+                          "<b>Spent:</b> {total_amount} {currency}\n"
+                          "<b>Current balance</b>: {current_balance} {currency}"}
+
 active_orders = {'ru': 'Ваши текущие заказы',
                  'en': 'Your current orders'}
 
@@ -112,3 +127,9 @@ correct_url = {
           '<i>If you want to change the URL, send the new URL in the next message</i>\n\n'
           '➕ To <b>place the order</b>, click the corresponding button below'
 }
+
+select_payment_method = {
+    'ru': '<b>Сумма заказа:</b> {total_amount} {currency}\n\n'
+          '<b>💳 Выберите способ оплаты</b>',
+    'en': '<b>Order price:</b> {total_amount} {currency}\n\n'
+          '<b>💳 Select a Payment Method</b>'}
