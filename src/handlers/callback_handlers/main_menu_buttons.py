@@ -15,13 +15,13 @@ async def _(query: types.CallbackQuery):
     lang = users.get_user_lang(user_id)
 
     current_orders_ids = [int(i) for i in orders.get_current_orders(user_id).keys()]
-    print(f'Текущие заказы, айдишки {current_orders_ids}')
     if current_orders_ids:
         current_orders = await get_orders_status(current_orders_ids, user_id)
 
-        orders_status: str = get_order_status_text(current_orders)
+        orders_status: str = get_order_status_text(lang, current_orders)
 
-        msg_text = f'<b>{messages.active_orders[lang]}:</b>\n{orders_status}'
+        msg_text = f'<b>{messages.active_orders[lang]}:</b>\n\n{orders_status}'
+        orders.move_completed_orders_to_archive(user_id, current_orders)
     else:
         msg_text = messages.no_active_orders[lang]
 

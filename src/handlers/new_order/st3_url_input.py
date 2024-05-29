@@ -65,7 +65,7 @@ async def _(msg: types.Message, state: FSMContext):
         service_msg_ids.append(service_msg.message_id)
         return
 
-    url = url[0] # first value
+    url = url[0]  # first value
 
     msg_text = messages.correct_url[lang].format(url=url, quantity=quantity, total_amount=total_amount,
                                                  currency=currency)

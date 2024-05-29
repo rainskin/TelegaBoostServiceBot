@@ -37,7 +37,7 @@ async def _(msg: types.Message, state: FSMContext):
         service_msg_ids.append(service_msg.message_id)
 
     else:
-        total_amount = round((value * rate / 1000), 2)
+        total_amount = round((value * rate / 1000))
         currency = 'RUB'
         service_msg = await msg.answer(messages.valid_quantity[lang].format(total_cost=total_amount, currency=currency),
                                        reply_markup=navigation_kb.order_navigation(lang).as_markup())

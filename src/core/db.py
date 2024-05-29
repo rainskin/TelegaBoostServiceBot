@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Dict
 
 import loader
 
@@ -55,7 +55,6 @@ class Users:
         self.collection.update_one({'id': user_id}, {'$set': {'balance': amount}})
 
 
-
 users = Users()
 
 
@@ -94,6 +93,17 @@ class Orders:
         r = not self.collection.find_one({'id': user_id})
         print(f'is first order {r}')
         return r
+
+    def move_completed_orders_to_archive(self, user_id: int, current_orders: Dict[str, dict]):
+
+        for order_id, order_info in current_orders.items():
+            status = order_info['status']
+            if status != 'In progress' and status != 'Canceled':
+                self.collection.update_one({'id': user_id},
+                                           {'$set': {f'orders_archive.{order_id}': order_info}}, upsert=True)
+
+                self.collection.update_one(
+                    {"id": user_id}, {"$unset": {f"current_orders.{order_id}": ""}})
 
 
 orders = Orders()
@@ -141,4 +151,3 @@ class Promo:
 
 
 promo = Promo()
-

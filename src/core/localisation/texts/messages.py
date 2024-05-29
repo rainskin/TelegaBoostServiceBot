@@ -133,3 +133,61 @@ select_payment_method = {
           '<b>💳 Выберите способ оплаты</b>',
     'en': '<b>Order price:</b> {total_amount} {currency}\n\n'
           '<b>💳 Select a Payment Method</b>'}
+
+translate_status_key = {
+    'charge': {
+        'ru': 'Сумма',
+        'en': 'Spent',
+    },
+    'start_count': {
+        'ru': 'Стартовое значение',
+        'en': 'Start count',
+    },
+    'status': {
+        'ru': 'Статус',
+        'en': 'Status',
+    },
+    'remains': {
+        'ru': 'Остаток',
+        'en': 'Remains',
+    },
+    'currency': {
+        'ru': 'Валюта',
+        'en': 'Currency',
+    },
+}
+
+current_order_status = {
+    'In progress': {
+        'ru': '🔹 Выполняется',
+        'en': '🔹 In progress',
+    },
+    'Completed': {
+        'ru': '✅ Завершён',
+        'en': '✅ Completed',
+    },
+    'Awaiting': {
+        'ru': '⌛️ Ожидание',
+        'en': '⌛️ Awaiting',
+    },
+    'Canceled': {
+        'ru': '❌ Отменён',
+        'en': '❌ Canceled',
+    },
+    'Fail': {
+        'ru': '🚫 Ошибка',
+        'en': '🚫 Fail',
+    },
+    'Partial': {
+        'ru': '🟡 Частично',
+        'en': '🟡 Partial',
+    },
+}
+
+
+def translate_order_status_key(key: str, lang: str) -> str:
+    return translate_status_key[key][lang]
+
+
+def translate_current_order_status(status: str, lang: str) -> str:
+    return current_order_status[status][lang]
