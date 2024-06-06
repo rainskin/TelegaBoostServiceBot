@@ -8,3 +8,7 @@ def services():
 
 def select_lang():
     return f'select_lang_'
+
+
+def special_offers():
+    return f'special_offer_'

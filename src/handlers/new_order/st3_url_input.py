@@ -35,7 +35,6 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     key = StorageKey(bot.id, chat_id, user_id)
     data = await storage.get_data(key)
     service_msg_ids: list = data['service_msg_ids']
-    rate = data['rate']
 
     await query.answer()
     msg = await query.message.answer(messages.ask_url[lang])
@@ -52,9 +51,8 @@ async def _(msg: types.Message, state: FSMContext):
     chat_id = msg.chat.id
     key = StorageKey(bot.id, chat_id, user_id)
     data = await storage.get_data(key)
+    hot_order = data['hot_order']
     service_msg_ids: list = data['service_msg_ids']
-    quantity = data['quantity']
-    total_amount = data['total_amount']
 
     entities = msg.entities or msg.entities or msg.caption_entities or []
     text = msg.text or msg.caption
@@ -67,12 +65,21 @@ async def _(msg: types.Message, state: FSMContext):
 
     url = url[0]  # first value
 
-    msg_text = messages.correct_url[lang].format(url=url, quantity=quantity, total_amount=total_amount,
-                                                 currency=currency)
-    service_msg = await msg.answer(msg_text, reply_markup=navigation_kb.order_navigation(lang, make_order_btn=True).as_markup())
+    if not hot_order:
+        quantity = data['quantity']
+        total_amount = data['total_amount']
+
+        msg_text = messages.correct_url[lang].format(url=url, quantity=quantity, total_amount=total_amount,
+                                                     currency=currency)
+
+    else:
+        msg_text = messages.correct_url_hot_order[lang]
+
+    await state.set_state(NewOrder.check_details)
+    service_msg = await msg.answer(msg_text,
+                                   reply_markup=navigation_kb.order_navigation(lang, make_order_btn=True).as_markup())
     service_msg_ids.append(service_msg.message_id)
     await storage.update_data(key, service_msg_ids=service_msg_ids, url=url)
-    await state.set_state(NewOrder.check_details)
 
 
 def _get_url_from_text(text, entities) -> list | None:

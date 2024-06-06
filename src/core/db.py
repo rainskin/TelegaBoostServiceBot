@@ -68,6 +68,10 @@ class Orders:
         doc = self.collection.find_one({'id': user_id}, {'current_orders': 1})
         return doc.get('current_orders') if doc else None
 
+    def get_orders_from_archive(self, user_id) -> dict | None:
+        doc = self.collection.find_one({'id': user_id}, {'orders_archive': 1})
+        return doc.get('orders_archive') if doc else None
+
     def new_order(self, user_id: id, platform: str, order_id: int, order_info: dict):
         order_id = str(order_id)
         if self.is_first_order(user_id):
@@ -94,13 +98,22 @@ class Orders:
         print(f'is first order {r}')
         return r
 
+    def get_order_info(self, user_id: int, order_id: str, current_orders=False):
+        if current_orders:
+            doc = self.collection.find_one({'id': user_id}, {'current_orders': 1})
+            return doc['current_orders'][order_id]
+        else:
+            doc = self.collection.find_one({'id': user_id}, {'orders_archive': 1})
+            return doc['orders_archive'][order_id]
+
     def move_completed_orders_to_archive(self, user_id: int, current_orders: Dict[str, dict]):
 
         for order_id, order_info in current_orders.items():
             status = order_info['status']
             if status != 'In progress' and status != 'Canceled':
                 self.collection.update_one({'id': user_id},
-                                           {'$set': {f'orders_archive.{order_id}': order_info}}, upsert=True)
+                                           {'$set': {f"orders_archive.{order_id}": f"current_orders.{order_id}"}},
+                                           upsert=True)
 
                 self.collection.update_one(
                     {"id": user_id}, {"$unset": {f"current_orders.{order_id}": ""}})
@@ -151,3 +164,24 @@ class Promo:
 
 
 promo = Promo()
+
+
+class Admin:
+
+    def __init__(self):
+        self.collection = loader.db['admin']
+
+    def get_commission_percentage(self, service_id: str):
+        doc: dict = self.collection.find_one({'shop_settings': True})
+        base_commission = doc['base_commission']
+        if service_id in doc['commission_percentage'].keys():
+            percentage = doc['commission_percentage'][service_id]
+        else:
+            percentage = base_commission
+        return percentage
+
+
+admin = Admin()
+
+
+

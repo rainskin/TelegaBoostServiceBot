@@ -1,12 +1,20 @@
 from typing import Dict
 
+from core.db import orders
 from core.localisation.texts import messages
 
 
-def get_order_status_text(lang: str, orders: Dict[str, dict]) -> str:
+def get_order_status_text(user_id: int, lang: str, _orders: Dict[str, dict], current_orders=False) -> str:
+
     order_ids, orders_info = [], []
     msgs = []
-    for order_id, order_info in orders.items():
+
+    for order_id, order_info in _orders.items():
+        additional_order_info = orders.get_order_info(user_id, order_id, current_orders)
+
+        for _key, _value in additional_order_info.items():
+            order_info[_key] = _value
+
         order_ids.append(order_id)
 
         order_info_str = []

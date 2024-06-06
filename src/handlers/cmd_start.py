@@ -1,8 +1,13 @@
+from asyncio import sleep
+
 from aiogram import types
 from aiogram.filters import Command
+from aiogram.fsm.storage.base import StorageKey
 
+import config
 from core.db import users, promo
-from loader import dp
+from core.storage import storage
+from loader import dp, bot
 from utils.keyboards import navigation_kb
 from core.localisation.lang import default_language
 from utils.navigation import return_to_menu
@@ -20,10 +25,11 @@ async def _(msg: types.Message):
 
         promo_name = 'balance_for_new_users'
 
+        await msg.answer(messages.welcome[lang].format(support_contact=config.SUPPORT_BOT_URL))
+        await msg.answer(messages.change_lang[lang], reply_markup=navigation_kb.select_lang().as_markup())
+
         if not promo.is_completed(promo_name):
             promo.add_participant(promo_name, user_id)
-
-        await msg.answer(messages.welcome[lang])
-        await msg.answer(messages.change_lang[lang], reply_markup=navigation_kb.select_lang().as_markup())
+            await msg.answer(messages.promo_activated[lang])
     else:
         await return_to_menu(user_id)

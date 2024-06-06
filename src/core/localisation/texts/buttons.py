@@ -1,3 +1,5 @@
+import config
+
 categories = {
     'callbacks': ['views', 'subscribers', 'boosts', 'boosts_18', 'reactions', 'bot_launches', 'vk', 'twitch'],
     'ru': ['👁 Просмотры', '👥 Подписчики', '⚡️ Бусты', '⚡️ Бусты для 18+ каналов', '👍🏻❤️‍🔥 Реакции', '🤖 Запуски бота',
@@ -6,13 +8,21 @@ categories = {
            '🤖 Bot launches "/start"', 'Vk', 'Twitch'],
 }
 
-current_orders = {'callback': 'current_orders',
-                  'ru': '♻️ Мои заказы',
-                  'en': '♻️ My orders'}
+hot_offers = {'callback': 'hot_offers',
+              'ru': '🔥 Горячее предложение',
+              'en': '🔥 Hot offers'}
 
-orders_history = {'callback': 'orders_history',
+current_orders = {'callback': 'current_orders',
+                  'ru': '♻️ Активные заказы',
+                  'en': '♻️ Current orders'}
+
+orders_history = {'callback': 'archive_orders',
                   'ru': '📋 История заказов',
                   'en': '📋 History of orders'}
+
+support = {'url': config.SUPPORT_BOT_URL,
+           'ru': '💬 Поддержка',
+           'en': '💬 Support'}
 
 new_order = {'callback': 'new_order',
              'ru': '➕ Новый заказ',
@@ -45,3 +55,29 @@ payment_method_card = {'callback': 'payment_method_card',
 payment_method_internal_balance = {'callback': 'payment_method_internal_balance',
                                    'ru': '💲 Оплатить с баланса',
                                    'en': '💲 Pay from balance'}
+
+views_and_subscribers_special_offer = {'name': {
+    'ru': '👤Подписчики + 👁 просмотры',
+    'en': '👤Subscribers + 👁 views', },
+    'info': {
+        'ru': 'Описание',
+        'en': 'Information'}
+}
+
+twenty_boosts_30_days = {'name': {
+    'ru': '🔥 20 бустов (25-30 дн) 22% скидка',
+    'en': '🔥 20 boosts (25-30 d) 22% discount',
+},
+    'info': {
+        'ru': '<b>!!!ТОЛЬКО ДЛЯ НОВЫХ ПОЛЬЗОВАТЕЛЕЙ</b>!!!\n\n'
+              'Бусты на закрытые и открытые каналы.\n'
+              'Буст держится 25-30 дней\n\n'
+              'Старая цена - 576 руб\n'
+              '<b>Скидка 22%</b>',
+        'en': '<b>!!!FOR NEW USERS ONLY</b>!!!\n\n'
+              'Boosts for closed and open channels.\n'
+              'The boost lasts 25-30 days\n\n'
+              'Old price - 576 rub\n'
+              '<b>22% Discount</b>'
+    }
+}

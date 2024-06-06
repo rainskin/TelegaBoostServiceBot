@@ -37,7 +37,7 @@ async def get_balance():
     return round(float(current_balance), 2)
 
 
-async def get_services(user_id: int):
+async def get_available_services(user_id: int):
     method = 'services'
     url = f'{BASE_URL}{method}&key={API_TOKEN}'
     services = await make_request(url, user_id)
@@ -55,6 +55,7 @@ async def get_tariffs(category_name, user_id: int):
     method = 'services'
     url = f'{BASE_URL}{method}&key={API_TOKEN}'
     services = await make_request(url, user_id)
+    print(services)
 
     tariffs = []
     for service in services:
@@ -75,13 +76,11 @@ async def get_service(tariff_id: int, user_id: int):
             return service
 
 
-async def get_orders_status(order_ids: List[int], user_id: int) -> Dict[str, dict]:
+async def get_order_statuses(order_ids: List[str], user_id: int) -> Dict[str, dict]:
     method = 'status'
-    orders_ids = ','.join(map(str, order_ids))
+    orders_ids = ','.join(order_ids)
     url = f'{BASE_URL}{method}&orders={orders_ids}&key={API_TOKEN}'
     orders: Dict[str, dict] = await make_request(url, user_id)
-    print(f'заказы {orders}')
-
     filtered_statuses = {str(order_id): status for order_id, status in orders.items() if 'error' not in status}
     return filtered_statuses
 

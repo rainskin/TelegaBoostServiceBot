@@ -1,4 +1,3 @@
-
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from core.localisation.lang import lang_names, lang_codes
@@ -81,33 +80,67 @@ def change_language(lang: str):
     return builder
 
 
+def support(lang: str):
+    builder = InlineKeyboardBuilder()
+    text = buttons.support[lang]
+    url = buttons.support['url']
+
+    builder.button(text=text, url=url)
+
+    return builder
+
+
 def main_menu(lang: str):
     builder = InlineKeyboardBuilder()
     current_orders_btn = current_orders_button(lang)
     new_order_btn = new_order_button(lang)
     change_language_btn = change_language(lang)
+    support_btn = support(lang)
 
-    builder_buttons = [current_orders_btn, new_order_btn, change_language_btn]
+    builder_buttons = [current_orders_btn, new_order_btn, support_btn, change_language_btn]
 
     for button in builder_buttons:
         builder.attach(button)
     return builder.adjust(2)
 
 
-def orders(lang: str):
+def orders_navigation(current_page: int, amount_pages: int):
     builder = InlineKeyboardBuilder()
-    new_order_btn = new_order_button(lang)
-    orders_history_btn = orders_history(lang)
+    amount_pages = amount_pages if amount_pages > 0 else 1
+    if current_page > 1:
+        builder.button(text='<<', callback_data='previous_page')
+    else:
+        builder.button(text='   ', callback_data='___')
 
-    builder_buttons = [new_order_btn, orders_history_btn]
+    builder.button(text=f'{current_page}/{amount_pages}', callback_data='number_button')
+
+    if current_page < amount_pages:
+        builder.button(text='>>', callback_data='next_page')
+    else:
+        builder.button(text='   ', callback_data='___')
+
+    builder.adjust(3)
+    return builder
+
+
+def orders(lang: str, current_page: int, amount_pages: int, current_orders=True):
+    builder = InlineKeyboardBuilder()
+    builder.attach(orders_navigation(current_page, amount_pages))
+
+    new_order_btn = new_order_button(lang)
+    if current_orders:
+        orders_btn = orders_history(lang)
+    else:
+        orders_btn = current_orders_button(lang)
+
+    builder_buttons = [new_order_btn, orders_btn]
 
     for button in builder_buttons:
         builder.attach(button)
 
-    builder.adjust(2)
     builder.attach(navigation(lang, menu_button=True))
 
-    return builder
+    return builder.adjust(3, 2, 1)
 
 
 def navigation(lang: str, menu_button=False, back_button=False):
@@ -139,6 +172,3 @@ def order_navigation(lang, make_order_btn=False):
     builder.adjust(1, 2)
 
     return builder
-
-
-
