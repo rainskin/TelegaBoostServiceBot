@@ -33,7 +33,7 @@ from utils.states import NewOrder, Payment
 # url
 # t.me/...
 
-async def create_order(key: StorageKey, service_id, quantity, url: str, data: dict, profit=0):
+async def create_order(key: StorageKey, service_id: str, quantity: int, url: str, data: dict, profit=0):
     user_id = key.user_id
     total_amount = data['total_amount']
 
@@ -63,7 +63,7 @@ async def create_order(key: StorageKey, service_id, quantity, url: str, data: di
 async def create_multiple_order(key: StorageKey, services_and_amount: List[tuple], url: str, data: dict) -> List[int]:
     order_ids = []
     for service_id, quantity in services_and_amount:
-        order_id = await create_order(key, service_id, quantity, url, data)
+        order_id = await create_order(key, str(service_id), quantity, url, data)
         order_ids.append(order_id)
 
     return order_ids

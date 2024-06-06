@@ -36,7 +36,7 @@ a = offer_viewers_and_subscribers.price
 
 twenty_boosts_30_days = SpecialOffer(buttons.twenty_boosts_30_days, 'fifteen_boosts')
 twenty_boosts_30_days.price = 450
-
+twenty_boosts_30_days.services_and_amount = (66, 20)
 special_offers_list = [
     twenty_boosts_30_days,
 ]
