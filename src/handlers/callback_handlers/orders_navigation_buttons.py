@@ -106,8 +106,6 @@ async def get_order_statuses_text(user_id: int, lang: str, current_orders=False,
         amount_pages = (number_of_orders + orders_per_page - 1) // orders_per_page
         _order_ids = get_unshown_orders(order_ids, current_page, orders_per_page)
 
-        print(f'Все айди: {order_ids}, Показаны{_order_ids}')
-
         current_order_statuses = await get_order_statuses(_order_ids, user_id)
         orders_statuses: str = get_order_status_text(user_id, lang, current_order_statuses, current_orders)
         msg_text = f'{msg_text}\n\n{orders_statuses}'

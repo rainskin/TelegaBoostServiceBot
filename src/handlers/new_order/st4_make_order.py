@@ -23,12 +23,12 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     currency = 'RUB'
 
     await query.answer()
-
+    user_balance = users.get_balance(user_id)
     if service_msg_ids:
         await bot.delete_messages(chat_id, service_msg_ids)
         service_msg_ids = []
 
-    if user_id == ADMIN_ID:
+    if user_balance > 0:
         kb = payment_methods.kb(lang, from_balance=True)
     else:
         kb = payment_methods.kb(lang)

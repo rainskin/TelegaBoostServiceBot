@@ -21,7 +21,7 @@ async def start_creating_new_order(lang, key: StorageKey, state: FSMContext, ser
     msg = messages.ask_quantity[lang].format(min_value=min_count, max_value=max_count)
     service_msg = await bot.send_message(key.chat_id, msg)
     await storage.set_data(key, service_id=service_id, rate=rate, profit=profit, min_value=min_count, max_value=max_count,
-                           service_msg_ids=[service_msg.message_id])
+                           service_msg_ids=[service_msg.message_id], hot_order=False)
     await state.set_state(states.NewOrder.choosing_quantity)
 
 

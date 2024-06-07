@@ -95,7 +95,6 @@ class Orders:
 
     def is_first_order(self, user_id):
         r = not self.collection.find_one({'id': user_id})
-        print(f'is first order {r}')
         return r
 
     def get_order_info(self, user_id: int, order_id: str, current_orders=False):
