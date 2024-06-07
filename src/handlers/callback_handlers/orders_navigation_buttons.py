@@ -14,6 +14,7 @@ from core.localisation.texts import messages
 from utils.api import get_order_statuses
 from utils.order_status import get_order_status_text
 
+
 # previous_btn = builder.button(text='<<', callback_data='previous_page')
 #     number_btn = builder.button(text=f'{current_page}/{amount_pages}', callback_data='number_button')
 #     next_btn = builder.button(text='>>', callback_data='next_page')
@@ -35,6 +36,7 @@ async def _(query: types.CallbackQuery):
     await get_order_statuses_text(user_id, lang, current_orders=current_orders, current_page=page)
     await query.answer()
     await query.message.delete()
+
 
 @dp.callback_query(F.data == 'next_page')
 async def _(query: types.CallbackQuery):
@@ -66,6 +68,8 @@ def get_current_page_number_from_inline_keyboards_info(keyboards: list[list[Inli
         current_page = text[0]
 
     return int(current_page)
+
+
 def get_unshown_orders(order_ids: list, current_page, orders_per_page: int):
     number_of_orders = len(order_ids)
 
@@ -93,9 +97,9 @@ async def get_order_statuses_text(user_id: int, lang: str, current_orders=False,
     else:
         _orders = orders.get_orders_from_archive(user_id)
 
-    order_ids = [i for i in _orders.keys()]
+    if _orders:
+        order_ids = [i for i in _orders.keys()]
 
-    if order_ids:
         if current_orders:
             msg_text = f'<b>{messages.active_orders[lang]}:</b>'
         else:
@@ -110,9 +114,9 @@ async def get_order_statuses_text(user_id: int, lang: str, current_orders=False,
         orders_statuses: str = get_order_status_text(user_id, lang, current_order_statuses, current_orders)
         msg_text = f'{msg_text}\n\n{orders_statuses}'
 
-        msg = await bot.send_message(user_id, msg_text,
-                                     reply_markup=navigation_kb.orders(lang, current_page, amount_pages,
-                                                                       current_orders).as_markup())
+        await bot.send_message(user_id, msg_text,
+                               reply_markup=navigation_kb.orders(lang, current_page, amount_pages,
+                                                                 current_orders).as_markup())
 
     else:
         if current_orders:
@@ -120,4 +124,4 @@ async def get_order_statuses_text(user_id: int, lang: str, current_orders=False,
         else:
             msg_text = messages.no_history_of_orders[lang]
 
-        await bot.send_message(msg_text)
+        await bot.send_message(user_id, msg_text)

@@ -23,7 +23,6 @@ async def _(query: types.CallbackQuery):
     await storage.set_data(key, current_orders=True)
     await get_order_statuses_text(user_id, lang, current_orders=True)
     await query.answer()
-    await query.message.delete()
 
 
 @dp.callback_query(F.data == 'archive_orders')
@@ -35,7 +34,6 @@ async def _(query: types.CallbackQuery):
 
     await get_order_statuses_text(user_id, lang)
     await query.answer()
-    await query.message.delete()
 
 
 @dp.callback_query(F.data == 'new_order')
