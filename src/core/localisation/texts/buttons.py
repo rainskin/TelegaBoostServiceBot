@@ -28,6 +28,11 @@ new_order = {'callback': 'new_order',
              'ru': '➕ Новый заказ',
              'en': '➕ New order'}
 
+cancel_order = {
+    'ru': 'Отменить',
+    'en': 'Cancel'
+}
+
 change_language = {'callbacks': ['change_language'],
                    'ru': ['🇷🇺 Поменять язык'],
                    'en': ['🇬🇧 Change language']}
@@ -39,6 +44,10 @@ navigation_menu = {'callbacks': ['back_to_menu', 'back'],
 to_continue = {'callback': 'to_continue',
                'ru': 'Продолжить ➡️',
                'en': 'Continue ➡️'}
+
+yes_or_no = {'callbacks': ['yes', 'no'],
+             'ru': ['Да', 'Нет'],
+             'en': ['Yes', 'No']}
 
 make_order_button = {'callback': 'make_order',
                      'ru': '☑️ ОФОРМИТЬ ЗАКАЗ',
@@ -55,6 +64,12 @@ payment_method_card = {'callback': 'payment_method_card',
 payment_method_internal_balance = {'callback': 'payment_method_internal_balance',
                                    'ru': '💲 Оплатить с баланса',
                                    'en': '💲 Pay from balance'}
+
+card_pay = {'ru': '💳ОПЛАТИТЬ',
+            'en': '💳PAY'}
+
+check_pay = {'ru': '⏳ ПРОВЕРИТЬ ОПЛАТУ',
+             'en': '⏳ CHECK PAYMENT'}
 
 views_and_subscribers_special_offer = {'name': {
     'ru': '👤Подписчики + 👁 просмотры',

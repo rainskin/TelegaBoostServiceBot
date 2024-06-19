@@ -1,9 +1,10 @@
 from aiogram.fsm.storage.base import StorageKey
 
+import config
 from core.db import users
 from core.storage import storage
 from loader import bot
-from utils.keyboards import navigation_kb, categories
+from utils.keyboards import navigation_kb, categories, admin
 from core.localisation.texts import messages
 
 
@@ -30,3 +31,10 @@ async def get_categories(user_id: int):
     kb = await categories.get_categories(user_id, lang)
     await bot.send_message(user_id, messages.plans[lang], reply_markup=kb.as_markup())
 
+
+async def get_admin_menu(user_id: int):
+    if user_id != config.ADMIN_ID:
+        return
+
+    text = f'<b>🧑🏻‍💻 Админ панель:</b>'
+    await bot.send_message(user_id, text, reply_markup=admin.admin_menu().as_markup())

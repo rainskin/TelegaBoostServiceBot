@@ -9,5 +9,13 @@ class NewOrder(StatesGroup):
     check_details = State()
 
 
+class ManageOrder(StatesGroup):
+    cancel_order = State()
+
+
 class Payment(StatesGroup):
     choosing_method = State()
+
+
+class AdminStates(StatesGroup):
+    to_take_orders_into_work = State()

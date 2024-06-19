@@ -1,3 +1,4 @@
+import asyncio
 from asyncio import sleep
 
 from aiogram import types
@@ -8,6 +9,7 @@ import config
 from core.db import users, promo
 from core.storage import storage
 from loader import dp, bot
+from utils import commands
 from utils.keyboards import navigation_kb
 from core.localisation.lang import default_language
 from utils.navigation import return_to_menu
@@ -27,7 +29,7 @@ async def _(msg: types.Message):
 
         await msg.answer(messages.welcome[lang].format(support_contact=config.SUPPORT_BOT_URL))
         await msg.answer(messages.change_lang[lang], reply_markup=navigation_kb.select_lang().as_markup())
-
+        await commands.set_commands(lang, bot)
         if not promo.is_completed(promo_name):
             promo.add_participant(promo_name, user_id)
             await msg.answer(messages.promo_activated[lang])

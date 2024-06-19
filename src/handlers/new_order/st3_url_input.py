@@ -10,23 +10,6 @@ from utils.keyboards import navigation_kb
 from utils.states import NewOrder
 
 
-# current_data =
-#
-# service_id
-# "97"
-# rate
-# 750
-# min_value
-# 1
-# max_value
-# # 10000
-# total_amount
-# 111
-# quantity
-# 245
-# service_msg_ids
-# [6548, ..., ..., ..., ..., ..., ...]
-
 @dp.callback_query(F.data == 'to_continue', NewOrder.choosing_quantity)
 async def _(query: types.CallbackQuery, state: FSMContext):
     user_id = query.from_user.id
@@ -75,7 +58,7 @@ async def _(msg: types.Message, state: FSMContext):
     else:
         msg_text = messages.correct_url_hot_order[lang]
 
-    await state.set_state(NewOrder.check_details)
+    # await state.set_state(NewOrder.check_details)
     service_msg = await msg.answer(msg_text,
                                    reply_markup=navigation_kb.order_navigation(lang, make_order_btn=True).as_markup())
     service_msg_ids.append(service_msg.message_id)

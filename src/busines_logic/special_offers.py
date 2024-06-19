@@ -16,7 +16,10 @@ class SpecialOffer:
         self.tag = uniq_tag
         self.price = 0
         self.currency = 'RUB'
-        self.services_and_amount: List[tuple] = []
+        self.amount_without_commission = 0
+        self.profit = 0
+        self.services_and_amount: dict = {}
+        self.canceling_is_available = False
 
     def get_keyboard(self):
         builder = InlineKeyboardBuilder()
@@ -36,7 +39,12 @@ a = offer_viewers_and_subscribers.price
 
 twenty_boosts_30_days = SpecialOffer(buttons.twenty_boosts_30_days, 'fifteen_boosts')
 twenty_boosts_30_days.price = 450
-twenty_boosts_30_days.services_and_amount = (66, 20)
+# twenty_boosts_30_days.services_and_amount = {'66': 20, }
+twenty_boosts_30_days.services_and_amount = {'67': 1, }
+twenty_boosts_30_days.amount_without_commission = 10
+twenty_boosts_30_days.profit = twenty_boosts_30_days.price - twenty_boosts_30_days.amount_without_commission
+
+
 special_offers_list = [
     twenty_boosts_30_days,
 ]

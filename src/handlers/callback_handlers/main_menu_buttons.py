@@ -12,6 +12,7 @@ from utils import navigation
 from utils.keyboards import navigation_kb, categories
 from core.localisation.texts import messages
 from utils.api import get_order_statuses
+from utils.keyboards.navigation_kb import cancel_order
 from utils.order_status import get_order_status_text
 
 
@@ -21,6 +22,18 @@ async def _(query: types.CallbackQuery):
     lang = users.get_user_lang(user_id)
     key = StorageKey(bot_id=bot.id, chat_id=user_id, user_id=user_id)
     await storage.set_data(key, current_orders=True)
+    not_accepted_orders = orders.get_not_accepted_orders(user_id)
+    if not_accepted_orders:
+        await query.message.answer(messages.not_accepted_order[lang])
+        for _order_id, _order_info in not_accepted_orders.items():
+            url = _order_info.get('url')
+            quantity = _order_info.get('quantity')
+            total_amount = _order_info.get('total_amount')
+
+            text = messages.not_accepted_order_status[lang].format(order_id=_order_id, url=url, quantity=quantity, total_amount=total_amount)
+            kb = cancel_order(lang, _order_id)
+            await query.message.answer(text, reply_markup=kb.as_markup())
+
     await get_order_statuses_text(user_id, lang, current_orders=True)
     await query.answer()
 

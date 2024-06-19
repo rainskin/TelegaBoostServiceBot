@@ -1,23 +1,16 @@
-from typing import List
-
-import aiogram
 from aiogram import types, F
 from aiogram.fsm.storage.base import StorageKey
 from aiogram.types import InlineKeyboardButton
 
+from busines_logic.order_management import remove_orders_to_history_and_return_money_for_canceled_orders
+from core.db import users, orders
+from core.localisation.texts import messages
 from core.storage import storage
 from loader import dp, bot
-from core.db import users, orders
-from utils import navigation
-from utils.keyboards import navigation_kb, categories
-from core.localisation.texts import messages
 from utils.api import get_order_statuses
+from utils.keyboards import navigation_kb
 from utils.order_status import get_order_status_text
 
-
-# previous_btn = builder.button(text='<<', callback_data='previous_page')
-#     number_btn = builder.button(text=f'{current_page}/{amount_pages}', callback_data='number_button')
-#     next_btn = builder.button(text='>>', callback_data='next_page')
 
 @dp.callback_query(F.data == 'previous_page')
 async def _(query: types.CallbackQuery):
@@ -94,34 +87,40 @@ def get_unshown_orders(order_ids: list, current_page, orders_per_page: int):
 async def get_order_statuses_text(user_id: int, lang: str, current_orders=False, current_page=1):
     if current_orders:
         _orders = orders.get_current_orders(user_id)
+        text = messages.receiving_information_about_current_orders[lang]
+
+        no_orders_text = messages.no_active_orders[lang]
     else:
         _orders = orders.get_orders_from_archive(user_id)
+        text = messages.receiving_information_about_archive_orders[lang]
+
+        no_orders_text = messages.no_history_of_orders[lang]
 
     if _orders:
+        message = await bot.send_message(user_id, text)
         order_ids = [i for i in _orders.keys()]
-
+        order_ids.reverse()
         if current_orders:
             msg_text = f'<b>{messages.active_orders[lang]}:</b>'
         else:
             msg_text = f'<b>{messages.history_of_orders[lang]}:</b>'
 
-        orders_per_page = 2
+        orders_per_page = 5
         number_of_orders = len(order_ids)
         amount_pages = (number_of_orders + orders_per_page - 1) // orders_per_page
         _order_ids = get_unshown_orders(order_ids, current_page, orders_per_page)
-
         current_order_statuses = await get_order_statuses(_order_ids, user_id)
+
         orders_statuses: str = get_order_status_text(user_id, lang, current_order_statuses, current_orders)
+
+        if current_orders:
+            await remove_orders_to_history_and_return_money_for_canceled_orders(user_id, current_order_statuses)
+
         msg_text = f'{msg_text}\n\n{orders_statuses}'
 
-        await bot.send_message(user_id, msg_text,
-                               reply_markup=navigation_kb.orders(lang, current_page, amount_pages,
-                                                                 current_orders).as_markup())
+        await bot.edit_message_text(msg_text, user_id, message.message_id,
+                                    reply_markup=navigation_kb.orders(lang, current_page, amount_pages,
+                                                                      current_orders).as_markup())
 
     else:
-        if current_orders:
-            msg_text = messages.no_active_orders[lang]
-        else:
-            msg_text = messages.no_history_of_orders[lang]
-
-        await bot.send_message(user_id, msg_text)
+        await bot.send_message(user_id, no_orders_text, reply_markup=navigation_kb.orders(lang,current_orders).as_markup())

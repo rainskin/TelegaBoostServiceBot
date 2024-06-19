@@ -37,27 +37,82 @@ not_enough_money = {'ru': "Недостаточно средств на бала
                           "Доступно {current_balance} {currency}",
                     'en': "Insufficient funds on balance\n"
                           "Available {current_balance} {currency}"}
-order_is_created = {'ru': "✅ <b>Заказ {order_id} оформлен</b>\n\n"
-                          "<b>Списано:</b> {total_amount} {currency}\n"
-                          "<b>Остаток</b>: {current_balance} {currency}",
+order_is_created = {'ru': "✅ <b>Заказ {order_id} оформлен</b>\n\n",
+                    'en': "✅ <b>Order {order_id} has been placed</b>\n\n"}
 
-                    'en': "✅ <b>Order {order_id} has been placed</b>\n\n"
-                          "<b>Spent:</b> {total_amount} {currency}\n"
-                          "<b>Current balance</b>: {current_balance} {currency}"}
+orders_is_created = {'ru': "✅ <b>Заказы {order_ids} оформлены</b>\n\n",
+                     'en': "✅ <b>Orders {order_ids} has been placed</b>\n\n"}
 
-orders_is_created = {'ru': "✅ <b>Заказы {order_ids} оформлены</b>\n\n"
-                           "<b>Списано:</b> {total_amount} {currency}\n"
-                           "<b>Остаток</b>: {current_balance} {currency}",
+take_order_into_work = {'ru': "✅ <b>Заказ {order_id} передан в работу</b>\n\n",
+                        'en': "✅ <b>Order {order_id} sent to work</b>\n\n"}
 
-                     'en': "✅ <b>Orders {order_ids} has been placed</b>\n\n"
-                           "<b>Spent:</b> {total_amount} {currency}\n"
-                           "<b>Current balance</b>: {current_balance} {currency}"}
+take_orders_into_work = {'ru': "✅ <b>Заказы {order_ids} переданы в работу</b>\n\n",
+                         'en': "✅ <b>Orders {order_ids} sent to work</b>\n\n"}
 
-active_orders = {'ru': 'Ваши текущие заказы',
-                 'en': 'Your current orders'}
+spent_amount_from_balance = {'ru': "<b>Списано:</b> {total_amount} {currency}\n"
+                                   "<b>Остаток</b>: {current_balance} {currency}",
 
-no_active_orders = {'ru': "Нет активных заказов",
-                    'en': "No active orders"}
+                             'en': "<b>Spent:</b> {total_amount} {currency}\n"
+                                   "<b>Current balance</b>: {current_balance} {currency}"}
+
+not_accepted_order = {
+    'ru': '<b>Заказы, ожидающие подтверждения:</b>',
+    'en': '<b>Orders awaiting confirmation:</b>',
+}
+
+not_accepted_order_status = {
+    'ru': '<b>Заказ {order_id}</b>\n\n'
+          '<b>Ссылка:</b> {url}\n'
+          '<b>Количество:</b> {quantity}\n'
+          '<b>Сумма:</b> {total_amount}',
+
+    'en': '<b>Order {order_id}</b>\n\n'
+          '<b>Link:</b> {url}\n'
+          '<b>Quantity:</b> {quantity}\n'
+          '<b>Amount:</b> {total_amount}',
+}
+
+action_is_not_available = {
+    'ru': 'Это действие не возможно выполнить сейчас',
+    'en': 'This action cannot be performed at this time'
+}
+
+canceling_not_accepted_order_is_not_available = {
+    'ru': 'Невозможно выполнить. Заказ уже отменён или началось выполнение',
+    'en': 'Unable to complete. The order has already been canceled or fulfillment has begun'
+}
+cancel_action = {
+    'ru': 'Действие отменено',
+    'en': 'Action cancelled',
+}
+
+cancel_order = {
+    'ru': 'Вы действительно хотите отменить заказ <b>{order_id}</b> ?',
+    'en': 'Are you sure you want to cancel order <b>{order_id}</b> ?',
+}
+
+order_successfully_canceled = {
+    'ru': 'Заказ отменён, средства вернулись на баланс',
+    'en': 'The order was cancelled, the funds were returned to the balance',
+}
+
+active_orders = {'ru': 'Заказы в работе',
+                 'en': 'Orders in progres'}
+
+no_active_orders = {'ru': "Нет заказов в работе",
+                    'en': "No orders in progress"}
+
+receiving_information_about_current_orders = {
+    'ru': 'Получаю информацию  заказах в работе...',
+    'en': 'Processing information about about orders in progress...'
+}
+
+receiving_information_about_archive_orders = {
+    'ru': 'Обрабатываю информацию о прошлых заказах...',
+    'en': 'Processing information about past orders...'
+}
+
+
 
 history_of_orders = {'ru': "История заказов",
                      'en': "History of orders"}
@@ -191,6 +246,26 @@ select_payment_method = {
           '<b>💳 Выберите способ оплаты</b>',
     'en': '<b>Order price:</b> {total_amount} {currency}\n\n'
           '<b>💳 Select a Payment Method</b>'}
+
+payment_by_card = {
+    'ru': 'Для оплаты заказа <b>{order_id}</b> нажмите на кнопку <b>💳ОПЛАТИТЬ</b>\n\n'
+          'После оплаты нажмите кнопку <b>⏳ ПРОВЕРИТЬ ОПЛАТУ</b>',
+    'en': 'To pay for your order  <b>{order_id}</b>, click on the <b>💳PAY</b> button\n\n'
+          'After payment, click the <b>⏳ CHECK PAYMENT</b> button'}
+
+current_payment_status = {
+    'ru': '<b>Текущий статус платежа</b>',
+    'en': '<b>Current payment status<b>',
+}
+
+some_error_try_again = {
+    'ru': '<b>❗️ Возникла какая-то ошибка.</b>\n'
+          'Попробуйте, пожалуйста, заново.\n'
+          'Если проблема сохраняется, обратитесь в поддержку',
+    'en': '<b>❗️ Some error occurred.<b>\n'
+          'Please try again.\n'
+          'If the problem persists, contact support',
+}
 
 translate_status_key = {
     'charge': {

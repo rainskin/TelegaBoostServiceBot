@@ -2,7 +2,6 @@ from aiogram import types, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.base import StorageKey
 
-import config
 from core import db
 from core.localisation.texts import messages
 from handlers.new_order import create
@@ -10,7 +9,7 @@ from loader import dp, bot
 from core.db import users
 from utils import callback_templates, api
 from utils.keyboards import navigation_kb
-from utils.special_offers import get_offer_by_tag
+from busines_logic.special_offers import get_offer_by_tag
 
 callback_template = callback_templates.services()
 
@@ -43,11 +42,10 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 
     old_rate: int | float = service['rate']
     new_rate: int = get_rate_with_commission(old_rate, service_id)
-    profit = new_rate - old_rate
     service_info = {
         'service_id': service_id,
+        'old_rate': old_rate,
         'rate': new_rate,
-        'profit': profit,
         'min_count': service['min'],
         'max_count': service['max'],
         'canceling_is_available': service['canceling_is_available']
@@ -81,7 +79,10 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 
     service_info = {
         'price': service.price,
-        'services_and_amount': service.services_and_amount
+        'amount_without_commission': service.amount_without_commission,
+        'services_and_amount': service.services_and_amount,
+        'profit': service.profit,
+        'canceling_is_available': service.canceling_is_available
     }
 
     service_info_text = messages.get_plan_info_text(lang, name, description, service_info, hot_offer=True)

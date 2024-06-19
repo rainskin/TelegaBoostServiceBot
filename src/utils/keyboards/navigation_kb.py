@@ -123,9 +123,11 @@ def orders_navigation(current_page: int, amount_pages: int):
     return builder
 
 
-def orders(lang: str, current_page: int, amount_pages: int, current_orders=True):
+def orders(lang: str, current_page: int = 0, amount_pages: int = 0, current_orders=True):
     builder = InlineKeyboardBuilder()
-    builder.attach(orders_navigation(current_page, amount_pages))
+
+    if amount_pages:
+        builder.attach(orders_navigation(current_page, amount_pages))
 
     new_order_btn = new_order_button(lang)
     if current_orders:
@@ -140,7 +142,11 @@ def orders(lang: str, current_page: int, amount_pages: int, current_orders=True)
 
     builder.attach(navigation(lang, menu_button=True))
 
-    return builder.adjust(3, 2, 1)
+    if amount_pages:
+        builder.adjust(3, 2, 1)
+    else:
+        builder.adjust(2, 1)
+    return builder
 
 
 def navigation(lang: str, menu_button=False, back_button=False):
@@ -171,4 +177,26 @@ def order_navigation(lang, make_order_btn=False):
     builder.attach(navigation(lang, menu_button=True))
     builder.adjust(1, 2)
 
+    return builder
+
+
+def yes_or_no_kb(lang):
+    builder = InlineKeyboardBuilder()
+    texts = buttons.yes_or_no[lang]
+    callbacks = buttons.yes_or_no['callbacks']
+
+    for (text, callback_data) in zip(texts, callbacks):
+        builder.button(text=text, callback_data=callback_data)
+
+    return builder.adjust(2)
+
+
+def cancel_order(lang, order_id: str):
+    builder = InlineKeyboardBuilder()
+
+    callback_template = callback_templates.cancel_order()
+    text = buttons.cancel_order[lang]
+    callback = f'{callback_template}{order_id}'
+
+    builder.button(text=text, callback_data=callback)
     return builder

@@ -1,7 +1,9 @@
+
 from typing import Dict
 
 from core.db import orders
 from core.localisation.texts import messages
+from core.localisation.texts.messages import translate_status_key
 
 
 def get_order_status_text(user_id: int, lang: str, _orders: Dict[str, dict], current_orders=False) -> str:
@@ -21,8 +23,14 @@ def get_order_status_text(user_id: int, lang: str, _orders: Dict[str, dict], cur
         for key, value in order_info.items():
             if key == 'status':
                 value = messages.translate_current_order_status(value, lang)
-            key = messages.translate_order_status_key(key, lang)
-
+            if key == 'internal_order_id' or key == 'charge':
+                continue
+            if key == 'total_amount':
+                key = 'charge'
+            if key in translate_status_key.keys():
+                key = messages.translate_order_status_key(key, lang)
+            else:
+                continue
             order_info_str.append(f'<b>{key}</b>: {value}')
 
         orders_info.append('\n'.join(order_info_str))
@@ -33,3 +41,4 @@ def get_order_status_text(user_id: int, lang: str, _orders: Dict[str, dict], cur
 
     r = '\n\n'.join(msgs)
     return r
+

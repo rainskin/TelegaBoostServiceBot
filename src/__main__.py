@@ -9,9 +9,8 @@ from loader import bot, dp
 async def main():
     handlers.setup()
     print('Bot is running')
-    await bot(DeleteWebhook(drop_pending_updates=True))
+    # await bot(DeleteWebhook(drop_pending_updates=True))
     await dp.start_polling(bot)
-    print('ffff')
 
 
 if __name__ == "__main__":

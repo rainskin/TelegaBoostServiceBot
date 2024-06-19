@@ -34,3 +34,13 @@ def kb(lang: str, from_balance=False):
 
     return builder
 
+
+def card_payment(lang: str, payment_url: str, internal_order_id: str):
+    builder = InlineKeyboardBuilder()
+
+    builder.button(text=buttons.card_pay[lang], url=payment_url)
+    callback_data = f'{callback_templates.check_payment()}{internal_order_id}'
+    builder.button(text=buttons.check_pay[lang], callback_data=callback_data)
+    builder.adjust(1)
+
+    return builder

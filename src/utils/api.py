@@ -28,7 +28,7 @@ async def make_request(url: str, user_id: int) -> Any:
         return None
 
 
-async def get_balance():
+async def get_account_balance():
     method = 'balance'
     url = f'{BASE_URL}{method}&key={API_TOKEN}'
     response = await make_request(url, config.ADMIN_ID)
@@ -55,7 +55,6 @@ async def get_tariffs(category_name, user_id: int):
     method = 'services'
     url = f'{BASE_URL}{method}&key={API_TOKEN}'
     services = await make_request(url, user_id)
-    print(services)
 
     tariffs = []
     for service in services:
@@ -97,7 +96,6 @@ async def create_new_order(user_id: int, service_id: str, link: str, quantity: i
 
     response = await make_request(url, user_id)
     order_id: int = response['order']
-    print(f'оформил заказик')
     return order_id
 
 
