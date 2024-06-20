@@ -27,10 +27,10 @@ async def check_payment_status(user_id: int, order_id: str) -> str:
     try:
         response = requests.post(base_url, data=params, headers=headers)
     except ConnectTimeout:
-        print('ConnectTimeout')  # Не хватило времени на подключение к сайту
+        # print('ConnectTimeout')  # Не хватило времени на подключение к сайту
         sys.exit()
     except ReadTimeout:
-        print('ReadTimeout')  # Не хватило времени на выполнение запроса
+        # print('ReadTimeout')  # Не хватило времени на выполнение запроса
         sys.exit()
 
     if response.status_code in [200, 400, 401]:
@@ -38,7 +38,7 @@ async def check_payment_status(user_id: int, order_id: str) -> str:
             response_json = response.json()  # Парсинг результата
 
         except:
-            print('Не удалось пропарсить ответ')
+            # print('Не удалось пропарсить ответ')
             sys.exit()
 
         if response_json['type'] == 'success':
@@ -56,7 +56,7 @@ async def check_payment_status(user_id: int, order_id: str) -> str:
             await bot.send_message(user_id, text)
 
     else:
-        print('Response code: ' + str(response.status_code))  # Вывод неизвестного кода ответа
+        # print('Response code: ' + str(response.status_code))  # Вывод неизвестного кода ответа
 
 #
 # async def check_periodically(sec: float, order_id: str):

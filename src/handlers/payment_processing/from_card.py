@@ -28,7 +28,6 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     payment_url = payment.confirmation.confirmation_url
     payment_id = payment.id
     data['payment_id'] = payment_id
-    print(payment_id)
     await query.answer()
 
     orders.save_last_order_info(user_id, data)

@@ -18,12 +18,10 @@ async def make_request(url: str, user_id: int) -> Any:
         return response.json()
     except requests.RequestException as e:
         error_message = "HTTP request failed: An error occurred while processing your request. Обратитесь в поддержку, пожалуйста"
-        print(error_message)
         await bot.send_message(chat_id=user_id, text=error_message)
         return None
     except ValueError as e:
         error_message = "Failed to decode JSON response: An error occurred while processing the response. Обратитесь в поддержку, пожалуйста"
-        print(error_message)
         await bot.send_message(chat_id=user_id, text=error_message)
         return None
 
