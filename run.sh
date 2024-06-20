@@ -1,4 +1,4 @@
-PROJECT_NAME=TelegramBoostServiceBot
+PROJECT_NAME=Telegramboostservice
 
 docker kill $PROJECT_NAME
 docker rm $PROJECT_NAME
