@@ -17,5 +17,7 @@ def get_category_name(system_name: str):
         api_name = 'VK'
     elif system_name == 'twitch':
         api_name = 'Twitch'
+    elif system_name == 'referrals':
+        api_name = 'Рефералы в бот'
 
     return api_name

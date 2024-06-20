@@ -1,11 +1,11 @@
 import config
 
 categories = {
-    'callbacks': ['views', 'subscribers', 'boosts', 'boosts_18', 'reactions', 'bot_launches', 'vk', 'twitch'],
+    'callbacks': ['views', 'subscribers', 'boosts', 'boosts_18', 'reactions', 'bot_launches', 'vk', 'twitch', 'referrals'],
     'ru': ['👁 Просмотры', '👥 Подписчики', '⚡️ Бусты', '⚡️ Бусты для 18+ каналов', '👍🏻❤️‍🔥 Реакции', '🤖 Запуски бота',
-           'Вконтакте', 'Твич'],
+           'Вконтакте', 'Твич', '🎮 Рефералы в бота'],
     'en': ['👁 Views', '👥 Subscribers', '⚡️ Boosts', '⚡️ Boosts for 18+ channels', '👍🏻❤️‍🔥 Reactions',
-           '🤖 Bot launches "/start"', 'Vk', 'Twitch'],
+           '🤖 Bot launches "/start"', 'Vk', 'Twitch', '🎮 Bot referrals'],
 }
 
 hot_offers = {'callback': 'hot_offers',

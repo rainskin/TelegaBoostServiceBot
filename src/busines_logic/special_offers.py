@@ -44,10 +44,7 @@ twenty_boosts_30_days.services_and_amount = {'67': 1, }
 twenty_boosts_30_days.amount_without_commission = 10
 twenty_boosts_30_days.profit = twenty_boosts_30_days.price - twenty_boosts_30_days.amount_without_commission
 
-
-special_offers_list = [
-    twenty_boosts_30_days,
-]
+special_offers_list = []
 
 
 def get_special_offers_keyboard(lang: str):
@@ -64,3 +61,7 @@ def get_offer_by_tag(tag: str) -> SpecialOffer:
     for offer in special_offers_list:
         if offer.tag == tag:
             return offer
+
+
+def special_offers_is_available():
+    return bool(special_offers_list)

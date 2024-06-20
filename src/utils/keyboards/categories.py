@@ -2,6 +2,7 @@ from typing import List
 
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
+from busines_logic.special_offers import special_offers_is_available
 from utils import api, callback_templates
 from core.localisation.lang import lang_names, lang_codes
 from core.localisation.texts import buttons
@@ -11,8 +12,11 @@ from utils.keyboards.navigation_kb import navigation
 
 async def get_categories(user_id, lang: str):
     available_categories = await api.get_available_services(user_id)
+    print(available_categories)
     builder = InlineKeyboardBuilder()
-    builder.button(text=buttons.hot_offers[lang], callback_data=f"{callback_templates.categories()}{buttons.hot_offers['callback']}")
+    if special_offers_is_available():
+        builder.button(text=buttons.hot_offers[lang],
+                       callback_data=f"{callback_templates.categories()}{buttons.hot_offers['callback']}")
 
     for name, callback in zip(buttons.categories[lang], buttons.categories['callbacks']):
         category_is_available = get_category_name(callback) in available_categories

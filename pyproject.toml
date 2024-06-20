@@ -12,6 +12,7 @@ envparse = "^0.2.0"
 pymongo = "^4.7.2"
 requests = "^2.31.0"
 motor = "^3.4.0"
+yookassa = "^3.2.0"
 
 
 [build-system]
