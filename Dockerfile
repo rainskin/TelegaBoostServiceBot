@@ -4,4 +4,5 @@ COPY pyproject.toml poetry.lock ./
 RUN pip install poetry && poetry install
 COPY . .
 ENV TZ="Europe/Moscow"
+ENV PYTHONPATH=/app
 CMD poetry run python src
