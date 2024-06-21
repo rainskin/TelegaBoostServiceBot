@@ -12,7 +12,6 @@ from utils.Payment_methods.aaio.config import MERCHANT_ID, SECRET_KEY1, API_KEY
 
 
 async def check_payment_status(user_id: int, order_id: str) -> str:
-
     base_url = 'https://aaio.so/api/info-pay'
 
     params = {
@@ -38,7 +37,7 @@ async def check_payment_status(user_id: int, order_id: str) -> str:
             response_json = response.json()  # Парсинг результата
 
         except:
-            # print('Не удалось пропарсить ответ')
+            print('Не удалось пропарсить ответ')
             sys.exit()
 
         if response_json['type'] == 'success':
@@ -56,7 +55,8 @@ async def check_payment_status(user_id: int, order_id: str) -> str:
             await bot.send_message(user_id, text)
 
     else:
-        # print('Response code: ' + str(response.status_code))  # Вывод неизвестного кода ответа
+        print('Response code: ' + str(response.status_code))  # Вывод неизвестного кода ответа
+
 
 #
 # async def check_periodically(sec: float, order_id: str):
@@ -94,6 +94,3 @@ async def get_payment_url(order_id: int, amount: float, lang: str, currency: str
 
     r = (base_payment_url + urlencode(params))
     return r
-
-
-

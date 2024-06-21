@@ -8,7 +8,7 @@ from core.storage import storage
 from handlers.new_order.create import place_order
 from loader import dp, bot
 from utils import callback_templates, navigation
-from utils.Payment_methods.yookassa.methods import create_payment, get_payment_by_id
+from utils.Payment_methods.aaio.methods import get_payment_url, check_payment_status
 from utils.keyboards.payment_methods import card_payment
 from utils.states import Payment
 
@@ -24,10 +24,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     internal_order_id = data['internal_order_id']
     data['service_msg_ids'] = []
 
-    payment = await create_payment(total_amount)
-    payment_url = payment.confirmation.confirmation_url
-    payment_id = payment.id
-    data['payment_id'] = payment_id
+    payment_url = await get_payment_url(internal_order_id, total_amount, lang)
     await query.answer()
 
     orders.save_last_order_info(user_id, data)
@@ -47,9 +44,7 @@ async def _(query: types.CallbackQuery):
     lang = users.get_user_lang(user_id)
     internal_order_id = query.data.replace(template, '')
     data = orders.get_last_order_info(user_id)
-    payment_id = data.get('payment_id')
-    payment = await get_payment_by_id(payment_id)
-    status = payment.status
+    status = await check_payment_status(user_id, internal_order_id)
     status_msg_ids = []
 
     if data and internal_order_id == data['internal_order_id']:
@@ -57,7 +52,7 @@ async def _(query: types.CallbackQuery):
             await query.answer()
             return
 
-        if status != 'succeeded':
+        if status != 'success':
             text = (f'{messages.current_payment_status[lang]}:\n\n'
                     f'{status}')
 
