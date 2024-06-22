@@ -49,11 +49,12 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 
 
 @dp.callback_query(F.data == 'no', states.BalanceRecharge.choosing_amount)
-async def _(query: types.CallbackQuery):
+async def _(query: types.CallbackQuery, state: FSMContext):
     user_id = query.from_user.id
     lang = users.get_user_lang(user_id)
     text = messages.cancel_action[lang]
 
     await query.message.answer(text)
-    await navigation.return_to_menu(user_id)
+    await state.set_state(None)
+    await navigation.return_to_menu(user_id, state)
     await query.message.delete()

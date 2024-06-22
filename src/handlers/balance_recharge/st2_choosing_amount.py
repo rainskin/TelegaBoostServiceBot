@@ -12,7 +12,7 @@ from utils.keyboards.navigation_kb import yes_or_no_kb
 
 
 @dp.message(F.content_type == ContentType.TEXT, states.BalanceRecharge.choosing_amount)
-async def _(msg: types.Message, state: FSMContext):
+async def _(msg: types.Message):
     user_id = msg.from_user.id
     lang = users.get_user_lang(user_id)
     chat_id = msg.chat.id

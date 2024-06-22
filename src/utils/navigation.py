@@ -1,3 +1,4 @@
+from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.base import StorageKey
 
 import config
@@ -8,7 +9,8 @@ from utils.keyboards import navigation_kb, categories, admin
 from core.localisation.texts import messages
 
 
-async def return_to_menu(user_id: int):
+async def return_to_menu(user_id: int, state: FSMContext):
+    await state.set_state(None)
     lang = users.get_user_lang(user_id)
     user_balance = users.get_balance(user_id)
 

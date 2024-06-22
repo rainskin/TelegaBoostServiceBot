@@ -1,4 +1,5 @@
 from aiogram import F, types
+from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.base import StorageKey
 
 from core.db import users, orders
@@ -13,7 +14,7 @@ from utils.states import Payment
 
 
 @dp.callback_query(F.data == 'payment_method_internal_balance', Payment.choosing_method)
-async def _(query: types.CallbackQuery):
+async def _(query: types.CallbackQuery, state: FSMContext):
     user_id = query.from_user.id
     chat_id = query.message.chat.id
     key = StorageKey(bot.id, chat_id, user_id)
@@ -41,7 +42,7 @@ async def _(query: types.CallbackQuery):
 
             users.update_balance(user_id, current_balance)
             await storage.delete_data(key)
-            await navigation.return_to_menu(user_id)
+            await navigation.return_to_menu(user_id, state)
             await bot.delete_messages(key.chat_id, service_msg_ids)
 
     else:

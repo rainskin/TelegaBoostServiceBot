@@ -39,7 +39,7 @@ template = callback_templates.check_payment()
 
 
 @dp.callback_query(F.data.startswith(template))
-async def _(query: types.CallbackQuery):
+async def _(query: types.CallbackQuery, state: FSMContext):
     user_id = query.from_user.id
     lang = users.get_user_lang(user_id)
     internal_order_id = query.data.replace(template, '')
@@ -68,7 +68,7 @@ async def _(query: types.CallbackQuery):
 
         await query.message.answer(message)
         await query.message.delete()
-        await navigation.return_to_menu(user_id)
+        await navigation.return_to_menu(user_id, state)
         if status_msg_ids:
             await bot.delete_messages(user_id, status_msg_ids)
 

@@ -3,6 +3,7 @@ from asyncio import sleep
 
 from aiogram import types
 from aiogram.filters import Command
+from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.base import StorageKey
 
 import config
@@ -17,7 +18,7 @@ from core.localisation.texts import messages
 
 
 @dp.message(Command('start'))
-async def _(msg: types.Message):
+async def _(msg: types.Message, state: FSMContext):
     user_id = msg.from_user.id
     if users.is_new(user_id):
         user_lang_code = msg.from_user.language_code
@@ -34,4 +35,5 @@ async def _(msg: types.Message):
             promo.add_participant(promo_name, user_id)
             await msg.answer(messages.promo_activated[lang])
     else:
-        await return_to_menu(user_id)
+
+        await return_to_menu(user_id, state)
