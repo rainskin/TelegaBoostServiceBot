@@ -51,7 +51,7 @@ class Users:
 
     def get_balance(self, user_id: int):
         balance: float = self.collection.find_one({'id': user_id})['balance']
-        return balance
+        return round(balance, 2)
 
     def update_balance(self, user_id: int, amount: float):
         self.collection.update_one({'id': user_id}, {'$set': {'balance': amount}})
@@ -328,6 +328,45 @@ class Admin:
 
     def remove_order_from_execution_queue(self, order_id: str):
         self.collection.update_one({'orders_for_execution': True}, {'$unset': {f'orders.{order_id}': ""}})
+
+    def save_payment(self, payment_id: str, payment_info: dict):
+        current_date = datetime.now().strftime(self.default_datetime_format)
+        payment_info['date'] = current_date
+        self.collection.update_one({'payments_queue': True}, {
+            '$set': {f'payments.{payment_id}': payment_info}
+        }, upsert=True)
+
+    def confirm_payment(self, payment_id: str, successful_payment_status: str):
+        doc = self.collection.find_one_and_update(
+            {'payments_queue': True},
+            {
+                '$set': {f'payments.{payment_id}.status': successful_payment_status}
+            },
+            return_document=True
+        )
+        payment_info = doc['payments'][payment_id]
+        payment_info['execution_date'] = datetime.now().strftime(self.default_datetime_format)
+        self.collection.update_one(
+            {'payments_queue': True},
+            {
+                '$set': {f'successful_payments.{payment_id}': payment_info},
+                '$unset': {f'payments.{payment_id}': payment_id}
+            }
+        )
+
+
+    def is_not_paid(self, payment_id: str, expected_status: str):
+        doc = self.collection.find_one({'payments_queue': True}, {'payments': 1})
+        payments = doc.get('payments')
+        payment = payments.get(payment_id)
+        payment_status = payment.get('status')
+        return payment_status != expected_status
+
+    def get_payment_info(self, payment_id: str):
+        doc = self.collection.find_one({'payments_queue': True}, {'payments': 1})
+        payment_info = doc['payments'][payment_id]
+
+        return payment_info
 
 
 admin = Admin()

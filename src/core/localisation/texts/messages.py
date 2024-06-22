@@ -13,6 +13,38 @@ welcome = {'ru': "<b>Добро пожаловать!</b>\n\n"
                  "Our support bot (from 10 to 20 Moscow time):\n"
                  "💬 {support_contact}"}
 
+balance_recharge_limits = {
+    'ru': "<b>💵 ДОСТУПНЫЕ СПОСОБЫ ОПЛАТЫ</b>\n\n"
+          "🔼 <b>СБП</b> - от 200 руб\n"
+          "💳 <b>Банковские карты</b> - от 300 руб\n\n"
+          "❗️<i>Суммы до <b>200 руб.</b> можно оплатить только криптовалютой.</i>\n\n"
+          "Подробнее на сайте платёжной системы",
+    'en': "<b>💵 AVAILABLE PAYMENT METHODS</b>\n\n"
+          "🔼 <b>SBP</b> - from 200 rubles\n"
+          "💳 <b>Bank cards</b> - from 300 rubles\n\n"
+          "❗️<i>Amounts up to <b>200 rubles</b> can only be paid with cryptocurrency.</i>\n\n"
+          "More details on the payment system website"}
+
+balance_recharge_input_amount = {'ru': "<b>Введите сумму пополнения</b>\n",
+                                 'en': "<b>Enter the amount you want to top up your balance with</b>\n"}
+
+balance_recharge_wrong_amount = {'ru': "Введите число в формате:\n"
+                                       "<b>100</b> или <b>100.50</b>",
+                                 'en': "Enter a number in the format:\n"
+                                       "<b>350<b> or <b>490.50<b>"}
+
+balance_recharge_accept_amount = {'ru': "Пополнить баланс на <b>{amount} {currency}?</b>",
+                                  'en': "Top up your balance with <b>{amount} {currency}?</b>"}
+
+balance_recharge_already_paid = {'ru': "<b>Ошибка.</b>\n\n"
+                                       "Этот счет уже был оплачен. Проверьте баланс",
+                                 'en': "<b>Error.<b>\n\n"
+                                       "This invoice has already been paid. Please check your balance"}
+
+balance_recharge_successfully_paid = {
+    'ru': "Баланс успешно пополнен на <b>{amount} {currency}</b>",
+    'en': "The balance has been successfully replenished with <b>{amount} {currency}</b>"}
+
 promo_activated = {'ru': "<b>Бонус активирован.</b>\n"
                          "Средства успешно начислены на ваш баланс",
                    'en': '<b>Bonus has been activated.</b>\n'
@@ -111,8 +143,6 @@ receiving_information_about_archive_orders = {
     'ru': 'Обрабатываю информацию о прошлых заказах...',
     'en': 'Processing information about past orders...'
 }
-
-
 
 history_of_orders = {'ru': "История заказов",
                      'en': "History of orders"}
@@ -243,9 +273,9 @@ correct_url_hot_order = {
 
 select_payment_method = {
     'ru': '<b>Сумма заказа:</b> {total_amount} {currency}\n\n'
-          '<b>💳 Выберите способ оплаты</b>',
+          '<b>💵 Ваш текущий баланс {current_balance} {currency}</b>',
     'en': '<b>Order price:</b> {total_amount} {currency}\n\n'
-          '<b>💳 Select a Payment Method</b>'}
+          '<b>💵 Your current balance {current_balance} {currency}</b>'}
 
 payment_by_card = {
     'ru': 'Для оплаты заказа <b>{order_id}</b> нажмите на кнопку <b>💳ОПЛАТИТЬ</b>\n\n'

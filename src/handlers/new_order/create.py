@@ -4,6 +4,7 @@ from typing import List
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.base import StorageKey
 
+import config
 from core.db import orders, users, admin
 from core.localisation.texts import messages
 from core.storage import storage
@@ -72,3 +73,5 @@ async def place_order(user_id: int, internal_order_id: str, hot_order: bool, dat
             data['quantity'] = quantity
             data['url'] = url
             admin.put_order_to_queue(user_id, internal_order_id, data)
+
+    await bot.send_message(config.ADMIN_ID, f'🤑 Новый заказ. Сумма {data["total_amount"]}')

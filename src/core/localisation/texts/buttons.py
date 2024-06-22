@@ -1,7 +1,8 @@
 import config
 
 categories = {
-    'callbacks': ['views', 'subscribers', 'boosts', 'boosts_18', 'reactions', 'bot_launches', 'vk', 'twitch', 'referrals'],
+    'callbacks': ['views', 'subscribers', 'boosts', 'boosts_18', 'reactions', 'bot_launches', 'vk', 'twitch',
+                  'referrals'],
     'ru': ['👁 Просмотры', '👥 Подписчики', '⚡️ Бусты', '⚡️ Бусты для 18+ каналов', '👍🏻❤️‍🔥 Реакции', '🤖 Запуски бота',
            'Вконтакте', 'Твич', '🎮 Рефералы в бота'],
     'en': ['👁 Views', '👥 Subscribers', '⚡️ Boosts', '⚡️ Boosts for 18+ channels', '👍🏻❤️‍🔥 Reactions',
@@ -11,6 +12,10 @@ categories = {
 hot_offers = {'callback': 'hot_offers',
               'ru': '🔥 Горячее предложение',
               'en': '🔥 Hot offers'}
+
+balance_recharge = {'callback': 'balance_recharge',
+                    'ru': '💵 Пополнить баланс',
+                    'en': '💵 Balance recharge'}
 
 current_orders = {'callback': 'current_orders',
                   'ru': '♻️ Активные заказы',

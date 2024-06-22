@@ -9,6 +9,7 @@ from handlers.new_order.create import place_order
 from loader import dp, bot
 from utils import callback_templates, navigation
 from utils.Payment_methods.aaio.methods import get_payment_url, check_payment_status
+from utils.Payment_methods.aaio.payment_statuses import current_payment_status_translated
 from utils.keyboards.payment_methods import card_payment
 from utils.states import Payment
 
@@ -27,7 +28,6 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     payment_url = await get_payment_url(internal_order_id, total_amount, lang)
     await query.answer()
 
-    orders.save_last_order_info(user_id, data)
     kb = card_payment(lang, payment_url, internal_order_id)
     await query.message.answer(messages.payment_by_card[lang].format(order_id=internal_order_id),
                                reply_markup=kb.as_markup())
@@ -54,7 +54,7 @@ async def _(query: types.CallbackQuery):
 
         if status != 'success':
             text = (f'{messages.current_payment_status[lang]}:\n\n'
-                    f'{status}')
+                    f'{current_payment_status_translated[status][lang]}')
 
             msg = await query.message.answer(text)
             status_msg_ids.append(msg.message_id)
@@ -65,11 +65,15 @@ async def _(query: types.CallbackQuery):
         await place_order(user_id, internal_order_id, hot_order, data, payment_method='card')
         message = f'{messages.order_is_created[lang].format(order_id=internal_order_id)}'
         orders.reset_last_order_info(user_id)
+
+        await query.message.answer(message)
+        await query.message.delete()
+        await navigation.return_to_menu(user_id)
         if status_msg_ids:
             await bot.delete_messages(user_id, status_msg_ids)
+
     else:
         message = messages.some_error_try_again[lang]
+        await query.message.answer(message)
 
-    await query.message.answer(message)
-    await navigation.return_to_menu(user_id)
     await query.answer()

@@ -31,17 +31,16 @@ async def _(query: types.CallbackQuery, state: FSMContext):
         await bot.delete_messages(chat_id, service_msg_ids)
         service_msg_ids = []
 
-    if user_balance > 0:
-        kb = payment_methods.kb(lang, from_balance=True)
-    else:
-        kb = payment_methods.kb(lang)
+    kb = payment_methods.kb(lang, from_balance=True)
 
-    text = messages.select_payment_method[lang].format(total_amount=total_amount, currency=currency)
+    text = messages.select_payment_method[lang].format(total_amount=total_amount,
+                                                       currency=currency, current_balance=user_balance)
     msg = await query.message.answer(text, reply_markup=kb.as_markup())
     await state.set_state(Payment.choosing_method)
 
     service_msg_ids.append(msg.message_id)
     internal_order_id = await get_internal_order_id(user_id)
+    orders.save_last_order_info(user_id, data)
     await storage.update_data(key, internal_order_id=internal_order_id)
 
 

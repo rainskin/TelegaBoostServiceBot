@@ -8,6 +8,7 @@ from core.storage import storage
 from handlers.new_order.create import place_order
 from loader import dp, bot
 from utils import navigation
+from utils.keyboards import navigation_kb
 from utils.states import Payment
 
 
@@ -27,12 +28,13 @@ async def _(query: types.CallbackQuery):
     await query.answer()
 
     if user_balance >= total_amount:
-        current_balance = user_balance - total_amount
+        current_balance = round((user_balance - total_amount), 2)
         await place_order(user_id, internal_order_id, hot_order, data, payment_method='internal_balance')
         message = (f'{messages.order_is_created[lang].format(order_id=internal_order_id)}'
                    f'{messages.spent_amount_from_balance[lang].format(currency=currency, total_amount=total_amount, current_balance=current_balance)}')
         orders.reset_last_order_info(user_id)
         await query.message.answer(message)
+        await query.message.delete()
 
         if service_msg_ids:
             await bot.delete_messages(user_id, service_msg_ids)
@@ -43,6 +45,7 @@ async def _(query: types.CallbackQuery):
             await bot.delete_messages(key.chat_id, service_msg_ids)
 
     else:
-        await query.message.answer(not_enough_money[lang].format(current_balance=user_balance, currency=currency))
+        await query.message.answer(not_enough_money[lang].format(current_balance=user_balance, currency=currency),
+                                   reply_markup=navigation_kb.balance_recharge_button(lang).as_markup())
 
 

@@ -69,7 +69,7 @@ async def check_payment_status(user_id: int, order_id: str) -> str:
 #             break
 
 
-async def get_payment_url(order_id: int, amount: float, lang: str, currency: str = 'RUB'):
+async def get_payment_url(order_id: str, amount: float, lang: str, currency: str = 'RUB'):
     base_payment_url = 'https://aaio.so/merchant/pay?'
     desc = 'Order Payment'  # Описание заказа
     lang = lang if (lang == 'ru' or lang == 'en') else 'en'  # Язык формы

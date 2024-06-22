@@ -20,3 +20,8 @@ def check_payment():
 
 def cancel_order():
     return f'cancel_order_'
+
+
+def balance_recharge():
+    return f'balance_recharge_'
+

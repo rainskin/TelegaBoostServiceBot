@@ -9,6 +9,9 @@ class NewOrder(StatesGroup):
     check_details = State()
 
 
+class BalanceRecharge(StatesGroup):
+    choosing_amount = State()
+
 class ManageOrder(StatesGroup):
     cancel_order = State()
 

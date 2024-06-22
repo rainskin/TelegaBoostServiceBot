@@ -25,9 +25,11 @@ def internal_balance_btn(lang: str):
     return builder
 
 
-def kb(lang: str, from_balance=False):
+def kb(lang: str, from_balance=False, from_card=False):
     builder = InlineKeyboardBuilder()
-    builder.attach(bank_card_btn(lang))
+
+    if from_card:
+        builder.attach(bank_card_btn(lang))
 
     if from_balance:
         builder.attach(internal_balance_btn(lang))
@@ -35,12 +37,16 @@ def kb(lang: str, from_balance=False):
     return builder
 
 
-def card_payment(lang: str, payment_url: str, internal_order_id: str):
+def card_payment(lang: str, payment_url: str, order_id: str, balance_recharge=False):
     builder = InlineKeyboardBuilder()
-
+    
     builder.button(text=buttons.card_pay[lang], url=payment_url)
-
-    callback_data = f'{callback_templates.check_payment()}{internal_order_id}'
+    if balance_recharge:
+        callback_template = callback_templates.balance_recharge()
+    else:
+        callback_template = callback_templates.check_payment()
+        
+    callback_data = f'{callback_template}{order_id}'
 
     builder.button(text=buttons.check_pay[lang], callback_data=callback_data)
     builder.adjust(1)
