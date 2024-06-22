@@ -18,7 +18,6 @@ async def _(msg: types.Message, state: FSMContext):
     chat_id = msg.chat.id
     key = StorageKey(bot.id, chat_id, user_id)
     text = msg.text
-    print(text)
 
     try:
         value = float(text)
