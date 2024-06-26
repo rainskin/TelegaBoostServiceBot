@@ -21,7 +21,6 @@ async def _(msg: types.Message):
 
     try:
         value = float(text)
-        print(value)
     except ValueError as e:
         await msg.answer(messages.balance_recharge_wrong_amount[lang])
         return
