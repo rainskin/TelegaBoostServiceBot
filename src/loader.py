@@ -1,5 +1,5 @@
-import pymongo
 import motor.motor_asyncio
+import pymongo
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode

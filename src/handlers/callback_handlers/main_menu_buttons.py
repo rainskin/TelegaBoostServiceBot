@@ -1,19 +1,16 @@
-from typing import List
 
-import aiogram
+
 from aiogram import types, F
 from aiogram.fsm.storage.base import StorageKey
 
 from core.storage import storage
-from handlers.callback_handlers.orders_navigation_buttons import get_unshown_orders, get_order_statuses_text
+from handlers.callback_handlers.orders_navigation_buttons import  get_order_statuses_text
 from loader import dp, bot
 from core.db import users, orders
 from utils import navigation
-from utils.keyboards import navigation_kb, categories
+from utils.keyboards import navigation_kb
 from core.localisation.texts import messages
-from utils.api import get_order_statuses
 from utils.keyboards.navigation_kb import cancel_order
-from utils.order_status import get_order_status_text
 
 
 @dp.callback_query(F.data == 'current_orders')

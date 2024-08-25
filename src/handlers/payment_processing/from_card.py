@@ -52,7 +52,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
             await query.answer()
             return
 
-        if status != 'success':
+        if status != 'success' and status != 'hold':
             text = (f'{messages.current_payment_status[lang]}:\n\n'
                     f'{current_payment_status_translated[status][lang]}')
 
@@ -61,16 +61,17 @@ async def _(query: types.CallbackQuery, state: FSMContext):
             await query.answer()
             return
 
-        hot_order = data['hot_order']
-        await place_order(user_id, internal_order_id, hot_order, data, payment_method='card')
-        message = f'{messages.order_is_created[lang].format(order_id=internal_order_id)}'
-        orders.reset_last_order_info(user_id)
+        if status == 'success' or status == 'hold':
+            hot_order = data['hot_order']
+            await place_order(user_id, internal_order_id, hot_order, data, payment_method='card')
+            message = f'{messages.order_is_created[lang].format(order_id=internal_order_id)}'
+            orders.reset_last_order_info(user_id)
 
-        await query.message.answer(message)
-        await query.message.delete()
-        await navigation.return_to_menu(user_id, state)
-        if status_msg_ids:
-            await bot.delete_messages(user_id, status_msg_ids)
+            await query.message.answer(message)
+            await query.message.delete()
+            await navigation.return_to_menu(user_id, state)
+            if status_msg_ids:
+                await bot.delete_messages(user_id, status_msg_ids)
 
     else:
         message = messages.some_error_try_again[lang]

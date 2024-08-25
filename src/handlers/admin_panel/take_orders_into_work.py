@@ -2,7 +2,6 @@ from aiogram import F
 from aiogram.fsm.storage.base import StorageKey
 from aiogram.types import CallbackQuery
 
-import config
 from core.db import users, admin, orders
 from core.localisation.texts import messages
 from core.storage import storage

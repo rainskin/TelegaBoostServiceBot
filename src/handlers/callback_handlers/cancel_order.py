@@ -1,20 +1,15 @@
-from typing import List
 
-import aiogram
+
 from aiogram import types, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.base import StorageKey
 
 from core.storage import storage
-from handlers.callback_handlers.orders_navigation_buttons import get_unshown_orders, get_order_statuses_text
 from loader import dp, bot
 from core.db import users, orders, admin
-from utils import navigation, callback_templates
-from utils.keyboards import navigation_kb, categories
+from utils import  callback_templates
+from utils.keyboards import navigation_kb
 from core.localisation.texts import messages
-from utils.api import get_order_statuses
-from utils.keyboards.navigation_kb import cancel_order
-from utils.order_status import get_order_status_text
 from utils.states import ManageOrder
 
 template = callback_templates.cancel_order()

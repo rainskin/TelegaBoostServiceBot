@@ -336,11 +336,11 @@ class Admin:
             '$set': {f'payments.{payment_id}': payment_info}
         }, upsert=True)
 
-    def confirm_payment(self, payment_id: str, successful_payment_status: str):
+    def confirm_payment(self, payment_id: str, status: str):
         doc = self.collection.find_one_and_update(
             {'payments_queue': True},
             {
-                '$set': {f'payments.{payment_id}.status': successful_payment_status}
+                '$set': {f'payments.{payment_id}.status': status}
             },
             return_document=True
         )
@@ -354,13 +354,12 @@ class Admin:
             }
         )
 
-
-    def is_not_paid(self, payment_id: str, expected_status: str):
+    def is_not_paid(self, payment_id: str):
         doc = self.collection.find_one({'payments_queue': True}, {'payments': 1})
         payments = doc.get('payments')
         payment = payments.get(payment_id)
         payment_status = payment.get('status')
-        return payment_status != expected_status
+        return payment_status != 'success' and payment_status != 'hold'
 
     def get_payment_info(self, payment_id: str):
         doc = self.collection.find_one({'payments_queue': True}, {'payments': 1})

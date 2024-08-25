@@ -1,5 +1,4 @@
 import datetime
-from typing import List
 
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.base import StorageKey

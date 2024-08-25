@@ -1,10 +1,9 @@
-from typing import List
+
 
 from aiogram import F, types
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.base import StorageKey
 
-from config import ADMIN_ID
 from core.db import users, orders
 from core.localisation.texts import messages
 from core.storage import storage

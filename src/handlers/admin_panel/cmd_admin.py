@@ -5,15 +5,12 @@ from aiogram.fsm.storage.base import StorageKey
 from aiogram.types import CallbackQuery
 
 import config
-from core.db import users, promo, admin
-from core.localisation.lang import default_language
-from core.localisation.texts import messages
+from core.db import  admin
 from core.storage import storage
 from loader import dp, bot
-from utils import commands, states
-from utils.keyboards import navigation_kb
+from utils import  states
 from utils.keyboards.admin import orders_manage
-from utils.navigation import return_to_menu, get_admin_menu
+from utils.navigation import  get_admin_menu
 
 
 @dp.message(Command('admin'))

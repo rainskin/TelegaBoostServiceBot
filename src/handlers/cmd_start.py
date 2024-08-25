@@ -1,14 +1,11 @@
-import asyncio
-from asyncio import sleep
+
 
 from aiogram import types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.storage.base import StorageKey
 
 import config
 from core.db import users, promo
-from core.storage import storage
 from loader import dp, bot
 from utils import commands
 from utils.keyboards import navigation_kb

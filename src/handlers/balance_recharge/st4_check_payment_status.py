@@ -1,16 +1,12 @@
 from aiogram import F, types
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.storage.base import StorageKey
 
 from core.db import users, admin
 from core.localisation.texts import messages
-from core.storage import storage
-from handlers.new_order.st4_make_order import get_internal_order_id
 from loader import dp, bot
-from utils import states, navigation, callback_templates
-from utils.Payment_methods.aaio.methods import get_payment_url, check_payment_status
+from utils import  navigation, callback_templates
+from utils.Payment_methods.aaio.methods import  check_payment_status
 from utils.Payment_methods.aaio.payment_statuses import current_payment_status_translated
-from utils.keyboards.payment_methods import card_payment
 
 template = callback_templates.balance_recharge()
 
@@ -24,13 +20,11 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     status = await check_payment_status(user_id, payment_id)
     status_msg_ids = []
 
-    successful_payment_status = 'success'
-
     if not status:
         await query.answer()
         return
 
-    if status != successful_payment_status:
+    if status != 'success' and status != 'hold':
 
         text = (f'{messages.current_payment_status[lang]}:\n\n'
                 f'{current_payment_status_translated[status][lang]}')
@@ -40,7 +34,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
         await query.answer()
         return
 
-    if not admin.is_not_paid(payment_id, successful_payment_status):
+    if not admin.is_not_paid(payment_id):
         text = messages.balance_recharge_already_paid[lang]
         await query.message.answer(text)
         await query.message.delete()
@@ -51,7 +45,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     if payment_info:
         amount = payment_info.get('amount')
         users.add_balance(user_id, amount)
-        admin.confirm_payment(payment_id, successful_payment_status)
+        admin.confirm_payment(payment_id, status)
         currency = 'RUB'
         await query.message.answer(messages.balance_recharge_successfully_paid[lang].format(amount=amount, currency=currency))
         await query.message.delete()

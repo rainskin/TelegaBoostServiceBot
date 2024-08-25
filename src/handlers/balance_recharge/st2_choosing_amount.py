@@ -1,6 +1,5 @@
 from aiogram import types, F
 from aiogram.enums import ContentType
-from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.base import StorageKey
 
 from core.db import users
