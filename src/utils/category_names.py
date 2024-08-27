@@ -10,7 +10,7 @@ def get_category_name(system_name: str):
     elif system_name == 'boosts_18':
         api_name = 'Telegram Boost [Для 18+ каналов]'
     elif system_name == 'reactions':
-        api_name = 'Telegram Reactions 2.0'
+        api_name = 'Telegram Reactions'
     elif system_name == 'bot_launches':
         api_name = 'BOT START'
     elif system_name == 'vk':

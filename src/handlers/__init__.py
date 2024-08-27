@@ -6,4 +6,5 @@ def setup():
     from . import new_order
     from . import payment_processing
     from . import admin_panel
+    from . import newsletter
 

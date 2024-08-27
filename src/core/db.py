@@ -56,6 +56,13 @@ class Users:
     def update_balance(self, user_id: int, amount: float):
         self.collection.update_one({'id': user_id}, {'$set': {'balance': amount}})
 
+    def get_all_users_ids(self):
+        return self.collection.distinct('id')
+
+    def delete_user(self, user_id: int):
+
+        self.collection.delete_one({'id': user_id})
+
 
 users = Users()
 

@@ -211,3 +211,11 @@ def cancel_order(lang, order_id: str):
 
     builder.button(text=text, callback_data=callback)
     return builder
+
+
+async def accept_button():
+    builder = InlineKeyboardBuilder()
+
+    builder.button(text='Подтвердить', callback_data=callback_templates.accept_button_template())
+
+    return builder.as_markup()

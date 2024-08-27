@@ -12,6 +12,7 @@ class NewOrder(StatesGroup):
 class BalanceRecharge(StatesGroup):
     choosing_amount = State()
 
+
 class ManageOrder(StatesGroup):
     cancel_order = State()
 
@@ -22,3 +23,8 @@ class Payment(StatesGroup):
 
 class AdminStates(StatesGroup):
     to_take_orders_into_work = State()
+
+
+class Newsletter(StatesGroup):
+    wait_for_message = State()
+    confirm_message = State()

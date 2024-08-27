@@ -13,18 +13,6 @@ from busines_logic.special_offers import get_offer_by_tag
 
 callback_template = callback_templates.services()
 
-
-def is_correct_info(plan_info):
-    return plan_info and ('\n' in plan_info)
-
-
-def get_rate_with_commission(rate: int, service_id: str):
-
-    commission = db.admin.get_commission_percentage(service_id)
-    rate = rate * (1 + (commission / 100))
-    return round(rate)
-
-
 @dp.callback_query(F.data.startswith(callback_template))
 async def _(query: types.CallbackQuery, state: FSMContext):
     user_id = query.from_user.id
@@ -95,3 +83,14 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 
     await query.answer()
     await query.message.delete()
+
+
+def is_correct_info(plan_info):
+    return plan_info and ('\n' in plan_info)
+
+
+def get_rate_with_commission(rate: int, service_id: str):
+
+    commission = db.admin.get_commission_percentage(service_id)
+    rate = rate * (1 + (commission / 100))
+    return round(rate)

@@ -25,3 +25,6 @@ def cancel_order():
 def balance_recharge():
     return f'balance_recharge_'
 
+
+def accept_button_template():
+    return 'accept_button'
