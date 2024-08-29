@@ -5,7 +5,7 @@ from aiogram.fsm.storage.base import StorageKey
 from aiogram.types import CallbackQuery
 
 import config
-from core.db import  admin
+from core.db import admin
 from core.storage import storage
 from loader import dp, bot
 from utils import  states

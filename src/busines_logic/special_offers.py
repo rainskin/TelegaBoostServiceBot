@@ -32,18 +32,6 @@ class SpecialOffer:
         self.info = self.name_and_info['info'][lang]
 
 
-offer_viewers_and_subscribers = SpecialOffer(buttons.views_and_subscribers_special_offer, 'views_and_subscribers')
-offer_viewers_and_subscribers.services_and_amount = [()]
-offer_viewers_and_subscribers.price = 450.00
-a = offer_viewers_and_subscribers.price
-
-twenty_boosts_30_days = SpecialOffer(buttons.twenty_boosts_30_days, 'fifteen_boosts')
-twenty_boosts_30_days.price = 450
-# twenty_boosts_30_days.services_and_amount = {'66': 20, }
-twenty_boosts_30_days.services_and_amount = {'67': 1, }
-twenty_boosts_30_days.amount_without_commission = 10
-twenty_boosts_30_days.profit = twenty_boosts_30_days.price - twenty_boosts_30_days.amount_without_commission
-
 special_offers_list = []
 
 

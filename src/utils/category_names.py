@@ -5,6 +5,8 @@ def get_category_name(system_name: str):
         api_name = 'Views Telegram'
     elif system_name == 'subscribers':
         api_name = 'Telegram Subscribers'
+    elif system_name == 'premium_subscribers':
+        api_name = 'Telegram Premium подписчики'
     elif system_name == 'boosts':
         api_name = 'Telegram Boost [БАЗА #1]'
     elif system_name == 'boosts_18':

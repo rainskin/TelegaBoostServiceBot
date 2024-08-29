@@ -27,7 +27,7 @@ async def _(query: CallbackQuery, state: FSMContext):
     await state.set_state()
     await query.message.delete()
 
-    user_ids = users.get_all_users_ids()
+    user_ids = users.get_all_active_users_ids()
     total_messages_processed = 0
     successfully_sent_messages = 0
     error_count = 0
@@ -45,13 +45,12 @@ async def _(query: CallbackQuery, state: FSMContext):
 
         except TelegramForbiddenError as e:
             error_count += 1
-            # await users.delete_user(user_id)
+            users.set_active_status(user_id, False)
         except TelegramBadRequest as e:
             print(e.message)
             error_count += 1
             # if 'chat not found' in e.message:
             #     print('чата нет')
-            #     await users.delete_user(user_id)
 
         messages_processed += 1
         total_messages_processed += 1

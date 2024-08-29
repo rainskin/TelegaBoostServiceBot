@@ -36,6 +36,17 @@ balance_recharge_wrong_amount = {'ru': "Введите число в форма�
 balance_recharge_accept_amount = {'ru': "Пополнить баланс на <b>{amount} {currency}?</b>",
                                   'en': "Top up your balance with <b>{amount} {currency}?</b>"}
 
+balance_recharge_accept_amount_with_commission = {'ru': "Комиссия {commission_amount}%\n"
+                                                        "Будет зачислено <b>{amount} {currency}?</b>\n\n"
+                                                        "Пополнить баланс?\n\n"
+                                                        "<i>Если хотите изменить сумму пополнения,"
+                                                        "отправьте ее следующим сообщением</i>",
+                                                  'en': "Commission {commission_amount}%\n"
+                                                        "Will <b>{amount} {currency} be credited?</b>\n\n"
+                                                        "Top up balance?\n\n"
+                                                        "<i>If you want to change the top-up amount,"
+                                                        "send it with the following message</i>"}
+
 balance_recharge_already_paid = {'ru': "<b>Ошибка.</b>\n\n"
                                        "Этот счет уже был оплачен. Проверьте баланс",
                                  'en': "<b>Error.<b>\n\n"
@@ -364,6 +375,19 @@ current_order_status = {
     },
 }
 
+about_referral_system = {
+    'ru': 'Приглашай пользователей по своей ссылке и<b> зарабатывай 10%</b> от каждого пополнения баланса.\n\n'
+          '<b>Твоя реф. ссылка:</b> {link}',
+    'en': 'Invite users using your link<b> and earn 10%</b> from each balance replenishment.\n\n'
+          '<b>Your ref. link:</b> {link}'}
+
+referral_statistics = {
+    'ru': '📊 [ТВОЯ СТАТИСТИКА]\n\n'
+          '<b>Приглашено пользователей:</b> {referral_amount} \n'
+          '<b>Заработано</b> {total_earned} {currency}',
+    'en': '📊 [YOUR STATS]\n\n'
+          '<b>Invited users </b> {referral_amount} \n'
+          '<b>Earned:</b> {total_earned} {currency}'}
 
 def translate_order_status_key(key: str, lang: str) -> str:
     return translate_status_key[key][lang]

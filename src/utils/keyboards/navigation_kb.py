@@ -99,6 +99,16 @@ def support(lang: str):
     return builder
 
 
+def referrals(lang: str):
+    builder = InlineKeyboardBuilder()
+    text = buttons.referrals[lang]
+    callback_data = buttons.referrals['callback']
+
+    builder.button(text=text, callback_data=callback_data)
+
+    return builder
+
+
 def main_menu(lang: str):
     builder = InlineKeyboardBuilder()
     current_orders_btn = current_orders_button(lang)
@@ -106,13 +116,14 @@ def main_menu(lang: str):
     balance_recharge_btn = balance_recharge_button(lang)
     change_language_btn = change_language(lang)
     support_btn = support(lang)
+    referrals_btn = referrals(lang)
 
-    builder_buttons = [current_orders_btn, new_order_btn, balance_recharge_btn,
-                       support_btn, change_language_btn]
+    builder_buttons = [current_orders_btn, new_order_btn, balance_recharge_btn, referrals_btn,
+                       support_btn,  change_language_btn]
 
     for button in builder_buttons:
         builder.attach(button)
-    return builder.adjust(2, 1, 2)
+    return builder.adjust(2, 1, 1, 2)
 
 
 def orders_navigation(current_page: int, amount_pages: int):

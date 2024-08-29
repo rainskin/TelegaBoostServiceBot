@@ -7,4 +7,5 @@ def setup():
     from . import payment_processing
     from . import admin_panel
     from . import newsletter
+    from . import referral_manage
 

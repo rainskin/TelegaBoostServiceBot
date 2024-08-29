@@ -1,11 +1,14 @@
 import config
 
 categories = {
-    'callbacks': ['views', 'subscribers', 'boosts', 'boosts_18', 'reactions', 'bot_launches', 'vk', 'twitch',
+    'callbacks': ['views', 'subscribers', 'premium_subscribers', 'boosts', 'boosts_18', 'reactions', 'bot_launches',
+                  'vk', 'twitch',
                   'referrals'],
-    'ru': ['👁 Просмотры', '👥 Подписчики', '⚡️ Бусты', '⚡️ Бусты для 18+ каналов', '👍🏻❤️‍🔥 Реакции', '🤖 Запуски бота',
+    'ru': ['👁 Просмотры', '👥 Подписчики', '⭐️ Премиум подписчики', '⚡️ Бусты', '⚡️ Бусты для 18+ каналов',
+           '👍🏻❤️‍🔥 Реакции', '🤖 Запуски бота',
            'Вконтакте', 'Твич', '🎮 Рефералы в бота'],
-    'en': ['👁 Views', '👥 Subscribers', '⚡️ Boosts', '⚡️ Boosts for 18+ channels', '👍🏻❤️‍🔥 Reactions',
+    'en': ['👁 Views', '👥 Subscribers', '⭐️ Premium Subscribers', '⚡️ Boosts', '⚡️ Boosts for 18+ channels',
+           '👍🏻❤️‍🔥 Reactions',
            '🤖 Bot launches "/start"', 'Vk', 'Twitch', '🎮 Bot referrals'],
 }
 
@@ -28,6 +31,10 @@ orders_history = {'callback': 'archive_orders',
 support = {'url': config.SUPPORT_BOT_URL,
            'ru': '💬 Поддержка',
            'en': '💬 Support'}
+
+referrals = {'callback': 'referrals',
+             'ru': '👥 Рефералы',
+             'en': '👥 Referrals'}
 
 new_order = {'callback': 'new_order',
              'ru': '➕ Новый заказ',

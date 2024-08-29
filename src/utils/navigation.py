@@ -2,7 +2,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.base import StorageKey
 
 import config
-from core.db import users
+from core.db.users import users
 from core.storage import storage
 from loader import bot
 from utils.keyboards import navigation_kb, categories, admin
