@@ -5,10 +5,15 @@ from core.db import orders
 
 
 class Admin:
-
     def __init__(self):
         self.collection = loader.db['admin']
         self.default_datetime_format = '%d-%m-%Y %H:%M'
+        self.init()
+
+    def init(self):
+        if not self.collection.find_one({'orders_for_execution': True}):
+            self.collection.insert_one({'orders_for_execution': True, 'orders': {}})
+
 
     def get_commission_percentage(self, service_id: str):
         doc: dict = self.collection.find_one({'shop_settings': True})
@@ -125,9 +130,25 @@ class Admin:
 
         return payment_info
 
+
+
     def get_referral_deposit_reward(self):
         doc = self.collection.find_one({'shop_settings': True})
         r = doc.get('referral_deposit_reward_percent')
         return r
 
-admin = Admin()
+
+admin: Admin = Admin()
+
+
+def build_payment_info(user_id: int, amount: float, currency: str, payment_url: str, balance_recharge=False,
+                       payment_status=None):
+    payment_purpose = 'balance_recharge' if balance_recharge else None
+    return {
+        'user_id': user_id,
+        'amount': amount,
+        'currency': currency,
+        'payment_url': payment_url,
+        'payment_purpose': payment_purpose,
+        'status': payment_status,
+    }

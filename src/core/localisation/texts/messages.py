@@ -282,11 +282,17 @@ correct_url_hot_order = {
           '➕ To <b>place the order</b>, click the corresponding button below',
 }
 
-select_payment_method = {
+confirm_order_payment = {
     'ru': '<b>Сумма заказа:</b> {total_amount} {currency}\n\n'
           '<b>💵 Ваш текущий баланс {current_balance} {currency}</b>',
     'en': '<b>Order price:</b> {total_amount} {currency}\n\n'
           '<b>💵 Your current balance {current_balance} {currency}</b>'}
+
+available_payment_methods = {
+    'ru': 'Выберите способ оплаты',
+    'en': 'Select a payment method'
+}
+
 
 payment_by_card = {
     'ru': 'Для оплаты заказа <b>{order_id}</b> нажмите на кнопку <b>💳ОПЛАТИТЬ</b>\n\n'

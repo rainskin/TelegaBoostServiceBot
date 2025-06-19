@@ -10,7 +10,7 @@ class Users:
         self.collection = loader.users
         self.default_datetime_format = '%d-%m-%Y %H:%M'
 
-    def register(self, _id: int, name: str, lang: str):
+    def register(self, _id: int, username: str | None, name: str, lang: str):
         if not self.is_new(_id):
             return
 
@@ -19,6 +19,7 @@ class Users:
         doc = {
             'id': _id,
             'balance': 0,
+            'username': username,
             'name': name,
             'lang': lang,
             'registration_date': date,
@@ -76,7 +77,6 @@ class Users:
     def get_inviter_id(self, user_id):
         doc = self.collection.find_one({'id': user_id})
         r = doc.get('invited_by')
-        print(f'твой инвайтер {r}')
         return r
 
     def get_all_referrals(self, user_id: int) -> List[int]:

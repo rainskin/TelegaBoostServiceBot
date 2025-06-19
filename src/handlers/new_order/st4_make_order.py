@@ -32,7 +32,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 
     kb = payment_methods.kb(lang, from_balance=True)
 
-    text = messages.select_payment_method[lang].format(total_amount=total_amount,
+    text = messages.confirm_order_payment[lang].format(total_amount=total_amount,
                                                        currency=currency, current_balance=user_balance)
     msg = await query.message.answer(text, reply_markup=kb.as_markup())
     await state.set_state(Payment.choosing_method)
@@ -49,16 +49,8 @@ async def get_internal_order_id(user_id: int):
     if internal_order:
         order_number = int(internal_order.replace(template, ''))
         new_internal_order = order_number + 1
-
     else:
-        active_orders = orders.get_current_orders(user_id)
-        orders_in_archive = orders.get_orders_from_archive(user_id)
-
-        amount_active_orders = len(active_orders) if active_orders else 0
-        amount_archive_orders = len(orders_in_archive) if orders_in_archive else 0
-
-        total_orders = amount_active_orders + amount_archive_orders
-        new_internal_order = total_orders + 1
+        new_internal_order = 1
 
     result = f'{template}{new_internal_order}'
     orders.update_last_internal_order(user_id, result)

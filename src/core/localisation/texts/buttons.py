@@ -77,6 +77,10 @@ payment_method_internal_balance = {'callback': 'payment_method_internal_balance'
                                    'ru': '💲 Оплатить с баланса',
                                    'en': '💲 Pay from balance'}
 
+payment_method_telegram_stars = {'callback': 'payment_method_telegram_stars',
+                                 'ru': '⭐️ Telegram Stars',
+                                 'en': '⭐️ Telegram Stars'}
+
 card_pay = {'ru': '💳ОПЛАТИТЬ',
             'en': '💳PAY'}
 

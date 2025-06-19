@@ -25,7 +25,16 @@ def internal_balance_btn(lang: str):
     return builder
 
 
-def kb(lang: str, from_balance=False, from_card=False):
+def telegram_stars_btn(lang: str):
+    builder = InlineKeyboardBuilder()
+    text = buttons.payment_method_telegram_stars[lang]
+    callback = buttons.payment_method_telegram_stars['callback']
+
+    builder.button(text=text, callback_data=callback)
+    return builder
+
+
+def kb(lang: str, from_balance=False, from_card=False, from_telegram_stars=False) -> InlineKeyboardBuilder:
     builder = InlineKeyboardBuilder()
 
     if from_card:
@@ -34,18 +43,21 @@ def kb(lang: str, from_balance=False, from_card=False):
     if from_balance:
         builder.attach(internal_balance_btn(lang))
 
+    if from_telegram_stars:
+        builder.attach(telegram_stars_btn(lang))
+
     return builder
 
 
 def card_payment(lang: str, payment_url: str, order_id: str, balance_recharge=False):
     builder = InlineKeyboardBuilder()
-    
+
     builder.button(text=buttons.card_pay[lang], url=payment_url)
     if balance_recharge:
         callback_template = callback_templates.balance_recharge()
     else:
         callback_template = callback_templates.check_payment()
-        
+
     callback_data = f'{callback_template}{order_id}'
 
     builder.button(text=buttons.check_pay[lang], callback_data=callback_data)

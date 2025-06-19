@@ -46,7 +46,6 @@ async def send_notification_to_user(user_id, order_id):
 async def _(query: CallbackQuery):
     _orders = admin.get_orders_for_execution()
 
-
     msg = await query.message.answer('Начинаю оформление заказов')
     await query.answer()
     await query.message.delete()
@@ -60,7 +59,7 @@ async def _(query: CallbackQuery):
         admin.remove_order_from_execution_queue(internal_order_id)
         orders.remove_not_accepted_order(user_id, internal_order_id)
 
-        await send_notification_to_user(user_id, order_id)
+        await send_notification_to_user(user_id, order_id)  # TODO: handle error if user block bot 
         count += 1
         await bot.edit_message_text(f'Оформил {count} заказ(ов)', query.from_user.id, msg.message_id)
 

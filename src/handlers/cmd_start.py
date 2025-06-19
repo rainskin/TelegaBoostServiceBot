@@ -24,10 +24,9 @@ async def _(msg: types.Message, command: CommandObject, state: FSMContext):
         user_lang_code = msg.from_user.language_code
         lang = default_language(user_lang_code)
         name = msg.from_user.full_name
-        users.register(user_id, name, lang)
-
+        username = msg.from_user.username
+        users.register(user_id, username, name, lang)
         promo_name = 'balance_for_new_users'
-
         await msg.answer(messages.welcome[lang].format(support_contact=config.SUPPORT_BOT_URL))
         await msg.answer(messages.change_lang[lang], reply_markup=navigation_kb.select_lang().as_markup())
         await commands.set_commands(lang, bot)

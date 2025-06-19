@@ -9,8 +9,13 @@ class Promo:
     def __init__(self):
         self.collection = loader.db['promo']
         self.default_datetime_format = '%d-%m-%Y %H:%M:%S'
+        self.create_promo_if_not_exists()
 
-    def add_balance_for_new_users(self, amount_rub: float, total_users: int):
+    def create_promo_if_not_exists(self):
+        if not self.collection.find_one({'promo_name': 'balance_for_new_users'}):
+            self.add_balance_for_new_users(0, 0, True)
+
+    def add_balance_for_new_users(self, amount_rub: float, total_users: int, completed: bool):
         current_date = datetime.now().strftime(self.default_datetime_format)
         doc = {
             'promo_name': 'balance_for_new_users',
@@ -19,7 +24,7 @@ class Promo:
             'total_users': total_users,
             'remains': total_users,
             'participants': [],
-            'completed': False
+            'completed': completed
         }
 
         self.collection.insert_one(doc)
@@ -35,7 +40,6 @@ class Promo:
         if 0 < remains <= total_users:
             remains -= 1
             amount = doc['amount']
-            print(f'{amount}, {type(amount)}')
 
             self.collection.update_one({'promo_name': promo_name}, {'$push': {'participants': user_id},
                                                                     '$set': {'remains': remains}})
@@ -45,4 +49,4 @@ class Promo:
             self.collection.update_one({'promo_name': promo_name}, {'$set': {'completed': True}})
 
 
-promo = Promo()
+promo: Promo = Promo()
