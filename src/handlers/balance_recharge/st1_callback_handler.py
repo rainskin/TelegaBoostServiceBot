@@ -14,9 +14,16 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     user_id = query.from_user.id
     lang = users.get_user_lang(user_id)
     key = StorageKey(bot.id, user_id, user_id)
+    data = await storage.get_data(key)
 
     await storage.delete_data(key)
-    await query.message.answer(messages.balance_recharge_limits[lang])
-    await query.message.answer(messages.balance_recharge_input_amount[lang])
+    limits_msg = await query.message.answer(messages.balance_recharge_limits[lang])
+    service_msg = await query.message.answer(messages.balance_recharge_input_amount[lang])
+
     await query.answer()
     await state.set_state(states.BalanceRecharge.choosing_amount)
+
+    msgs_to_delete = data.get('msgs_to_delete', [])
+    msgs_to_delete += [limits_msg.message_id, service_msg.message_id]
+
+    await storage.set_data(key,msgs_to_delete=msgs_to_delete)

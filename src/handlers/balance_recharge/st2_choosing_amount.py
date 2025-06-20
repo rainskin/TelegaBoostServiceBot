@@ -18,6 +18,7 @@ async def _(msg: types.Message):
     chat_id = msg.chat.id
     key = StorageKey(bot.id, chat_id, user_id)
     text = msg.text
+    data = await storage.get_data(key)
 
     try:
         value = float(text)
@@ -37,9 +38,13 @@ async def _(msg: types.Message):
     else:
         formatted_value = f"{value:.2f}"
         text = messages.balance_recharge_accept_amount[lang].format(amount=formatted_value, currency=currency)
-    await msg.answer(text,
-                     reply_markup=yes_or_no_kb(lang).as_markup())
-    await storage.set_data(key, amount=value)
+        amount_with_commission = value
+
+    service_msg = await msg.answer(text, reply_markup=yes_or_no_kb(lang).as_markup())
+
+    msgs_to_delete = data.get('msgs_to_delete', [])
+    msgs_to_delete += [msg.message_id, service_msg.message_id]
+    await storage.update_data(key, amount=value, amount_with_commission=amount_with_commission, msgs_to_delete=msgs_to_delete)
 
 
 

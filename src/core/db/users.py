@@ -7,7 +7,7 @@ import loader
 class Users:
 
     def __init__(self):
-        self.collection = loader.users
+        self.collection = loader.db_users
         self.default_datetime_format = '%d-%m-%Y %H:%M'
 
     def register(self, _id: int, username: str | None, name: str, lang: str):

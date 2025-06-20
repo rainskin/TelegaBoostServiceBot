@@ -87,6 +87,8 @@ card_pay = {'ru': '💳ОПЛАТИТЬ',
 check_pay = {'ru': '⏳ ПРОВЕРИТЬ ОПЛАТУ',
              'en': '⏳ CHECK PAYMENT'}
 
+telegram_star_pay = {'ru': ' Оплатить {amount} ⭐️',
+                     'en': ' Pay {amount} ⭐️'}
 views_and_subscribers_special_offer = {'name': {
     'ru': '👤Подписчики + 👁 просмотры',
     'en': '👤Subscribers + 👁 views', },

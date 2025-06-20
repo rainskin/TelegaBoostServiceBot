@@ -15,15 +15,19 @@ welcome = {'ru': "<b>Добро пожаловать!</b>\n\n"
 
 balance_recharge_limits = {
     'ru': "<b>💵 ДОСТУПНЫЕ СПОСОБЫ ОПЛАТЫ</b>\n\n"
-          "🔼 <b>СБП</b> - от 200 руб\n"
-          "💳 <b>Банковские карты</b> - от 300 руб\n\n"
-          "❗️<i>Суммы до <b>200 руб.</b> можно оплатить только криптовалютой.</i>\n\n"
-          "Подробнее на сайте платёжной системы",
+          "⭐ <b>Телеграм звёзды</b>\n"
+          "💸 <b>Платёжная система AAIO</b>\n\n"
+          "<i>ЛИМИТЫ И СПОСОБЫ ОПЛАТЫ AAIO</i>\n\n"
+          "🔼 <b>СБП</b> - от 500 руб\n"
+          "💳 <b>Банковские карты</b> - от 1000 руб\n\n"
+          "❗ Суммы до 500 руб. можно оплатить только <b>телеграм звёздами</b> либо <b>криптовалютой</b>",
     'en': "<b>💵 AVAILABLE PAYMENT METHODS</b>\n\n"
-          "🔼 <b>SBP</b> - from 200 rubles\n"
-          "💳 <b>Bank cards</b> - from 300 rubles\n\n"
-          "❗️<i>Amounts up to <b>200 rubles</b> can only be paid with cryptocurrency.</i>\n\n"
-          "More details on the payment system website"}
+          "⭐ <b>Telegram stars</b>\n"
+          "💸 <b>AAIO payment system</b>\n\n"
+          "<i>AAIO PAYMENT LIMITS AND METHODS</i>\n\n"
+          "🔼 <b>SBP</b> - from 500 rub\n"
+          "💳 <b>Bank cards</b> - from 1000 rub\n\n"
+          "❗ Amounts up to 500 rub can only be paid with <b>telegram stars</b> or <b>cryptocurrency</b>"}
 
 balance_recharge_input_amount = {'ru': "<b>Введите сумму пополнения</b>\n",
                                  'en': "<b>Enter the amount you want to top up your balance with</b>\n"}
@@ -55,6 +59,14 @@ balance_recharge_already_paid = {'ru': "<b>Ошибка.</b>\n\n"
 balance_recharge_successfully_paid = {
     'ru': "Баланс успешно пополнен на <b>{amount} {currency}</b>",
     'en': "The balance has been successfully replenished with <b>{amount} {currency}</b>"}
+
+balance_recharge_invoice_title = {
+    'ru': "Пополнение баланса",
+    'en': "Top up balance"}
+
+balance_recharge_invoice_description = {
+    'ru': "Для пополнения баланса на {amount} {currency} нажмите на кнопку ниже",
+    'en': "To top up your balance with {amount} {currency}, click the button below"}
 
 promo_activated = {'ru': "<b>Бонус активирован.</b>\n"
                          "Средства успешно начислены на ваш баланс",
@@ -293,7 +305,6 @@ available_payment_methods = {
     'en': 'Select a payment method'
 }
 
-
 payment_by_card = {
     'ru': 'Для оплаты заказа <b>{order_id}</b> нажмите на кнопку <b>💳ОПЛАТИТЬ</b>\n\n'
           'После оплаты нажмите кнопку <b>⏳ ПРОВЕРИТЬ ОПЛАТУ</b>',
@@ -394,6 +405,7 @@ referral_statistics = {
     'en': '📊 [YOUR STATS]\n\n'
           '<b>Invited users </b> {referral_amount} \n'
           '<b>Earned:</b> {total_earned} {currency}'}
+
 
 def translate_order_status_key(key: str, lang: str) -> str:
     return translate_status_key[key][lang]

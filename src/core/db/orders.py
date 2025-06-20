@@ -5,7 +5,7 @@ import loader
 class Orders:
 
     def __init__(self):
-        self.collection = loader.orders
+        self.collection = loader.db_orders
         self.default_datetime_format = '%d-%m-%Y %H:%M:%S'
 
     def get_current_orders(self, user_id) -> dict | None:

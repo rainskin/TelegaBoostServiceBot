@@ -1,42 +1,39 @@
 from aiogram.types import LabeledPrice
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
+from core.db import users
+from core.localisation.texts import buttons
 from loader import bot
 
 CURRENCY = 'XTR'
 
 
-def telegram_stars_btn():
+def telegram_stars_btn(lang: str, amount: int):
     builder = InlineKeyboardBuilder()
-    text = "Тест 111 ⭐"
+    text = buttons.telegram_star_pay[lang].format(amount=amount)
 
     builder.button(text=text, pay=True)
     return builder.as_markup()
 
 
-async def send_invoice(chat_id: int, amount: int):
-    # prices = [LabeledPrice(label='Balance recharge', amount=2),LabeledPrice(label="smth else", amount=1)]
-    prices = [LabeledPrice(label='Balance recharge', amount=1)]
+async def send_invoice(chat_id: int, title: str, description: str, payload: str, amount: int):
+    """
+    args:
+        chat_id: ID of the chat where the invoice will be sent
+        payload: unique string identifier for the invoice
+        amount: amount in XTR to be charged
+    """
+    lang = users.get_user_lang(chat_id)
+    prices = [LabeledPrice(label=title, amount=amount)]
 
-    await bot.send_invoice(
+    return await bot.send_invoice(
         chat_id=chat_id,
-        title=f"Пополнение баланса",
-        description="описание",
-        payload='recharge_balance111',
+        title=title,
+        description=description,
+        payload=payload,
         provider_token='',
         currency=CURRENCY,
         prices=prices,
-        reply_markup=telegram_stars_btn()
+        reply_markup=telegram_stars_btn(lang, amount)
     )
 
-    # invoice = await bot.create_invoice_link(
-    #     title="test",
-    #     description="test test",
-    #     payload='recharge_balance',
-    #     provider_token='',
-    #     currency=CURRENCY,
-    #     prices=prices,
-    #
-    # )
-    # print(invoice)
-    # эффект огня "5104841245755180586"

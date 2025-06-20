@@ -18,16 +18,16 @@ async def _(query: CallbackQuery):
     data = await storage.get_data(key)
     lang = users.get_user_lang(user_id)
     total_orders = data.get('total_orders')
-    total_amount = data.get('total_amount')
+    total_amount: float = data.get('total_amount')
 
     current_balance = await api.get_account_balance()
     if current_balance > total_amount:
         text = (f'<b>Текущий баланс:</b> {current_balance} руб.\n'
-                f'Оформить <b>{total_orders}</b> заказ(ов)? Будет списано: <b>{total_amount} руб.</b>')
+                f'Оформить <b>{total_orders}</b> заказ(ов)? Будет списано: <b>{total_amount:.2f} руб.</b>')
         kb = navigation_kb.yes_or_no_kb(lang).as_markup()
     else:
         text = (f'<b>Недостаточно средств.</b>\n'
-                f'Текущий баланс: <b>{current_balance} руб.</b>\n'
+                f'Текущий баланс: <b>{current_balance:.2f} руб.</b>\n'
                 f'Необходимо пополнить счет еще минимум на <b>{round((total_amount - current_balance), 2)} руб.</b>')
         kb = None
 

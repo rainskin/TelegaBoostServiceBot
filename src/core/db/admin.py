@@ -14,6 +14,17 @@ class Admin:
         if not self.collection.find_one({'orders_for_execution': True}):
             self.collection.insert_one({'orders_for_execution': True, 'orders': {}})
 
+        if not self.collection.find_one({'recharge_xtr_commissions': True}):
+            doc = {
+                'recharge_xtr_commissions': True,
+                'telegram_star_to_usd_equivalent': 0.0,
+                'ton_to_usdt_spot_fee_percent': 0.0,
+                'ton_network_fee_percent': 0.0,
+                'p2p_premium_percent_from_db': 0.0,
+                'info': 'This document contains settings for recharge XTR commissions.'
+            }
+
+            self.collection.insert_one(doc)
 
     def get_commission_percentage(self, service_id: str):
         doc: dict = self.collection.find_one({'shop_settings': True})
@@ -28,6 +39,10 @@ class Admin:
         doc: dict = self.collection.find_one({'shop_settings': True})
         r = doc.get('balance_recharge_commission')
         return r
+
+    def get_recharge_xtr_commissions(self):
+        return self.collection.find_one({'recharge_xtr_commissions': True})
+
 
     def get_orders_queue(self) -> dict | None:
         doc = self.collection.find_one({'order_queue': True})
@@ -99,16 +114,39 @@ class Admin:
             '$set': {f'payments.{payment_id}': payment_info}
         }, upsert=True)
 
-    def confirm_payment(self, payment_id: str, status: str):
-        doc = self.collection.find_one_and_update(
+    # def update_payment_status(self, payment_id: str, status: str, telegram_payment_charge_id: str = None):
+    #     doc = self.collection.update_one(
+    #         {'payments_queue': True},
+    #         {
+    #             '$set': {f'payments.{payment_id}.status': status,
+    #                      f'payments.{payment_id}.telegram_payment_charge_id': telegram_payment_charge_id},
+    #         }
+    #     )
+
+    def update_payment_status(self, payment_id: str, status: str, telegram_payment_charge_id: str = None):
+        update_fields = {f'payments.{payment_id}.status': status}
+        if telegram_payment_charge_id is not None:
+            update_fields[f'payments.{payment_id}.telegram_payment_charge_id'] = telegram_payment_charge_id
+
+        self.collection.update_one(
             {'payments_queue': True},
-            {
-                '$set': {f'payments.{payment_id}.status': status}
-            },
-            return_document=True
+            {'$set': update_fields}
         )
+
+        # payment_info = doc['payments'][payment_id]
+        # payment_info['execution_date'] = datetime.now().strftime(self.default_datetime_format)
+        # self.collection.update_one(
+        #     {'payments_queue': True},
+        #     {
+        #         '$set': {f'successful_payments.{payment_id}': payment_info},
+        #         '$unset': {f'payments.{payment_id}': payment_id}
+        #     }
+        # )
+
+    def move_to_successful_payments(self, payment_id: str):
+        doc = self.collection.find_one({'payments_queue': True}, {'payments': 1})
         payment_info = doc['payments'][payment_id]
-        payment_info['execution_date'] = datetime.now().strftime(self.default_datetime_format)
+        payment_info['status_update_date'] = datetime.now().strftime(self.default_datetime_format)
         self.collection.update_one(
             {'payments_queue': True},
             {
@@ -116,6 +154,20 @@ class Admin:
                 '$unset': {f'payments.{payment_id}': payment_id}
             }
         )
+        print(f"Payment {payment_id} moved to successful payments.")
+
+    def move_to_failed_payments(self, payment_id: str):
+        doc = self.collection.find_one({'payments_queue': True}, {'payments': 1})
+        payment_info = doc['payments'][payment_id]
+        payment_info['status_update_date'] = datetime.now().strftime(self.default_datetime_format)
+        self.collection.update_one(
+            {'payments_queue': True},
+            {
+                '$set': {f'failed_payments.{payment_id}': payment_info},
+                '$unset': {f'payments.{payment_id}': payment_id}
+            }
+        )
+        print(f"Payment {payment_id} moved to failed payments.")
 
     def is_not_paid(self, payment_id: str):
         doc = self.collection.find_one({'payments_queue': True}, {'payments': 1})
@@ -130,8 +182,6 @@ class Admin:
 
         return payment_info
 
-
-
     def get_referral_deposit_reward(self):
         doc = self.collection.find_one({'shop_settings': True})
         r = doc.get('referral_deposit_reward_percent')
@@ -141,12 +191,32 @@ class Admin:
 admin: Admin = Admin()
 
 
-def build_payment_info(user_id: int, amount: float, currency: str, payment_url: str, balance_recharge=False,
-                       payment_status=None):
+# def build_payment_info(user_id: int, amount: float, currency: str, payment_url: str, balance_recharge=False,
+#                        payment_status=None):
+#     payment_purpose = 'balance_recharge' if balance_recharge else None
+#     return {
+#         'user_id': user_id,
+#         'amount': amount,
+#         'currency': currency,
+#         'payment_url': payment_url,
+#         'payment_purpose': payment_purpose,
+#         'status': payment_status,
+#     }
+
+def build_payment_info(
+    user_id: int,
+    amount_rub: float,
+    currency: str,
+    amount_original: float = None,
+    payment_url: str = None,
+    balance_recharge: bool = False,
+    payment_status: str = None,
+):
     payment_purpose = 'balance_recharge' if balance_recharge else None
     return {
         'user_id': user_id,
-        'amount': amount,
+        'amount_rub': amount_rub,
+        'amount_original': amount_original,
         'currency': currency,
         'payment_url': payment_url,
         'payment_purpose': payment_purpose,

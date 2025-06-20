@@ -28,3 +28,7 @@ def balance_recharge():
 
 def accept_button_template():
     return 'accept_button'
+
+
+def balance_recharge_template():
+    return 'balance_recharge_'

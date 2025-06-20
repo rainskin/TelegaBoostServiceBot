@@ -29,12 +29,14 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 
     data = await storage.get_data(key)
     amount = data.get('amount')
+    amount_with_commission = data.get('amount_with_commission')
 
     internal_order_id = await get_internal_order_id(user_id)
     payment_id = f'P{internal_order_id}'
     text = messages.payment_by_card[lang].format(order_id=payment_id)
     payment_url = await get_payment_url(payment_id, amount, lang)
-    payment_info = await build_payment_info(user_id, amount, payment_url, balance_recharge=True)
+    payment_info = build_payment_info(user_id, amount_rub=amount_with_commission, currency='RUB', amount_original=amount,
+                                      payment_url=payment_url, balance_recharge=True)
 
     admin.save_payment(payment_id, payment_info)
 
@@ -199,7 +201,8 @@ async def _(query: types.CallbackQuery, state: FSMContext):
         else:
             amount = amount
         await add_balance(user_id, amount)
-        admin.confirm_payment(payment_id, status)
+        admin.update_payment_status(payment_id, status)
+        admin.move_to_successful_payments(payment_id)
         currency = 'RUB'
 
         formatted_amount = f'{amount:.2f}'

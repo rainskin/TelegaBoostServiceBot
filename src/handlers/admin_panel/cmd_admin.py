@@ -37,8 +37,8 @@ async def _ (query: CallbackQuery, state: FSMContext):
         orders = orders_queue
 
     if orders:
-        total_orders = 0
-        total_amount = 0
+        total_orders: int = 0
+        total_amount: float = 0
         previously_paid = 0
         total_spent_by_users = 0
         total_profit = 0
