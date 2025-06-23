@@ -1,6 +1,6 @@
 from core.env import env
 
-DEBUG = True
+DEBUG = False
 
 BOT_TOKEN = env.get('BOT_TOKEN') if not DEBUG else env.get('TEST_BOT_TOKEN')
 

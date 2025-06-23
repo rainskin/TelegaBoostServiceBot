@@ -85,9 +85,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 
     if payment_info:
         amount = payment_info.get('amount_rub')
-        print(amount)
-
-        recharge_commission = admin.get_balance_recharge_commission()
+        # recharge_commission = admin.get_balance_recharge_commission()
         # if recharge_commission:
         #     amount = await get_amount_minus_commission(amount, recharge_commission)
         # else:

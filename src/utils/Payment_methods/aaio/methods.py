@@ -51,7 +51,7 @@ async def check_payment_status(user_id: int, order_id: str) -> str:
             else:
                 text = (f"Ошибка: <b>{error}</b>\n\n"
                         f"Попробуйте повторить действие через некоторое время. Либо обратитесь в поддержку\n\n"
-                        f"Номер вашего заказа: {order_id}")
+                        f"ID транзакции: {order_id}")
             await bot.send_message(user_id, text)
 
     else:
