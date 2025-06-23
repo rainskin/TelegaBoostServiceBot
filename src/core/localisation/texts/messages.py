@@ -13,6 +13,9 @@ welcome = {'ru': "<b>Добро пожаловать!</b>\n\n"
                  "Our support bot (from 10 to 20 Moscow time):\n"
                  "💬 {support_contact}"}
 
+support_contact = {'ru': "💬 <b>Контакт службы поддержки:</b> {support_contact}",
+                   'en': "💬 <b>Support contact bot:</b> {support_contact}"}
+
 balance_recharge_limits = {
     'ru': "<b>💵 ДОСТУПНЫЕ СПОСОБЫ ОПЛАТЫ</b>\n\n"
           "⭐ <b>Телеграм звёзды</b>\n"
