@@ -81,9 +81,3 @@ async def successful_payment_handler(msg: types.Message, state: FSMContext):
     await bot.delete_message(user_id, invoice_message)
 
 
-@dp.message(Command('refund'))
-async def refund(msg: types.Message):
-    await bot.refund_star_payment(msg.from_user.id, refund_id)
-
-
-refund_id = 'stxD7kGPjIuoX7DLpecgKevxUoHoaJXidd0rkCYkLeyw87JATfDfBe6kn93mU3Z28_o57PSlTeh5zrw3LazWi5jNefn7grA7uS6XaPrRMxyN2k'

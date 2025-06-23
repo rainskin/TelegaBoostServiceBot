@@ -61,6 +61,12 @@ class Users:
     def get_all_active_users_ids(self):
         return self.collection.distinct('id', {'is_active': True})
 
+    def update_user(self, user_id: int, data: dict):
+        self.collection.update_one({'id': user_id}, {'$set': data}, upsert=True)
+
+    def get_all_users_ids(self):
+        return self.collection.distinct('id')
+
     def set_active_status(self, user_id: int, status: bool):
         self.collection.update_one({'id': user_id}, {'$set': {'is_active': status}}, upsert=True)
 

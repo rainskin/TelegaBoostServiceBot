@@ -65,11 +65,11 @@ def convert_to_stars(service_price_rub):
     # 5. Сколько Stars требуется
     num_stars = math.ceil(usd_total_required / TELEGRAM_STAR_TO_USD_EQUIVALENT)
 
-    print(f"\n--- Детализация расчета ---")
-    print(f"Исходная цена услуги (RUB): {service_price_rub:.2f} RUB")
-    print(f"Необходимая чистая сумма USDT (для получения {service_price_rub} RUB): {required_usdt_net:.4f} USDT")
-    print(f"USDT с учетом комиссии спота TON/USDT: {usd_after_ton_spot_fee:.4f} USD")
-    print(f"через USDT с учетом комиссии за газ TON: {usd_total_required:.4f} USD")
-    print(f"\nИтоговая цена в Telegram Stars: {num_stars} Stars")
+    # print(f"\n--- Детализация расчета ---")
+    # print(f"Исходная цена услуги (RUB): {service_price_rub:.2f} RUB")
+    # print(f"Необходимая чистая сумма USDT (для получения {service_price_rub} RUB): {required_usdt_net:.4f} USDT")
+    # print(f"USDT с учетом комиссии спота TON/USDT: {usd_after_ton_spot_fee:.4f} USD")
+    # print(f"через USDT с учетом комиссии за газ TON: {usd_total_required:.4f} USD")
+    # print(f"\nИтоговая цена в Telegram Stars: {num_stars} Stars")
 
     return int(num_stars)

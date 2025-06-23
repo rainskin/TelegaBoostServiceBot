@@ -5,7 +5,7 @@ from aiogram.fsm.storage.base import StorageKey
 from aiogram.types import CallbackQuery
 
 import config
-from core.db import admin
+from core.db import admin, users
 from core.storage import storage
 from loader import dp, bot
 from utils import  states
@@ -22,6 +22,42 @@ async def _(msg: types.Message, state: FSMContext):
     key = StorageKey(bot_id=bot.id, chat_id=user_id, user_id=user_id)
     await storage.delete_data(key)
     await get_admin_menu(user_id)
+
+# @dp.message(Command('refund'))
+# async def refund(msg: types.Message):
+#     user_id = msg.from_user.id
+#     if user_id != config.ADMIN_ID:
+#         return
+#     await bot.refund_star_payment(msg.from_user.id, refund_id)
+#
+#
+
+
+@dp.message(Command('update_usernames'))
+async def users_cmd(msg: types.Message):
+    user_id = msg.from_user.id
+    if user_id != config.ADMIN_ID:
+        return
+
+    user_ids = users.get_all_users_ids()
+
+    count = 0
+    for user_id in user_ids:
+        try:
+            user = await bot.get_chat(user_id)
+            username = user.username if user.username else None
+            name = user.full_name if user.full_name else None
+
+            doc = {'username': username,
+                   'name': name}
+            
+            users.update_user(user_id, doc)
+            count += 1
+        except Exception as e:
+            await bot.send_message(config.ADMIN_ID, f"Error updating username for user {user_id}: {e}")
+
+    await bot.send_message(config.ADMIN_ID, f'updated {count} from {len(user_ids)} users')
+
 
 
 @dp.callback_query(F.data == 'manage_orders')
