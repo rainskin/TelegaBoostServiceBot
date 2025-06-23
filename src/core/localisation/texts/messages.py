@@ -29,24 +29,34 @@ balance_recharge_limits = {
           "💳 <b>Bank cards</b> - from 1000 rub\n\n"
           "❗ Amounts up to 500 rub can only be paid with <b>telegram stars</b> or <b>cryptocurrency</b>"}
 
-balance_recharge_input_amount = {'ru': "<b>Введите сумму пополнения</b>\n",
-                                 'en': "<b>Enter the amount you want to top up your balance with</b>\n"}
+balance_recharge_input_amount = {'ru': "Минимальная сумма для пополнения - "
+                                       "<b>{minimal_recharge_amount} {currency}</b>\n\n"
+                                       "Укажите желаемую сумму пополнения",
+                                 'en': "Minimum amount for top-up - "
+                                       "<b>{minimal_recharge_amount} {currency}</b>\n\n"
+                                       "Enter the desired top-up amount"}
 
 balance_recharge_wrong_amount = {'ru': "Введите число в формате:\n"
                                        "<b>100</b> или <b>100.50</b>",
                                  'en': "Enter a number in the format:\n"
                                        "<b>350<b> or <b>490.50<b>"}
 
+balance_recharge_amount_too_small = {'ru': "Сумма пополнения должна быть не менее "
+                                           "<b>{minimal_recharge_amount} {currency}</b>\n\n"
+                                           "Укажите новую сумму пополнения",
+                                     'en': "The top-up amount must be at least "
+                                           "<b>{minimal_recharge_amount} {currency}</b>\n\n"
+                                           "Please specify a new top-up amount"}
 balance_recharge_accept_amount = {'ru': "Пополнить баланс на <b>{amount} {currency}?</b>",
                                   'en': "Top up your balance with <b>{amount} {currency}?</b>"}
 
 balance_recharge_accept_amount_with_commission = {'ru': "Комиссия {commission_amount}%\n"
-                                                        "Будет зачислено <b>{amount} {currency}?</b>\n\n"
+                                                        "Будет зачислено <b>{amount} {currency}</b>\n\n"
                                                         "Пополнить баланс?\n\n"
                                                         "<i>Если хотите изменить сумму пополнения,"
                                                         "отправьте ее следующим сообщением</i>",
                                                   'en': "Commission {commission_amount}%\n"
-                                                        "Will <b>{amount} {currency} be credited?</b>\n\n"
+                                                        "Will <b>{amount} {currency} be credited</b>\n\n"
                                                         "Top up balance?\n\n"
                                                         "<i>If you want to change the top-up amount,"
                                                         "send it with the following message</i>"}
@@ -306,11 +316,15 @@ available_payment_methods = {
 }
 
 payment_by_card = {
-    'ru': 'Для оплаты заказа <b>{order_id}</b> нажмите на кнопку <b>💳ОПЛАТИТЬ</b>\n\n'
-          'После оплаты нажмите кнопку <b>⏳ ПРОВЕРИТЬ ОПЛАТУ</b>',
-    'en': 'To pay for your order  <b>{order_id}</b>, click on the <b>💳PAY</b> button\n\n'
-          'After payment, click the <b>⏳ CHECK PAYMENT</b> button'}
-
+    'ru': '<i>ID транзакции: {transaction_id}</i>\n\n'
+          'Для пополнения баланса на <b>{amount} {currency}</b> оплатите выставленный счет, '
+          'нажав на кнопку <b>💳ОПЛАТИТЬ</b>\n\n'
+          'После оплаты нажмите кнопку\n<b>⏳ ПРОВЕРИТЬ ОПЛАТУ</b>',
+    'en': '<i>Transaction ID: {transaction_id}</i>\n\n'
+          'To top up your balance with <b>{amount} {currency}</b>, '
+          'pay the issued invoice by clicking the <b>💳PAY</b> button\n\n'
+          'After payment, click the\n<b>⏳ CHECK PAYMENT</b> button'
+}
 current_payment_status = {
     'ru': '<b>Текущий статус платежа</b>',
     'en': '<b>Current payment status<b>',

@@ -19,14 +19,25 @@ async def _(msg: types.Message):
     key = StorageKey(bot.id, chat_id, user_id)
     text = msg.text
     data = await storage.get_data(key)
+    msgs_to_delete = data.get('msgs_to_delete', [])
 
     try:
         value = float(text)
     except ValueError as e:
-        await msg.answer(messages.balance_recharge_wrong_amount[lang])
+        msg_wrong_amount = await msg.answer(messages.balance_recharge_wrong_amount[lang])
+        msgs_to_delete += [msg.message_id, msg_wrong_amount.message_id]
+        await storage.update_data(key, msgs_to_delete=msgs_to_delete)
         return
 
-    currency = 'RUB'
+    currency = data.get('currency')
+    minimal_recharge_amount = data.get('minimal_recharge_amount')
+
+    if value < minimal_recharge_amount:
+        msg_too_small_amount = await msg.answer(messages.balance_recharge_amount_too_small[lang].format(
+            minimal_recharge_amount=minimal_recharge_amount, currency=currency))
+        msgs_to_delete += [msg.message_id, msg_too_small_amount.message_id]
+        await storage.update_data(key, msgs_to_delete=msgs_to_delete)
+        return
 
     recharge_commission = admin.get_balance_recharge_commission()
     if recharge_commission:
@@ -42,7 +53,6 @@ async def _(msg: types.Message):
 
     service_msg = await msg.answer(text, reply_markup=yes_or_no_kb(lang).as_markup())
 
-    msgs_to_delete = data.get('msgs_to_delete', [])
     msgs_to_delete += [msg.message_id, service_msg.message_id]
     await storage.update_data(key, amount=value, amount_with_commission=amount_with_commission, msgs_to_delete=msgs_to_delete)
 

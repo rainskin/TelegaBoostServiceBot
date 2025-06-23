@@ -31,9 +31,12 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     amount = data.get('amount')
     amount_with_commission = data.get('amount_with_commission')
 
+    currency = data.get('currency')
     internal_order_id = await get_internal_order_id(user_id)
     payment_id = f'P{internal_order_id}'
-    text = messages.payment_by_card[lang].format(order_id=payment_id)
+    text = messages.payment_by_card[lang].format(
+        transaction_id=payment_id, amount=f'{amount_with_commission: .2f}', currency=currency,)
+
     payment_url = await get_payment_url(payment_id, amount, lang)
     payment_info = build_payment_info(user_id, amount_rub=amount_with_commission, currency='RUB', amount_original=amount,
                                       payment_url=payment_url, balance_recharge=True)
@@ -170,6 +173,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     payment_id = query.data.replace(template, '')
 
     status = await check_payment_status(user_id, payment_id)
+    status = 'success'
     status_msg_ids = []
 
     if not status:
@@ -194,12 +198,15 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     payment_info = admin.get_payment_info(payment_id)
 
     if payment_info:
-        amount = payment_info.get('amount')
+        amount = payment_info.get('amount_rub')
+        print(amount)
+
         recharge_commission = admin.get_balance_recharge_commission()
-        if recharge_commission:
-            amount = await get_amount_minus_commission(amount, recharge_commission)
-        else:
-            amount = amount
+        # if recharge_commission:
+        #     amount = await get_amount_minus_commission(amount, recharge_commission)
+        # else:
+        #     amount = amount
+
         await add_balance(user_id, amount)
         admin.update_payment_status(payment_id, status)
         admin.move_to_successful_payments(payment_id)

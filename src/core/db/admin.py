@@ -11,20 +11,67 @@ class Admin:
         self.init()
 
     def init(self):
-        if not self.collection.find_one({'orders_for_execution': True}):
-            self.collection.insert_one({'orders_for_execution': True, 'orders': {}})
 
-        if not self.collection.find_one({'recharge_xtr_commissions': True}):
-            doc = {
+        self.collection.update_one(
+            {'orders_for_execution': True},
+            {'$setOnInsert': {
+                'orders': {},
+            }},
+            upsert=True
+        )
+
+        self.collection.update_one(
+            {'recharge_xtr_commissions': True},
+            {'$setOnInsert': {
                 'recharge_xtr_commissions': True,
                 'telegram_star_to_usd_equivalent': 0.0,
                 'ton_to_usdt_spot_fee_percent': 0.0,
                 'ton_network_fee_percent': 0.0,
                 'p2p_premium_percent_from_db': 0.0,
                 'info': 'This document contains settings for recharge XTR commissions.'
-            }
+            }},
+            upsert=True
+        )
 
-            self.collection.insert_one(doc)
+        self.collection.update_one(
+            {'exchange_rates': True},
+            {'$setOnInsert': {
+                'usdt_to_rub_rate': 0.0,
+                'updated_at': datetime.now().strftime(self.default_datetime_format),
+                'update_interval_in_seconds': 3600,
+                'info': 'This document contains exchange rates and update interval settings.'
+            }},
+            upsert=True
+        )
+
+        self.collection.update_one(
+            {'shop_settings': True},
+            {'$setOnInsert': {
+                'base_commission': 0,  # int
+                'commission_percentage': {},  # dict with service_id as key and commission percentage as value
+                'balance_recharge_commission': 0,  # int
+                'minimal_recharge_amount': 0,  # int
+                'referral_deposit_reward_percent': 0,  # int
+                'info': 'This document contains shop settings including commissions and referral rewards.'
+            }},
+            upsert=True
+        )
+
+    def get_exchange_rates(self) -> dict | None:
+        doc = self.collection.find_one({'exchange_rates': True})
+        if doc:
+            return doc
+        return None
+
+    def update_exchange_rates(self, usdt_to_rub_rate: float):
+        current_datetime = datetime.now().strftime(self.default_datetime_format)
+        self.collection.update_one(
+            {'exchange_rates': True},
+            {'$set': {
+                'usdt_to_rub_rate': usdt_to_rub_rate,
+                'updated_at': current_datetime
+            }}
+        )
 
     def get_commission_percentage(self, service_id: str):
         doc: dict = self.collection.find_one({'shop_settings': True})
@@ -35,6 +82,10 @@ class Admin:
             percentage = base_commission
         return percentage
 
+    def get_minimal_recharge_amount(self):
+        doc: dict = self.collection.find_one({'shop_settings': True})
+        r = doc.get('minimal_recharge_amount')
+        return r
     def get_balance_recharge_commission(self):
         doc: dict = self.collection.find_one({'shop_settings': True})
         r = doc.get('balance_recharge_commission')
@@ -42,7 +93,6 @@ class Admin:
 
     def get_recharge_xtr_commissions(self):
         return self.collection.find_one({'recharge_xtr_commissions': True})
-
 
     def get_orders_queue(self) -> dict | None:
         doc = self.collection.find_one({'order_queue': True})
@@ -114,15 +164,6 @@ class Admin:
             '$set': {f'payments.{payment_id}': payment_info}
         }, upsert=True)
 
-    # def update_payment_status(self, payment_id: str, status: str, telegram_payment_charge_id: str = None):
-    #     doc = self.collection.update_one(
-    #         {'payments_queue': True},
-    #         {
-    #             '$set': {f'payments.{payment_id}.status': status,
-    #                      f'payments.{payment_id}.telegram_payment_charge_id': telegram_payment_charge_id},
-    #         }
-    #     )
-
     def update_payment_status(self, payment_id: str, status: str, telegram_payment_charge_id: str = None):
         update_fields = {f'payments.{payment_id}.status': status}
         if telegram_payment_charge_id is not None:
@@ -132,16 +173,6 @@ class Admin:
             {'payments_queue': True},
             {'$set': update_fields}
         )
-
-        # payment_info = doc['payments'][payment_id]
-        # payment_info['execution_date'] = datetime.now().strftime(self.default_datetime_format)
-        # self.collection.update_one(
-        #     {'payments_queue': True},
-        #     {
-        #         '$set': {f'successful_payments.{payment_id}': payment_info},
-        #         '$unset': {f'payments.{payment_id}': payment_id}
-        #     }
-        # )
 
     def move_to_successful_payments(self, payment_id: str):
         doc = self.collection.find_one({'payments_queue': True}, {'payments': 1})
@@ -191,26 +222,14 @@ class Admin:
 admin: Admin = Admin()
 
 
-# def build_payment_info(user_id: int, amount: float, currency: str, payment_url: str, balance_recharge=False,
-#                        payment_status=None):
-#     payment_purpose = 'balance_recharge' if balance_recharge else None
-#     return {
-#         'user_id': user_id,
-#         'amount': amount,
-#         'currency': currency,
-#         'payment_url': payment_url,
-#         'payment_purpose': payment_purpose,
-#         'status': payment_status,
-#     }
-
 def build_payment_info(
-    user_id: int,
-    amount_rub: float,
-    currency: str,
-    amount_original: float = None,
-    payment_url: str = None,
-    balance_recharge: bool = False,
-    payment_status: str = None,
+        user_id: int,
+        amount_rub: float,
+        currency: str,
+        amount_original: float = None,
+        payment_url: str = None,
+        balance_recharge: bool = False,
+        payment_status: str = None,
 ):
     payment_purpose = 'balance_recharge' if balance_recharge else None
     return {
