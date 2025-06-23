@@ -118,7 +118,7 @@ async def get_order_statuses_text(user_id: int, lang: str, current_orders=False,
 
         msg_text = f'{msg_text}\n\n{orders_statuses}'
 
-        await bot.edit_message_text(msg_text, user_id, message.message_id,
+        await bot.edit_message_text(msg_text, chat_id=user_id, message_id=message.message_id,
                                     reply_markup=navigation_kb.orders(lang, current_page, amount_pages,
                                                                       current_orders).as_markup())
 
