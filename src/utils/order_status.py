@@ -6,13 +6,15 @@ from core.localisation.texts import messages
 from core.localisation.texts.messages import translate_status_key
 
 
-def get_order_status_text(user_id: int, lang: str, _orders: Dict[str, dict], current_orders=False) -> str:
+def get_order_status_text(user_id: int, lang: str, _orders: Dict[str, dict]) -> str:
 
     order_ids, orders_info = [], []
     msgs = []
 
     for order_id, order_info in _orders.items():
-        additional_order_info = orders.get_order_info(user_id, order_id, current_orders)
+        additional_order_info = orders.get_order_info(user_id, order_id, current_orders=True)
+        if not additional_order_info:
+            additional_order_info = orders.get_order_info(user_id, order_id, current_orders=False)
 
         for _key, _value in additional_order_info.items():
             order_info[_key] = _value

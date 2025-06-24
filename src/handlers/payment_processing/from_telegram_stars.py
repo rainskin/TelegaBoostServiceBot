@@ -70,6 +70,7 @@ async def successful_payment_handler(msg: types.Message, state: FSMContext):
     formatted_amount = f'{amount_rub:.2f}'
 
     await add_balance(user_id, amount_rub)
+
     status = 'successful'
     admin.update_payment_status(payment_id, status, telegram_payment_charge_id)
     admin.move_to_successful_payments(payment_id)

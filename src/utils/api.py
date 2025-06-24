@@ -11,7 +11,6 @@ BASE_URL = config.BASE_URL
 
 
 async def make_request(url: str, user_id: int) -> Any:
-    lang = users.get_user_lang(user_id)
     try:
         response = requests.get(url)
         response.raise_for_status()

@@ -14,10 +14,6 @@ async def remove_orders_to_history_and_return_money_for_canceled_orders(user_id:
 
         if status == 'Partial':
             full_order_info = orders.get_order_info(user_id, order_id, current_orders=True)
-            hot_order = full_order_info['hot_order']
-
-            if hot_order:
-                continue
 
             total_amount = full_order_info['total_amount']
             quantity = full_order_info['quantity']
@@ -32,10 +28,12 @@ async def remove_orders_to_history_and_return_money_for_canceled_orders(user_id:
                     f'Остаток: {remains} единиц\n'
                     f'Цена одного выполнения: {cost_per_one_execution}\n\n'
                     f'Возвращаю пользователю: {amount}')
+
             await bot.send_message(config.ADMIN_ID, text)
 
             orders.return_money_for_current_order(user_id, order_id, amount)
 
         if status != 'In progress' and status != 'Awaiting':
             orders.move_orders_to_archive(user_id, order_id)
+
 

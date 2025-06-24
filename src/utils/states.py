@@ -13,8 +13,9 @@ class BalanceRecharge(StatesGroup):
     choosing_amount = State()
 
 
-class ManageOrder(StatesGroup):
+class ManageOrders(StatesGroup):
     cancel_order = State()
+    scroll_orders = State()
 
 
 class Payment(StatesGroup):

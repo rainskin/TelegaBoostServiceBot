@@ -1,3 +1,5 @@
+from typing import List
+
 from core.db import users
 
 import loader
@@ -34,7 +36,7 @@ class Orders:
                 upsert=True
             )
 
-    def get_not_accepted_orders(self, user_id: int):
+    def get_not_accepted_orders(self, user_id: int) -> dict | None:
         doc = self.collection.find_one({'user_id': user_id}, {'not_accepted_orders': 1})
         return doc.get('not_accepted_orders') if doc else None
 
@@ -101,13 +103,20 @@ class Orders:
             _orders: dict = doc.get('current_orders')
             return order_id in _orders.keys()
 
-    def get_order_info(self, user_id: int, order_id: str, current_orders=False):
+    def get_order_info(self, user_id: int, order_id: str, current_orders=False) -> dict | None:
         if current_orders:
             doc = self.collection.find_one({'user_id': user_id}, {'current_orders': 1})
-            return doc['current_orders'][order_id]
+            return doc.get('current_orders', {}).get(order_id)
         else:
             doc = self.collection.find_one({'user_id': user_id}, {'orders_archive': 1})
-            return doc['orders_archive'][order_id]
+            return doc.get('orders_archive', {}).get(order_id)
+
+    # def get_order_info(self, user_id: int, order_id: str):
+    #     doc = self.collection.find_one({'user_id': user_id}, {'current_orders': 1, 'orders_archive': 1})
+    #     return (
+    #             doc.get('current_orders', {}).get(order_id)
+    #             or doc.get('orders_archive', {}).get(order_id)
+    #     )
 
     def move_orders_to_archive(self, user_id: int, order_id: str):
         pipeline = [

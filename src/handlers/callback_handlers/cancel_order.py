@@ -10,7 +10,7 @@ from core.db import users, orders, admin
 from utils import  callback_templates
 from utils.keyboards import navigation_kb
 from core.localisation.texts import messages
-from utils.states import ManageOrder
+from utils.states import ManageOrders
 
 template = callback_templates.cancel_order()
 
@@ -34,11 +34,11 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 
     await query.message.edit_text(text, reply_markup=kb)
     await storage.set_data(key, order_id=order_id)
-    await state.set_state(ManageOrder.cancel_order)
+    await state.set_state(ManageOrders.cancel_order)
     await query.answer()
 
 
-@dp.callback_query(F.data == 'yes', ManageOrder.cancel_order)
+@dp.callback_query(F.data == 'yes', ManageOrders.cancel_order)
 async def _(query: types.CallbackQuery, state: FSMContext):
     user_id = query.from_user.id
     key = StorageKey(bot_id=bot.id, chat_id=user_id, user_id=user_id)
@@ -57,7 +57,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     await query.answer()
 
 
-@dp.callback_query(F.data == 'no', ManageOrder.cancel_order)
+@dp.callback_query(F.data == 'no', ManageOrders.cancel_order)
 async def _(query: types.CallbackQuery, state: FSMContext):
     user_id = query.from_user.id
     key = StorageKey(bot_id=bot.id, chat_id=user_id, user_id=user_id)

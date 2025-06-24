@@ -49,7 +49,7 @@ class Users:
         return self.collection.find_one({'id': user_id})['platform']
 
     def add_balance(self, user_id: int, amount: float):
-        self.collection.update_one({'id': user_id}, {'$inc': {'balance': amount}})
+        self.collection.update_one({'id': user_id}, {'$inc': {'balance': round(amount, 2)}})
 
     def get_balance(self, user_id: int):
         balance: float = self.collection.find_one({'id': user_id})['balance']
