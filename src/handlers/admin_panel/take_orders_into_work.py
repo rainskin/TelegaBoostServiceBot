@@ -59,9 +59,16 @@ async def _(query: CallbackQuery):
         admin.remove_order_from_execution_queue(internal_order_id)
         orders.remove_not_accepted_order(user_id, internal_order_id)
 
-        await send_notification_to_user(user_id, order_id)  # TODO: handle error if user block bot 
+        non_active_users_number = 0
+        try:
+            await send_notification_to_user(user_id, order_id)
+        except Exception as e:
+            non_active_users_number += 1
+            print(f"Error sending notification to user {user_id}: {e}")
         count += 1
-        await bot.edit_message_text(f'Оформил {count} заказ(ов)', query.from_user.id, msg.message_id)
+
+        non_active_users_stats_text = f'Заблокировали бота: {non_active_users_number}' if non_active_users_number > 0 else ''
+        await bot.edit_message_text(f'Оформил {count} заказ(ов)\n\n{non_active_users_stats_text}', chat_id=query.from_user.id, message_id=msg.message_id)
 
     await bot.send_message(query.from_user.id, 'Закончил оформление заказов', )
 

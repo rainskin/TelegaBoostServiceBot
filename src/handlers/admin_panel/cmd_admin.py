@@ -86,8 +86,8 @@ async def _ (query: CallbackQuery, state: FSMContext):
 
         text = (f'<b>Текущая очередь заказов</b>\n\n'
                 f'<b>Всего заказов:</b> {total_orders}\n'
-                f'<b>Для оплаты необходимо:</b> {total_amount}\n'
-                f'<b>Потрачено пользователями:</b> {total_spent_by_users}\n'
+                f'<b>Для оплаты необходимо:</b> {round(total_amount, 2)}\n'
+                f'<b>Потрачено пользователями:</b> {total_spent_by_users:.2f}\n'
                 f'<b>Прибыль:</b> {round(total_profit, 2)}')
         kb = orders_manage().as_markup()
         await storage.set_data(key, total_orders=total_orders, total_amount=total_amount)
