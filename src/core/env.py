@@ -30,5 +30,9 @@ class Env:
     def get_int(var_name: str, default: T = ...) -> int | T:
         return parse(var_name, default, int)
 
+    @staticmethod
+    def get_bool(var_name: str, default: T = ...) -> bool | T:
+        return parse(var_name, default, lambda x: x.lower() in ['true', '1', 'yes'])
+
 
 env = Env('.env')

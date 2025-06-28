@@ -119,7 +119,6 @@ async def try_get_orders(user_id: int, lang: str, current_orders: bool = False) 
 
 def get_order_ids(orders: dict):
     order_ids = [i for i in orders.keys()]
-    print(f'Список заказов в get_order_statuses_text: {order_ids}')
     order_ids.reverse()
     return order_ids
 

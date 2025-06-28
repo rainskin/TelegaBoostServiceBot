@@ -96,21 +96,19 @@ class Admin:
 
     def get_orders_queue(self) -> dict | None:
         doc = self.collection.find_one({'order_queue': True})
-        _orders = doc.get('orders')
-        if _orders:
-            for order_id, order_info in _orders.items():
-                self.collection.update_one({'orders_for_execution': True}, {
-                    '$set': {f'orders.{order_id}': order_info},
-                }, upsert=True)
+        return doc.get('orders') if doc and doc.get('orders') else None
 
-                self.collection.update_one({'order_queue': True}, {
-                    '$unset': {f'orders.{order_id}': ''},
-                })
-
-            return _orders
-
-        else:
-            return None
+    def move_orders_to_execution_queue(self, _orders: dict):
+        for order_id, order_info in _orders.items():
+            self.collection.update_one(
+                {'orders_for_execution': True},
+                {'$set': {f'orders.{order_id}': order_info}},
+                upsert=True
+            )
+            self.collection.update_one(
+                {'order_queue': True},
+                {'$unset': {f'orders.{order_id}': ''}}
+            )
 
     def put_order_to_queue(self, user_id: int, internal_order_id: str, data: dict):
         date = datetime.now().strftime(self.default_datetime_format)
@@ -141,7 +139,7 @@ class Admin:
 
         orders.add_not_accepted_order(user_id, internal_order_id, order_info)
 
-    def get_orders_for_execution(self):
+    def get_orders_for_execution(self) -> dict | None:
         doc = self.collection.find_one({'orders_for_execution': True})
         _orders = doc['orders']
         return doc.get('orders') if doc else None

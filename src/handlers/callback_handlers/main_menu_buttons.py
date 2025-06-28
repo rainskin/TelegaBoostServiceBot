@@ -13,7 +13,7 @@ from utils.keyboards import navigation_kb
 from core.localisation.texts import messages
 from utils.keyboards.navigation_kb import cancel_order
 from utils.states import ManageOrders
-from busines_logic.order_management import remove_orders_to_history_and_return_money_for_canceled_orders
+from busines_logic.order_managment.handle_canceled_orders import remove_orders_to_history_and_return_money_for_canceled_orders
 from utils.api import get_order_statuses
 
 @dp.callback_query(F.data == 'current_orders')

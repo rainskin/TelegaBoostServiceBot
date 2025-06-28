@@ -2,10 +2,9 @@ from aiogram import F
 from aiogram.fsm.storage.base import StorageKey
 from aiogram.types import CallbackQuery
 
-from core.db import users, admin, orders
-from core.localisation.texts import messages
+from busines_logic.order_managment.take_into_work import take_orders_into_work
+from core.db import users, admin
 from core.storage import storage
-from handlers.new_order.create import create_order
 from loader import dp, bot
 from utils import states, api
 from utils.keyboards import navigation_kb
@@ -36,41 +35,15 @@ async def _(query: CallbackQuery):
     await query.answer()
 
 
-async def send_notification_to_user(user_id, order_id):
-    lang = users.get_user_lang(user_id)
-    text = messages.take_order_into_work[lang].format(order_id=order_id)
-    await bot.send_message(user_id, text)
-
-
 @dp.callback_query(F.data == 'yes', states.AdminStates.to_take_orders_into_work)
 async def _(query: CallbackQuery):
-    _orders = admin.get_orders_for_execution()
-
-    msg = await query.message.answer('Начинаю оформление заказов')
+    await query.message.answer('Начинаю оформление заказов')
     await query.answer()
     await query.message.delete()
 
-    count = 0
-    for internal_order_id, order_info in _orders.items():
-        user_id = order_info.get('user_id')
+    _orders = admin.get_orders_for_execution()
 
-        order_id = await create_order(internal_order_id, order_info)
-
-        admin.remove_order_from_execution_queue(internal_order_id)
-        orders.remove_not_accepted_order(user_id, internal_order_id)
-
-        non_active_users_number = 0
-        try:
-            await send_notification_to_user(user_id, order_id)
-        except Exception as e:
-            non_active_users_number += 1
-            print(f"Error sending notification to user {user_id}: {e}")
-        count += 1
-
-        non_active_users_stats_text = f'Заблокировали бота: {non_active_users_number}' if non_active_users_number > 0 else ''
-        await bot.edit_message_text(f'Оформил {count} заказ(ов)\n\n{non_active_users_stats_text}', chat_id=query.from_user.id, message_id=msg.message_id)
-
-    await bot.send_message(query.from_user.id, 'Закончил оформление заказов', )
+    await take_orders_into_work(_orders)
 
 
 @dp.callback_query(F.data == 'no', states.AdminStates.to_take_orders_into_work)
@@ -78,4 +51,3 @@ async def _(query: CallbackQuery):
     await query.message.answer('Действие отменено')
     await query.message.delete()
     await query.answer()
-

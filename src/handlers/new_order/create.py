@@ -41,23 +41,6 @@ async def start_creating_new_hot_order(lang, key: StorageKey, state: FSMContext,
                            profit=profit, canceling_is_available=canceling_is_available, hot_order=True)
     await state.set_state(states.NewOrder.waiting_for_url)
 
-async def create_order(internal_order_id: str, order_info: dict):
-    quantity = order_info['quantity']
-    service_id = order_info['service_id']
-    user_id = order_info['user_id']
-    url = order_info['url']
-    platform = users.get_user_platform(user_id)
-
-    default_datetime_format = '%d-%m-%Y %H:%M'
-    current_datetime = datetime.datetime.now().strftime(default_datetime_format)
-    order_info['execution_date'] = current_datetime
-    order_info['internal_order_id'] = internal_order_id
-
-    order_id = await api.create_new_order(user_id, service_id, url, quantity)
-    orders.new_order(user_id, platform, order_id, order_info)
-
-    return order_id
-
 
 async def place_order(user_id: int, internal_order_id: str, hot_order: bool, data: dict, payment_method: str):
     data['payment_method'] = payment_method

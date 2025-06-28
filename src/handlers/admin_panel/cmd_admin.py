@@ -5,6 +5,8 @@ from aiogram.fsm.storage.base import StorageKey
 from aiogram.types import CallbackQuery
 
 import config
+from busines_logic.order_managment.take_into_work import try_get_orders_for_execution, get_summary_text, \
+    get_total_amount
 from core.db import admin, users
 from core.storage import storage
 from loader import dp, bot
@@ -65,35 +67,18 @@ async def _ (query: CallbackQuery, state: FSMContext):
     user_id = query.from_user.id
     key = StorageKey(bot_id=bot.id, chat_id=user_id, user_id=user_id)
 
-    orders_to_execution = admin.get_orders_for_execution()
-    if orders_to_execution:
-        orders = orders_to_execution
-    else:
-        orders_queue: dict = admin.get_orders_queue()
-        orders = orders_queue
+    orders = try_get_orders_for_execution()
 
     if orders:
-        total_orders: int = 0
-        total_amount: float = 0
-        previously_paid = 0
-        total_spent_by_users = 0
-        total_profit = 0
-        for order_id, order_info in orders.items():
-            total_amount += order_info['amount_without_commission']
-            total_spent_by_users += order_info['total_amount']
-            total_profit += order_info['profit']
-            total_orders += 1
-
-        text = (f'<b>Текущая очередь заказов</b>\n\n'
-                f'<b>Всего заказов:</b> {total_orders}\n'
-                f'<b>Для оплаты необходимо:</b> {round(total_amount, 2)}\n'
-                f'<b>Потрачено пользователями:</b> {total_spent_by_users:.2f}\n'
-                f'<b>Прибыль:</b> {round(total_profit, 2)}')
+        total_amount = get_total_amount(orders)
+        text = get_summary_text(orders)
         kb = orders_manage().as_markup()
-        await storage.set_data(key, total_orders=total_orders, total_amount=total_amount)
+        await storage.set_data(key, total_orders=len(orders), total_amount=total_amount)
+
     else:
         text = 'Пока что нет заказов'
         kb = None
+
     await query.message.answer(text, reply_markup=kb)
     await state.set_state(states.AdminStates.to_take_orders_into_work)
     await query.answer()
