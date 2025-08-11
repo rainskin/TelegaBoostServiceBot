@@ -77,9 +77,11 @@ async def send_notification_to_user(user_id, order_id):
 async def take_orders_into_work(orders: dict):
     count = 0
     non_active_users_number = 0
-
+    total_amount = 0.0
+    available_balance = await api.get_account_balance()
     for internal_order_id, order_info in orders.items():
         user_id = order_info.get('user_id')
+        amount = order_info.get('amount_without_commission')
 
         order_id = await create_order(internal_order_id, order_info)
 
@@ -92,11 +94,10 @@ async def take_orders_into_work(orders: dict):
             non_active_users_number += 1
             print(f"Error sending notification to user {user_id}: {e}")
         count += 1
+        total_amount += amount
 
-    await asyncio.sleep(10)
-    available_balance = await api.get_account_balance()
     non_active_users_stats_text = f'Заблокировали бота: {non_active_users_number}' if non_active_users_number > 0 else ''
-    text = f'Оформил {count} заказ(ов)\n\n{non_active_users_stats_text}\n\nОстаток на балансе:{available_balance}'
+    text = f'Оформил {count} заказ(ов)\n\n{non_active_users_stats_text}\n\nПредполагаемый остаток на балансе:{available_balance-total_amount}'
     await send_report_to_admin(text)
 
 
