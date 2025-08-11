@@ -27,7 +27,7 @@ def get_total_amount(orders: dict) -> float:
     return total_amount
 
 
-def get_summary_text(orders: dict) -> str:
+def get_summary_text(orders: dict, available_balance: float) -> str:
     total_amount = 0
     total_spent_by_users = 0.0
     total_profit = 0.0
@@ -39,8 +39,10 @@ def get_summary_text(orders: dict) -> str:
         total_profit += order_info['profit']
         total_orders += 1
 
+
     text = (f'<b>Текущая очередь заказов</b>\n\n'
             f'<b>Всего заказов:</b> {total_orders}\n'
+            f'<b>Текущий баланс:</b>{available_balance}'
             f'<b>Для оплаты необходимо:</b> {round(total_amount, 2)}\n'
             f'<b>Потрачено пользователями:</b> {total_spent_by_users:.2f}\n'
             f'<b>Прибыль:</b> {round(total_profit, 2)}')
@@ -91,6 +93,7 @@ async def take_orders_into_work(orders: dict):
             print(f"Error sending notification to user {user_id}: {e}")
         count += 1
 
+    await asyncio.sleep(10)
     available_balance = await api.get_account_balance()
     non_active_users_stats_text = f'Заблокировали бота: {non_active_users_number}' if non_active_users_number > 0 else ''
     text = f'Оформил {count} заказ(ов)\n\n{non_active_users_stats_text}\n\nОстаток на балансе:{available_balance}'
@@ -106,7 +109,8 @@ async def try_take_orders_into_work():
     if not orders:
         return
 
-    text = get_summary_text(orders)
+    available_balance = await api.get_account_balance()
+    text = get_summary_text(orders, available_balance)
     await send_report_to_admin(text)
 
     total_amount = get_total_amount(orders)
