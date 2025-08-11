@@ -42,7 +42,7 @@ def get_summary_text(orders: dict, available_balance: float) -> str:
 
     text = (f'<b>Текущая очередь заказов</b>\n\n'
             f'<b>Всего заказов:</b> {total_orders}\n'
-            f'<b>Текущий баланс:</b>{available_balance}\n'
+            f'<b>Текущий баланс:</b> {available_balance}\n'
             f'<b>Для оплаты необходимо:</b> {round(total_amount, 2)}\n'
             f'<b>Потрачено пользователями:</b> {total_spent_by_users:.2f}\n'
             f'<b>Прибыль:</b> {round(total_profit, 2)}')
