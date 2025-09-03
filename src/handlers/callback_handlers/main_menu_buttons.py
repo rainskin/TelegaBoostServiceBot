@@ -13,7 +13,8 @@ from utils.keyboards import navigation_kb
 from core.localisation.texts import messages
 from utils.keyboards.navigation_kb import cancel_order
 from utils.states import ManageOrders
-from busines_logic.order_managment.handle_canceled_orders import remove_orders_to_history_and_return_money_for_canceled_orders
+from busines_logic.order_managment.handle_canceled_orders import \
+    remove_orders_to_history_and_return_money_for_canceled_orders, update_statuses
 from utils.api import get_order_statuses
 
 @dp.callback_query(F.data == 'current_orders')
@@ -45,6 +46,8 @@ async def _(query: types.CallbackQuery, state: FSMContext):
         return
 
     current_order_statuses = await get_order_statuses(order_ids, user_id)
+
+    update_statuses(user_id, current_order_statuses)
     await remove_orders_to_history_and_return_money_for_canceled_orders(user_id, current_order_statuses)
 
     await get_order_statuses_text(user_id, lang, order_ids, current_orders=current_orders)

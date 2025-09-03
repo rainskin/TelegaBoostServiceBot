@@ -17,10 +17,9 @@ def convert_to_stars(service_price_rub):
     """
 
     commissions = admin.get_recharge_xtr_commissions()
-    telegram_star_to_usd_equivalent = commissions.get('telegram_star_to_usd_equivalent')
+    telegram_star_to_usd_equivalent = commissions.get('telegram_star_to_usd_equivalent')  # TODO: избавиться от п2п курса и, возможно, других комиссий. Сейчас в БД значение п2п комсы = 0
     ton_to_usdt_spot_fee_percent = commissions.get('ton_to_usdt_spot_fee_percent')
     ton_network_fee_percent = commissions.get('ton_network_fee_percent')
-
     p2p_premium_percent = commissions.get('p2p_premium_percent_from_db')
 
     if service_price_rub <= 0:
@@ -66,7 +65,7 @@ def convert_to_stars(service_price_rub):
     # 5. Сколько Stars требуется
     num_stars = math.ceil(usd_total_required / telegram_star_to_usd_equivalent)
 
-    # print(f"\n--- Детализация расчета ---")
+    print(f"\n--- Детализация расчета ---")
     # print(f"Исходная цена услуги (RUB): {service_price_rub:.2f} RUB")
     # print(f"Необходимая чистая сумма USDT (для получения {service_price_rub} RUB): {required_usdt_net:.4f} USDT")
     # print(f"USDT с учетом комиссии спота TON/USDT: {usd_after_ton_spot_fee:.4f} USD")
@@ -74,3 +73,7 @@ def convert_to_stars(service_price_rub):
     # print(f"\nИтоговая цена в Telegram Stars: {num_stars} Stars")
 
     return int(num_stars)
+
+
+
+

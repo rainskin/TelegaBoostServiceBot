@@ -2,7 +2,7 @@ from typing import List, Dict, Any
 
 import config
 import requests
-
+import asyncio
 from core.db import users
 from loader import bot
 
@@ -94,6 +94,13 @@ async def create_new_order(user_id: int, service_id: str, link: str, quantity: i
     response = await make_request(url, user_id)
     order_id: int = response['order']
     return order_id
+
+async def main():
+    service = await get_order_statuses(['169337601'], config.ADMIN_ID)
+    print(service)
+
+
+# asyncio.run(main())
 
 
 # order_ids = [70117436, 111]

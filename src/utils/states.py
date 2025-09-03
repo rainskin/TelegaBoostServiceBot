@@ -9,6 +9,12 @@ class NewOrder(StatesGroup):
     check_details = State()
 
 
+class BuyStars(StatesGroup):
+    waiting_for_amount = State()
+    waiting_for_username = State()
+    confirmation = State()
+
+
 class BalanceRecharge(StatesGroup):
     choosing_amount = State()
 

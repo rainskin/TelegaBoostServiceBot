@@ -18,6 +18,8 @@ async def _(msg: types.Message, command: CommandObject, state: FSMContext):
     user_id = msg.from_user.id
 
     start_link_args = command.args
+    if msg.chat.type != 'private':
+        return
 
     if users.is_new(user_id):
 

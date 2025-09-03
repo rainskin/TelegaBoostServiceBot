@@ -105,14 +105,17 @@ not_enough_money = {'ru': "Недостаточно средств на бала
                           "Доступно {current_balance} {currency}",
                     'en': "Insufficient funds on balance\n"
                           "Available {current_balance} {currency}"}
+order_is_paid = {'ru': "💰 <b>Заказ {internal_order_id} </b> успешно оплачен\n\n",
+                 'en': "💰 <b>Order {internal_order_id} </b> has been successfully paid\n\n"}
+
 order_is_created = {'ru': "✅ <b>Заказ {order_id} оформлен</b>\n\n",
                     'en': "✅ <b>Order {order_id} has been placed</b>\n\n"}
 
-orders_is_created = {'ru': "✅ <b>Заказы {order_ids} оформлены</b>\n\n",
-                     'en': "✅ <b>Orders {order_ids} has been placed</b>\n\n"}
+# orders_is_created = {'ru': "✅ <b>Заказы {order_ids} оформлены</b>\n\n",
+#                      'en': "✅ <b>Orders {order_ids} has been placed</b>\n\n"}
 
-take_order_into_work = {'ru': "✅ <b>Заказ {order_id} передан в работу</b>\n\n",
-                        'en': "✅ <b>Order {order_id} sent to work</b>\n\n"}
+take_order_into_work = {'ru': "✅ <b>Заказ {internal_order_id}</b> передан в работу\n\n",
+                        'en': "✅ <b>Order {internal_order_id}</b> sent to work\n\n"}
 
 take_orders_into_work = {'ru': "✅ <b>Заказы {order_ids} переданы в работу</b>\n\n",
                          'en': "✅ <b>Orders {order_ids} sent to work</b>\n\n"}
@@ -297,14 +300,6 @@ correct_url = {
           '<b>💴 Total: </b> {total_amount} {currency}\n\n'
           '<i>If you want to change the URL, send the new URL in the next message</i>\n\n'
           '➕ To <b>place the order</b>, click the corresponding button below'
-}
-correct_url_hot_order = {
-    'ru': '✔️<b>Ссылка принята.</b>\n\n'
-          '<i>Если хотите изменить ссылку, отправьте новую ссылку в следующем сообщении</i>\n\n'
-          '➕ Для <b>оформления заказа</b> нажмите на соответствующую кнопку ниже',
-    'en': '✔️<b>URL accepted.</b>\n\n'
-          '<i>If you want to change the URL, send the new URL in the next message</i>\n\n'
-          '➕ To <b>place the order</b>, click the corresponding button below',
 }
 
 confirm_order_payment = {

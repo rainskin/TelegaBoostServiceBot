@@ -1,10 +1,9 @@
-from typing import List
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from utils import api, callback_templates
-from core.localisation.lang import lang_names, lang_codes
 from core.localisation.texts import buttons
+from utils import callback_templates
 
 
 def bank_card_btn(lang: str):

@@ -34,7 +34,6 @@ async def _(msg: types.Message, state: FSMContext):
     chat_id = msg.chat.id
     key = StorageKey(bot.id, chat_id, user_id)
     data = await storage.get_data(key)
-    hot_order = data['hot_order']
     service_msg_ids: list = data['service_msg_ids']
 
     entities = msg.entities or msg.entities or msg.caption_entities or []
@@ -48,15 +47,11 @@ async def _(msg: types.Message, state: FSMContext):
 
     url = url[0]  # first value
 
-    if not hot_order:
-        quantity = data['quantity']
-        total_amount = data['total_amount']
+    quantity = data['quantity']
+    total_amount = data['total_amount']
 
-        msg_text = messages.correct_url[lang].format(url=url, quantity=quantity, total_amount=total_amount,
-                                                     currency=currency)
-
-    else:
-        msg_text = messages.correct_url_hot_order[lang]
+    msg_text = messages.correct_url[lang].format(url=url, quantity=quantity, total_amount=total_amount,
+                                                 currency=currency)
 
     # await state.set_state(NewOrder.check_details)
     service_msg = await msg.answer(msg_text,
