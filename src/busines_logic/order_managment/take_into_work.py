@@ -63,6 +63,9 @@ async def create_order(internal_order_id: str, order_info: dict):
     order_info['internal_order_id'] = internal_order_id
 
     order_id = await api.create_new_order(user_id, service_id, url, quantity)
+    if order_id is None:
+        await bot.send_message(config.ADMIN_ID, f'Ошибка при создании заказа {internal_order_id}\n<b>Backend_order_id is None</b>')
+
     orders_db.new_order(user_id, platform, order_id, order_info)
 
     return order_id
