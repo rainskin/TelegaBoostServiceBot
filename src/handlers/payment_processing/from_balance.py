@@ -3,7 +3,6 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.base import StorageKey
 
 from busines_logic.order_managment.place_paid_orders_to_que import place_paid_order
-from config import MAINTENANCE_MODE
 from core.db import users
 from core.db.models.order_item import OrderItem
 from core.db.main_orders_que import orders_queue

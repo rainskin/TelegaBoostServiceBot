@@ -137,7 +137,6 @@ async def take_orders_into_work(orders: dict):
         print(order_item.dict())
         if ServiceType(order_item.service_type) == ServiceType.TG_STARS:
             process_tg_stars_order(order_item)
-            continue
         elif ServiceType(order_item.service_type) == ServiceType.STANDARD:
             await process_standard_order(order_item)
         else:

@@ -2,7 +2,7 @@ from aiogram import BaseMiddleware, types
 from aiogram.types import CallbackQuery
 from typing import Callable, Dict, Any
 
-from config import MAINTENANCE_MODE
+from core.db import admin
 
 
 class CallbackMaintenanceMiddleware(BaseMiddleware):
@@ -13,7 +13,7 @@ class CallbackMaintenanceMiddleware(BaseMiddleware):
             data: Dict[str, Any]
     ) -> Any:
 
-        if MAINTENANCE_MODE:
+        if admin.is_maintenance_mode():
             await show_maintenance_alert_as_query_answer(query)
             return
 

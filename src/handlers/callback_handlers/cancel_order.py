@@ -4,6 +4,7 @@ from aiogram import types, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.base import StorageKey
 
+from core.db.main_orders_que import orders_queue
 from core.storage import storage
 from loader import dp, bot
 from core.db import users, orders, admin
@@ -18,22 +19,23 @@ template = callback_templates.cancel_order()
 @dp.callback_query(F.data.startswith(template))
 async def _(query: types.CallbackQuery, state: FSMContext):
     user_id = query.from_user.id
-    order_id: str = query.data.replace(template, '')
+    internal_order_id: str = query.data.replace(template, '')
     lang = users.get_user_lang(user_id)
     key = StorageKey(bot_id=bot.id, chat_id=user_id, user_id=user_id)
-    if is_not_accepted_order(user_id, order_id):
-        if not orders.is_order_exist(user_id, order_id, not_accepted_order=True) or admin.is_order_in_execution_queue(order_id):
+    status = orders_queue.get_status(internal_order_id)
+    if is_not_accepted_order(user_id, internal_order_id) and not status.IN_PROGRESS:
+        if not orders.is_order_exist(user_id, internal_order_id, not_accepted_order=True) or admin.is_order_in_execution_queue(internal_order_id):
             text = messages.canceling_not_accepted_order_is_not_available[lang]
             kb = None
         else:
-            text = messages.cancel_order[lang].format(order_id=order_id)
+            text = messages.cancel_order[lang].format(order_id=internal_order_id)
             kb = navigation_kb.yes_or_no_kb(lang).as_markup()
     else:
         text = messages.action_is_not_available[lang]
         kb = None
 
     await query.message.edit_text(text, reply_markup=kb)
-    await storage.set_data(key, order_id=order_id)
+    await storage.set_data(key, order_id=internal_order_id)
     await state.set_state(ManageOrders.cancel_order)
     await query.answer()
 

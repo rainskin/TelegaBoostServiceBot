@@ -5,9 +5,11 @@ from aiogram.methods import DeleteWebhook
 import background_tasks
 import handlers
 from loader import bot, dp
+from utils import middlewares
 
 
 async def main():
+    middlewares.setup()
     handlers.setup()
     await background_tasks.start()
     print('bot is running')

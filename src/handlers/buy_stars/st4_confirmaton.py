@@ -35,7 +35,7 @@ async def handle_payment(query: types.CallbackQuery, state: FSMContext):
 
     total_amount = data.get('total_amount')
     amount_without_commission = data.get('amount_without_commission')
-    profit = total_amount - amount_without_commission
+    profit = data.get('profit')
 
     order_item = OrderItem(
         internal_order_id=internal_order_id,
@@ -53,13 +53,13 @@ async def handle_payment(query: types.CallbackQuery, state: FSMContext):
     save_unpaid_order(order_item)
     await delete_messages(user_id, msgs_to_delete)
 
-@dp.callback_query(F.data == 'yes', states.BuyStars.confirmation)
+@dp.callback_query(F.data == 'no', states.BuyStars.confirmation)
 async def handle_payment(query: types.CallbackQuery, state: FSMContext):
     user_id = query.message.chat.id
     lang = users.get_user_lang(user_id)
     key = StorageKey(bot.id, user_id, user_id)
     data = await storage.get_data(key)
     msgs_to_delete = data.get('msgs_to_delete', [])
-    await query.answer()
+    await query.answer('Отменено')
     await delete_messages(user_id, msgs_to_delete)
     await return_to_menu(user_id, state)

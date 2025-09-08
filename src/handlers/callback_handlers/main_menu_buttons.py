@@ -4,6 +4,8 @@ from aiogram import types, F
 from aiogram.fsm.storage.base import StorageKey
 
 from aiogram.fsm.context import FSMContext
+
+from core.db.main_orders_que import orders_queue
 from core.storage import storage
 from handlers.callback_handlers.orders_navigation_buttons import get_order_statuses_text, get_order_ids, try_get_orders
 from loader import dp, bot
@@ -26,13 +28,16 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     not_accepted_orders = orders.get_not_accepted_orders(user_id)
     if not_accepted_orders:
         await query.message.answer(messages.not_accepted_order[lang])
-        for _order_id, _order_info in not_accepted_orders.items():
+        for internal_order_id, _order_info in not_accepted_orders.items():
+            order_status = orders_queue.get_status(internal_order_id)
+            # if order_status.IN_PROGRESS:
+            #     continue
             url = _order_info.get('url')
             quantity = _order_info.get('quantity')
             total_amount = _order_info.get('total_amount')
 
-            text = messages.not_accepted_order_status[lang].format(order_id=_order_id, url=url, quantity=quantity, total_amount=total_amount)
-            kb = cancel_order(lang, _order_id)
+            text = messages.not_accepted_order_status[lang].format(order_id=internal_order_id, url=url, quantity=quantity, total_amount=total_amount)
+            kb = cancel_order(lang, internal_order_id)
             await query.message.answer(text, reply_markup=kb.as_markup())
 
     current_orders = True

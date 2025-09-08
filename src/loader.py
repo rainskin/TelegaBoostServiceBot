@@ -5,10 +5,9 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 
 from config import BOT_TOKEN, MONGO_URL, MONGO_DB_NAME
-from utils.Middlewares.MaintenanceMiddlaware import CallbackMaintenanceMiddleware
 
 dp: Dispatcher = Dispatcher()
-dp.callback_query.middleware(CallbackMaintenanceMiddleware())
+
 
 default = DefaultBotProperties(parse_mode=ParseMode.HTML, link_preview_is_disabled=True)
 bot: Bot = Bot(BOT_TOKEN, default=default)

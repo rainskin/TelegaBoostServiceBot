@@ -53,10 +53,18 @@ class Admin:
                 'balance_recharge_commission': 0,  # int
                 'minimal_recharge_amount': 0,  # int
                 'referral_deposit_reward_percent': 0,  # int
+                'maintenance_mode': False,  # bool
                 'info': 'This document contains shop settings including commissions and referral rewards.'
             }},
             upsert=True
         )
+
+    def is_maintenance_mode(self) -> bool:
+        doc = self.collection.find_one({'shop_settings': True})
+        print(doc)
+        r = doc.get('maintenance_mode', False) if doc else False
+        print(r)
+        return r
 
     def get_exchange_rates(self) -> dict | None:
         doc = self.collection.find_one({'exchange_rates': True})
@@ -74,6 +82,14 @@ class Admin:
             }}
         )
 
+    def get_tg_stars_price_ranges_in_rub(self):
+        doc = self.collection.find_one({'tg_star_per_rub': True}, {"price_ranges": 1})
+        if not doc or "price_ranges" not in doc:
+            return []
+
+        # вернём список списков [[min_stars, price_per_star], ...]
+        return [(r["min_stars"], r["price_per_star"]) for r in doc["price_ranges"]]
+
     def get_commission_percentage(self, service_id: str):
         doc: dict = self.collection.find_one({'shop_settings': True})
         base_commission = doc['base_commission']
@@ -87,6 +103,7 @@ class Admin:
         doc: dict = self.collection.find_one({'shop_settings': True})
         r = doc.get('minimal_recharge_amount')
         return r
+
     def get_balance_recharge_commission(self):
         doc: dict = self.collection.find_one({'shop_settings': True})
         r = doc.get('balance_recharge_commission')
@@ -111,34 +128,34 @@ class Admin:
                 {'$unset': {f'orders.{order_id}': ''}}
             )
 
-# TODO: Переделать
+    # TODO: Переделать
 
-#     def put_order_to_queue(self, user_id: int, internal_order_id: str, data: dict):
-#         date = datetime.now().strftime(self.default_datetime_format)
-#         quantity = data['quantity']
-#         service_id = data['service_id']
-#         url = data['url']
-#         amount_without_commission = data.get('amount_without_commission')
-#         profit = data['profit']
-#         total_amount = data['total_amount']
-#         canceling_is_available = data.get('canceling_is_available')
-#
-#         order_info = {
-#             'date': date,
-#             'user_id': user_id,
-#             'service_id': service_id,
-#             'url': url,
-#             'quantity': quantity,
-#             'amount_without_commission': amount_without_commission,
-#             'total_amount': total_amount,
-#             'profit': profit,
-#             'canceling_is_available': canceling_is_available
-#         }
-#         self.collection.update_one({'order_queue': True}, {'$set': {
-#             f'orders.{internal_order_id}': order_info
-#         }}, upsert=True)
-#
-#         orders.add_not_accepted_order(user_id, internal_order_id, order_info)
+    #     def put_order_to_queue(self, user_id: int, internal_order_id: str, data: dict):
+    #         date = datetime.now().strftime(self.default_datetime_format)
+    #         quantity = data['quantity']
+    #         service_id = data['service_id']
+    #         url = data['url']
+    #         amount_without_commission = data.get('amount_without_commission')
+    #         profit = data['profit']
+    #         total_amount = data['total_amount']
+    #         canceling_is_available = data.get('canceling_is_available')
+    #
+    #         order_info = {
+    #             'date': date,
+    #             'user_id': user_id,
+    #             'service_id': service_id,
+    #             'url': url,
+    #             'quantity': quantity,
+    #             'amount_without_commission': amount_without_commission,
+    #             'total_amount': total_amount,
+    #             'profit': profit,
+    #             'canceling_is_available': canceling_is_available
+    #         }
+    #         self.collection.update_one({'order_queue': True}, {'$set': {
+    #             f'orders.{internal_order_id}': order_info
+    #         }}, upsert=True)
+    #
+    #         orders.add_not_accepted_order(user_id, internal_order_id, order_info)
 
     def put_order_to_queue(self, order_item: OrderItem):
 
