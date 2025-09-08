@@ -1,5 +1,7 @@
 from typing import List, Dict, Any
 
+import aiohttp
+
 import config
 import requests
 import asyncio
@@ -10,19 +12,50 @@ API_TOKEN = config.API_TOKEN
 BASE_URL = config.BASE_URL
 
 
-async def make_request(url: str, user_id: int) -> Any:
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        return response.json()
-    except requests.RequestException as e:
-        error_message = "HTTP request failed: An error occurred while processing your request. Обратитесь в поддержку, пожалуйста"
-        await bot.send_message(chat_id=user_id, text=error_message)
-        return None
-    except ValueError as e:
-        error_message = "Failed to decode JSON response: An error occurred while processing the response. Обратитесь в поддержку, пожалуйста"
-        await bot.send_message(chat_id=user_id, text=error_message)
-        return None
+# async def make_request(url: str, user_id: int) -> Any:
+#     try:
+#         response = requests.get(url)
+#         response.raise_for_status()
+#         return response.json()
+#     except requests.RequestException as e:
+#         error_message = "HTTP request failed: An error occurred while processing your request. Обратитесь в поддержку, пожалуйста"
+#         await bot.send_message(chat_id=user_id, text=error_message)
+#         return None
+#     except ValueError as e:
+#         error_message = "Failed to decode JSON response: An error occurred while processing the response. Обратитесь в поддержку, пожалуйста"
+#         await bot.send_message(chat_id=user_id, text=error_message)
+#         return None
+
+
+# Универсальная обертка с ретраями
+async def make_request(url: str, user_id: int, retries: int = 3, cooldown: int = 5) -> Any:
+    for attempt in range(1, retries + 1):
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, timeout=10) as response:
+                    response.raise_for_status()
+                    return await response.json()
+
+        except (aiohttp.ClientError, asyncio.TimeoutError) as e:
+            # Если это не последняя попытка — ждем и пробуем еще раз
+            if attempt < retries:
+                await asyncio.sleep(cooldown * attempt)  # задержка растёт
+                continue
+
+            error_message = (
+                f"❌ Ошибка HTTP-запроса (попытка {attempt}/{retries}).\n"
+                f"Ошибка: {str(e)}"
+            )
+            await bot.send_message(chat_id=config.ADMIN_ID, text=error_message)
+            return None
+
+        except Exception as e:
+            error_message = (
+                f"❌ Непредвиденная ошибка при обработке запроса.\n"
+                f"Ошибка: {str(e)}"
+            )
+            await bot.send_message(chat_id=config.ADMIN_ID, text=error_message)
+            return None
 
 
 async def get_account_balance():
@@ -81,19 +114,42 @@ async def get_order_statuses(order_ids: List[str], user_id: int) -> Dict[str, di
     return filtered_statuses
 
 
+# async def create_new_order(user_id: int, service_id: str, link: str, quantity: int):
+#     method = 'add'
+#     service_id = service_id
+#     quantity = str(quantity)
+#     url = (f'{BASE_URL}{method}&'
+#            f'service={service_id}&'
+#            f'link={link}'
+#            f'&quantity={quantity}&'
+#            f'key={API_TOKEN}')
+#
+#     response = await make_request(url, user_id)
+#     order_id: int = response['order']
+#     return order_id
+
 async def create_new_order(user_id: int, service_id: str, link: str, quantity: int):
     method = 'add'
-    service_id = service_id
-    quantity = str(quantity)
-    url = (f'{BASE_URL}{method}&'
-           f'service={service_id}&'
-           f'link={link}'
-           f'&quantity={quantity}&'
-           f'key={API_TOKEN}')
+    url = (
+        f"{BASE_URL}{method}&"
+        f"service={service_id}&"
+        f"link={link}&"
+        f"quantity={quantity}&"
+        f"key={API_TOKEN}"
+    )
 
     response = await make_request(url, user_id)
-    order_id: int = response['order']
-    return order_id
+
+    if response is None:
+        return None  # если все ретраи упали — возвращаем None, дальше решаешь как обработать
+
+    try:
+        order_id: int = response['order']
+        return order_id
+    except KeyError:
+        error_message = "⚠️ API вернул неожиданный ответ при создании заказа"
+        await bot.send_message(chat_id=config.ADMIN_ID, text=error_message)
+        return None
 
 async def main():
     service = await get_order_statuses(['169337601'], config.ADMIN_ID)

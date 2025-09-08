@@ -1,16 +1,14 @@
+import config
 from core.db import admin, orders as orders_db, users
 from core.db.main_orders_que import orders_queue
 from core.db.models.order_item import OrderItem
 from enums.orders.order_status import OrderStatus
+from loader import bot
 from utils import api
 
 
 async def process_standard_order(order_item: OrderItem):
-    print('начало оформления')
-    print(order_item.dict())
     backend_order_id = await create_order(order_item)
-    print('оформление завершено')
-    print(backend_order_id)
 
     order_item.backend_order_id = backend_order_id
     order_item.order_status = OrderStatus.IN_PROGRESS
@@ -31,6 +29,12 @@ async def create_order(order_item: OrderItem):
     platform = users.get_user_platform(user_id)
 
     backend_order_id = await api.create_new_order(user_id, str(service_id), url, quantity)
+
+    if backend_order_id is None:
+        await bot.send_message(config.ADMIN_ID,
+                               f"Не удалось создать заказ {order_item.internal_order_id}. backend_order_id is None")
+        return
+
     order_item.backend_order_id = backend_order_id
     orders_db.new_order(platform, order_item)
 
