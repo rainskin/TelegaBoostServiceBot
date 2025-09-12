@@ -129,6 +129,7 @@ async def get_order_statuses(order_ids: List[str], user_id: int) -> Dict[str, di
 #     return order_id
 
 async def create_new_order(user_id: int, service_id: str, link: str, quantity: int) -> int | None:
+
     method = 'add'
     url = (
         f"{BASE_URL}{method}&"
@@ -157,6 +158,7 @@ async def main():
 
 
 # asyncio.run(main())
+
 
 
 # order_ids = [70117436, 111]

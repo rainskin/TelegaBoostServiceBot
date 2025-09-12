@@ -76,7 +76,8 @@ def get_summary_text(orders: dict, available_balance: float) -> str:
 #     return order_id
 #
 
-async def send_notification_to_user(user_id, internal_order_id):
+
+async def send_notification_to_user(user_id, order_id):
     lang = users.get_user_lang(user_id)
     text = messages.take_order_into_work[lang].format(internal_order_id=internal_order_id)
     await bot.send_message(user_id, text)
