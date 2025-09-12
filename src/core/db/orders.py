@@ -3,6 +3,9 @@ from typing import List
 from core.db import users
 
 import loader
+from core.db.models.order_item import OrderItem
+from enums.orders.order_status import OrderStatus
+
 
 class Orders:
 
@@ -18,31 +21,51 @@ class Orders:
         doc = self.collection.find_one({'user_id': user_id}, {'orders_archive': 1})
         return doc.get('orders_archive') if doc else None
 
-    def new_order(self, user_id: id, platform: str, order_id: int, order_info: dict):
-        order_id = str(order_id)
-        if self.is_first_order(user_id):
-            doc = {
-                'user_id': user_id,
-                'platform': platform,
-                'current_orders': {order_id: order_info}
-            }
+    # def new_order(self, user_id: id, platform: str, order_id: int, order_info: dict):
+    #     order_id = str(order_id)
+    #     if self.is_first_order(user_id):
+    #         doc = {
+    #             'user_id': user_id,
+    #             'platform': platform,
+    #             'current_orders': {order_id: order_info}
+    #         }
+    #
+    #         self.collection.insert_one(doc)
+    #
+    #     else:
+    #         self.collection.update_one(
+    #             {'user_id': user_id},
+    #             {'$set': {f'current_orders.{order_id}': order_info}},
+    #             upsert=True
+    #         )
 
-            self.collection.insert_one(doc)
-
-        else:
-            self.collection.update_one(
-                {'user_id': user_id},
-                {'$set': {f'current_orders.{order_id}': order_info}},
-                upsert=True
-            )
+    def new_order(self, platform: str, order_item: OrderItem):
+        user_id = order_item.user_id
+        backend_order_id = order_item.backend_order_id
+        order_id = str(backend_order_id) if backend_order_id else order_item.internal_order_id
+        print(f"Saving new order {order_id} for user {user_id} in platform {platform}")
+        print(order_item.internal_order_id)
+        self.collection.update_one(
+            {'user_id': user_id},
+            {'$set': {f'current_orders.{order_id}': order_item.dict()}},
+            upsert=True
+        )
 
     def get_not_accepted_orders(self, user_id: int) -> dict | None:
         doc = self.collection.find_one({'user_id': user_id}, {'not_accepted_orders': 1})
         return doc.get('not_accepted_orders') if doc else None
 
-    def add_not_accepted_order(self, user_id: int, order_id: str, order_info: dict):
-        self.collection.update_one({'user_id': user_id}, {'$set': {
-            f'not_accepted_orders.{order_id}': order_info}},
+    #  TODO переделать
+
+    # def add_not_accepted_order(self, user_id: int, order_id: str, order_info: dict):
+    #     self.collection.update_one({'user_id': user_id}, {'$set': {
+    #         f'not_accepted_orders.{order_id}': order_info}},
+    #                                upsert=True)
+
+    # Новая версия с использованием OrderItem
+    def add_not_accepted_order(self, order_item: OrderItem):
+        self.collection.update_one({'user_id': order_item.user_id}, {'$set': {
+            f'not_accepted_orders.{order_item.internal_order_id}': order_item.dict()}},
                                    upsert=True)
 
     def remove_not_accepted_order(self, user_id: int, order_id):
@@ -88,6 +111,7 @@ class Orders:
             if order_info:
                 users.add_balance(user_id, amount)
 
+    # TODO удалить
     def is_first_order(self, user_id):
         r = not self.collection.find_one({'user_id': user_id})
         return r
@@ -118,6 +142,34 @@ class Orders:
     #             or doc.get('orders_archive', {}).get(order_id)
     #     )
 
+    def get_internal_order_id_by_backend_order_id(self, user_id: int, backend_order_id: str) -> str | None:
+        order_info = self.get_order_info(user_id, backend_order_id, current_orders=True)
+        if not order_info:
+            order_info = self.get_order_info(user_id, backend_order_id, current_orders=False)
+        return order_info.get('internal_order_id') if order_info else None
+
+    def update_order_status(self, backend_order_id: str, status: OrderStatus):
+        doc = self.collection.find_one_and_update(
+            {f'current_orders.{backend_order_id}': {"$exists": True}},
+            {"$set": {f'current_orders.{backend_order_id}.order_status': status.value}}
+        )
+        if not doc:
+            self.collection.find_one_and_update(
+                {f'orders_archive.{backend_order_id}': {"$exists": True}},
+                {"$set": {f'orders_archive.{backend_order_id}.order_status': status.value}}
+            )
+
+    def update_active_order(self, backend_order_id: str, order_item: OrderItem):
+        doc = self.collection.find_one_and_update(
+            {f'current_orders.{backend_order_id}': {"$exists": True}},
+            {"$set": {f'current_orders.{backend_order_id}': order_item.dict()}}
+        )
+        if not doc:
+            self.collection.find_one_and_update(
+                {f'orders_archive.{backend_order_id}': {"$exists": True}},
+                {"$set": {f'orders_archive.{backend_order_id}': order_item.dict()}}
+            )
+
     def move_orders_to_archive(self, user_id: int, order_id: str):
         pipeline = [
             {
@@ -137,15 +189,18 @@ class Orders:
 
         self.collection.update_one({'user_id': user_id}, pipeline)
 
-    def save_last_order_info(self, user_id: int, data: dict):
-        self.collection.update_one({'user_id': user_id}, {"$set": {'last_order_info': data}}, upsert=True)
+    # TODO Удалить после проверки, что ничего не ломается.
+    # ------------------------------------------------------------------------------
+    # def save_last_order_info(self, user_id: int, data: dict):
+    #     self.collection.update_one({'user_id': user_id}, {"$set": {'last_order_info': data}}, upsert=True)
 
-    def get_last_order_info(self, user_id: int):
-        doc = self.collection.find_one({'user_id': user_id}, {'last_order_info': 1})
-        return doc.get('last_order_info') if doc else None
+    # def get_last_order_info(self, user_id: int):
+    #     doc = self.collection.find_one({'user_id': user_id}, {'last_order_info': 1})
+    #     return doc.get('last_order_info') if doc else None
 
-    def reset_last_order_info(self, user_id: int):
-        self.collection.update_one({'user_id': user_id}, {"$unset": {'last_order_info': ''}})
+    # def reset_last_order_info(self, user_id: int):
+    #     self.collection.update_one({'user_id': user_id}, {"$unset": {'last_order_info': ''}})
+    # ------------------------------------------------------------------------------
 
     def get_last_internal_order(self, user_id: int):
         doc = self.collection.find_one({'user_id': user_id}, {'last_internal_order': 1})

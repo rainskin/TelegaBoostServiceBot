@@ -1,5 +1,5 @@
 services:
-  app:
+  TgUpBot:
     build: src
     restart: always
     environment:

@@ -2,12 +2,13 @@ from datetime import datetime
 
 import loader
 from core.db import orders
+from core.db.models.order_item import OrderItem
 
 
 class Admin:
     def __init__(self):
         self.collection = loader.db['admin']
-        self.default_datetime_format = '%d-%m-%Y %H:%M'
+        self.default_datetime_format = '%d-%m-%Y %H:%M:%S'
         self.init()
 
     def init(self):
@@ -52,10 +53,16 @@ class Admin:
                 'balance_recharge_commission': 0,  # int
                 'minimal_recharge_amount': 0,  # int
                 'referral_deposit_reward_percent': 0,  # int
+                'maintenance_mode': False,  # bool
                 'info': 'This document contains shop settings including commissions and referral rewards.'
             }},
             upsert=True
         )
+
+    def is_maintenance_mode(self) -> bool:
+        doc = self.collection.find_one({'shop_settings': True})
+        r = doc.get('maintenance_mode', False) if doc else False
+        return r
 
     def get_exchange_rates(self) -> dict | None:
         doc = self.collection.find_one({'exchange_rates': True})
@@ -73,6 +80,14 @@ class Admin:
             }}
         )
 
+    def get_tg_stars_price_ranges_in_rub(self):
+        doc = self.collection.find_one({'tg_star_per_rub': True}, {"price_ranges": 1})
+        if not doc or "price_ranges" not in doc:
+            return []
+
+        # вернём список списков [[min_stars, price_per_star], ...]
+        return [(r["min_stars"], r["price_per_star"]) for r in doc["price_ranges"]]
+
     def get_commission_percentage(self, service_id: str):
         doc: dict = self.collection.find_one({'shop_settings': True})
         base_commission = doc['base_commission']
@@ -86,6 +101,7 @@ class Admin:
         doc: dict = self.collection.find_one({'shop_settings': True})
         r = doc.get('minimal_recharge_amount')
         return r
+
     def get_balance_recharge_commission(self):
         doc: dict = self.collection.find_one({'shop_settings': True})
         r = doc.get('balance_recharge_commission')
@@ -110,34 +126,44 @@ class Admin:
                 {'$unset': {f'orders.{order_id}': ''}}
             )
 
-    def put_order_to_queue(self, user_id: int, internal_order_id: str, data: dict):
-        date = datetime.now().strftime(self.default_datetime_format)
-        quantity = data['quantity']
-        service_id = data['service_id']
-        url = data['url']
-        amount_without_commission = data.get('amount_without_commission')
-        profit = data['profit']
-        total_amount = data['total_amount']
-        hot_order = data['hot_order']
-        canceling_is_available = data.get('canceling_is_available')
+    # TODO: Переделать
 
-        order_info = {
-            'date': date,
-            'user_id': user_id,
-            'service_id': service_id,
-            'url': url,
-            'quantity': quantity,
-            'amount_without_commission': amount_without_commission,
-            'total_amount': total_amount,
-            'profit': profit,
-            'hot_order': hot_order,
-            'canceling_is_available': canceling_is_available
-        }
+    #     def put_order_to_queue(self, user_id: int, internal_order_id: str, data: dict):
+    #         date = datetime.now().strftime(self.default_datetime_format)
+    #         quantity = data['quantity']
+    #         service_id = data['service_id']
+    #         url = data['url']
+    #         amount_without_commission = data.get('amount_without_commission')
+    #         profit = data['profit']
+    #         total_amount = data['total_amount']
+    #         canceling_is_available = data.get('canceling_is_available')
+    #
+    #         order_info = {
+    #             'date': date,
+    #             'user_id': user_id,
+    #             'service_id': service_id,
+    #             'url': url,
+    #             'quantity': quantity,
+    #             'amount_without_commission': amount_without_commission,
+    #             'total_amount': total_amount,
+    #             'profit': profit,
+    #             'canceling_is_available': canceling_is_available
+    #         }
+    #         self.collection.update_one({'order_queue': True}, {'$set': {
+    #             f'orders.{internal_order_id}': order_info
+    #         }}, upsert=True)
+    #
+    #         orders.add_not_accepted_order(user_id, internal_order_id, order_info)
+
+    def put_order_to_queue(self, order_item: OrderItem):
+
+        order_item.updated_at = datetime.now().strftime(self.default_datetime_format)
+        internal_order_id = order_item.internal_order_id
         self.collection.update_one({'order_queue': True}, {'$set': {
-            f'orders.{internal_order_id}': order_info
+            f'orders.{internal_order_id}': order_item.dict()
         }}, upsert=True)
 
-        orders.add_not_accepted_order(user_id, internal_order_id, order_info)
+        orders.add_not_accepted_order(order_item)
 
     def get_orders_for_execution(self) -> dict | None:
         doc = self.collection.find_one({'orders_for_execution': True})
@@ -183,7 +209,6 @@ class Admin:
                 '$unset': {f'payments.{payment_id}': payment_id}
             }
         )
-        print(f"Payment {payment_id} moved to successful payments.")
 
     def move_to_failed_payments(self, payment_id: str):
         doc = self.collection.find_one({'payments_queue': True}, {'payments': 1})
@@ -196,7 +221,6 @@ class Admin:
                 '$unset': {f'payments.{payment_id}': payment_id}
             }
         )
-        print(f"Payment {payment_id} moved to failed payments.")
 
     def is_not_paid(self, payment_id: str):
         doc = self.collection.find_one({'payments_queue': True}, {'payments': 1})

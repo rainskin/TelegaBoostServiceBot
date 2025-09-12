@@ -11,7 +11,11 @@ categories = {
            '👍🏻❤️‍🔥 Reactions',
            '🤖 Bot launches "/start"', 'Vk', 'Twitch', '🎮 Bot referrals'],
 }
-
+buy_stars_button = {
+    'callback': 'buy_stars',
+    'ru': '⭐️ Купить Звезды',
+    'en': '⭐️ Buy Stars'
+}
 hot_offers = {'callback': 'hot_offers',
               'ru': '🔥 Горячее предложение',
               'en': '🔥 Hot offers'}

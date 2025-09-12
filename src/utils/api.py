@@ -4,7 +4,7 @@ import aiohttp
 
 import config
 import requests
-
+import asyncio
 from core.db import users
 from loader import bot
 
@@ -128,7 +128,8 @@ async def get_order_statuses(order_ids: List[str], user_id: int) -> Dict[str, di
 #     order_id: int = response['order']
 #     return order_id
 
-async def create_new_order(user_id: int, service_id: str, link: str, quantity: int):
+async def create_new_order(user_id: int, service_id: str, link: str, quantity: int) -> int | None:
+
     method = 'add'
     url = (
         f"{BASE_URL}{method}&"
@@ -150,6 +151,14 @@ async def create_new_order(user_id: int, service_id: str, link: str, quantity: i
         error_message = "⚠️ API вернул неожиданный ответ при создании заказа"
         await bot.send_message(chat_id=config.ADMIN_ID, text=error_message)
         return None
+
+async def main():
+    service = await get_order_statuses(['169337601'], config.ADMIN_ID)
+    print(service)
+
+
+# asyncio.run(main())
+
 
 
 # order_ids = [70117436, 111]

@@ -10,7 +10,7 @@ from busines_logic.order_managment.take_into_work import try_get_orders_for_exec
 from core.db import admin, users
 from core.storage import storage
 from loader import dp, bot
-from utils import  states
+from utils import states, api
 from utils.keyboards.admin import orders_manage
 from utils.navigation import  get_admin_menu
 
@@ -68,10 +68,10 @@ async def _ (query: CallbackQuery, state: FSMContext):
     key = StorageKey(bot_id=bot.id, chat_id=user_id, user_id=user_id)
 
     orders = try_get_orders_for_execution()
-
+    available_balance = await api.get_account_balance()
     if orders:
         total_amount = get_total_amount(orders)
-        text = get_summary_text(orders)
+        text = get_summary_text(orders, available_balance)
         kb = orders_manage().as_markup()
         await storage.set_data(key, total_orders=len(orders), total_amount=total_amount)
 

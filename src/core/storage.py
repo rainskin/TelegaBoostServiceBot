@@ -51,7 +51,7 @@ class MongoStorage(BaseStorage):
 
     async def get_data(self, key: StorageKey) -> dict:
         document = await self.collection.find_one({'chat_id': key.chat_id, 'user_id': key.user_id})
-        return document['data'] if document else {}
+        return document.get('data', {}) if document else {}
 
     async def reset_data(self, key: StorageKey):
         await self.collection.update_one(

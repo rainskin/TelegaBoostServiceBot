@@ -8,6 +8,7 @@ from core.storage import storage
 from loader import dp, bot
 from utils import states
 from utils.keyboards import payment_methods
+from utils.methods import delete_messages
 
 
 @dp.callback_query(F.data == 'yes', states.BalanceRecharge.choosing_amount)
@@ -23,10 +24,8 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     await query.message.answer(text, reply_markup=kb)
     await query.answer()
     await query.message.delete()
-    for msg_id in msgs_to_delete:
-        try:
-            await bot.delete_message(user_id, msg_id)
-        except Exception as e:
-            print(f"Error deleting message {msg_id}: {e}")
+    await delete_messages(user_id, msgs_to_delete)
+
     await state.set_state(states.Payment.choosing_method)
+
 

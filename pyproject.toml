@@ -7,7 +7,7 @@ readme = "README.md"
 packages = [{include = "src"}]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.11,<4"
 aiogram = "3.13.1"
 envparse = "^0.2.0"
 pymongo = "^4.7.2"

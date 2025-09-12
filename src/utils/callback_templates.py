@@ -32,3 +32,11 @@ def accept_button_template():
 
 def balance_recharge_template():
     return 'balance_recharge_'
+
+
+def pay_unpaid_order_template():
+    return 'pay_unpaid_order_'
+
+
+def delete_unpaid_order_template():
+    return 'delete_unpaid_order_'

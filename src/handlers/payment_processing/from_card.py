@@ -8,7 +8,6 @@ from core.db import users, orders, admin
 from core.db.admin import build_payment_info
 from core.localisation.texts import messages
 from core.storage import storage
-from handlers.new_order.create import place_order
 from handlers.new_order.st4_make_order import get_internal_order_id
 from loader import dp, bot
 from utils import callback_templates, navigation, states
