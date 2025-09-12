@@ -4,3 +4,9 @@ services:
     restart: always
     environment:
       TZ: Europe/Moscow
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
