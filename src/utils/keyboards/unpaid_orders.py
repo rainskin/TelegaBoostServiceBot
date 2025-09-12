@@ -3,13 +3,13 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from utils.callback_templates import pay_unpaid_order_template, delete_unpaid_order_template
 
 pay_unpaid_order_button_text = {
-    'ru': 'Оплатить заказ',
-    'en': 'Pay for the order',
+    'ru': '💵 Оплатить заказ',
+    'en': '💵 Pay for the order',
 }
 
 delete_unpaid_order_button_text = {
-    'ru': 'Удалить заказ',
-    'en': 'Delete order',
+    'ru': '🗑 Удалить заказ',
+    'en': '🗑 Delete order',
 }
 
 

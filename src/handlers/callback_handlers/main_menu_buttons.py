@@ -1,5 +1,4 @@
 
-
 from aiogram import types, F
 from aiogram.fsm.storage.base import StorageKey
 
@@ -7,6 +6,7 @@ from aiogram.fsm.context import FSMContext
 
 from core.db.main_orders_que import orders_queue
 from core.storage import storage
+from enums.orders.service_type import ServiceType
 from handlers.callback_handlers.orders_navigation_buttons import get_order_statuses_text, get_order_ids, try_get_orders
 from loader import dp, bot
 from core.db import users, orders
@@ -29,9 +29,15 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     if not_accepted_orders:
         await query.message.answer(messages.not_accepted_order[lang])
         for internal_order_id, _order_info in not_accepted_orders.items():
-            order_status = orders_queue.get_status(internal_order_id)
-            # if order_status.IN_PROGRESS:
-            #     continue
+
+            # заказы на звезды не отображаются
+            try:
+                order_item = orders_queue.get(internal_order_id)
+                if order_item.service_type.TG_STARS:
+                    continue
+            except Exception:
+                pass
+
             url = _order_info.get('url')
             quantity = _order_info.get('quantity')
             total_amount = _order_info.get('total_amount')
@@ -44,16 +50,26 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     _orders = await try_get_orders(user_id, lang, current_orders=current_orders)
 
     if not _orders:
+        await query.message.answer(messages.no_active_orders[lang],
+                                   reply_markup=navigation_kb.orders(lang, current_orders=current_orders).as_markup())
         return
     order_ids = get_order_ids(_orders)
+    if not order_ids:
+        await query.message.answer(messages.no_active_orders[lang],
+                                   reply_markup=navigation_kb.orders(lang, current_orders=current_orders).as_markup())
+        return
+
+    order_ids = get_orders_without_tg_stars_orders(order_ids)
 
     if not order_ids:
+        await query.message.answer(messages.no_active_orders[lang], reply_markup=navigation_kb.orders(lang, current_orders=current_orders).as_markup())
         return
 
     current_order_statuses = await get_order_statuses(order_ids, user_id)
 
     update_statuses(user_id, current_order_statuses)
     await remove_orders_to_history_and_return_money_for_canceled_orders(user_id, current_order_statuses)
+
 
     await get_order_statuses_text(user_id, lang, order_ids, current_orders=current_orders)
     await state.set_state(ManageOrders.scroll_orders)
@@ -71,11 +87,23 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     _orders = await try_get_orders(user_id, lang, current_orders=current_orders)
 
     if not _orders:
+        await query.message.answer(messages.no_history_of_orders[lang],
+                                   reply_markup=navigation_kb.orders(lang, current_orders=current_orders).as_markup())
         return
     order_ids = get_order_ids(_orders)
 
     if not order_ids:
+        await query.message.answer(messages.no_history_of_orders[lang],
+                                   reply_markup=navigation_kb.orders(lang, current_orders=current_orders).as_markup())
         return
+
+    order_ids = get_orders_without_tg_stars_orders(order_ids)
+
+    if not order_ids:
+        await query.message.answer(messages.no_history_of_orders[lang],
+                                   reply_markup=navigation_kb.orders(lang, current_orders=current_orders).as_markup())
+        return
+
     await get_order_statuses_text(user_id, lang, order_ids, current_orders=current_orders)
     await state.set_state(ManageOrders.scroll_orders)
     await storage.set_data(key, current_orders=current_orders, order_ids=order_ids)
@@ -101,3 +129,16 @@ async def _(query: types.CallbackQuery):
     await query.answer()
     await query.message.delete()
 
+
+def get_orders_without_tg_stars_orders(order_ids: list[str]):
+    for order_id in order_ids:
+        try:
+            order_item = orders_queue.get(order_id)
+            if order_item:
+                service_type = order_item.service_type
+                if service_type == ServiceType.TG_STARS:
+                    order_ids.remove(order_item.internal_order_id)
+        except Exception:
+            continue
+
+    return order_ids

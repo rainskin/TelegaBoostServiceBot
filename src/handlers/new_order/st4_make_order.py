@@ -17,7 +17,6 @@ from utils.states import NewOrder
 
 @dp.callback_query(F.data == 'make_order', NewOrder.waiting_for_url)
 async def _(query: types.CallbackQuery, state: FSMContext):
-    print('make order handler...')
     user_id = query.from_user.id
     lang = users.get_user_lang(user_id)
     chat_id = query.message.chat.id

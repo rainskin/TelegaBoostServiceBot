@@ -40,7 +40,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
         await state.set_state(Payment.choosing_method)
 
     else:
-        text = f'Текущий статус заказа {internal_order_id}: {order_status.value}'
+        text = messages.unpaid_order_failed_to_do[lang].format(internal_order_id=internal_order_id, status=order_status.value)
         await query.message.edit_text(text, reply_markup=None)
 
 

@@ -61,9 +61,7 @@ class Admin:
 
     def is_maintenance_mode(self) -> bool:
         doc = self.collection.find_one({'shop_settings': True})
-        print(doc)
         r = doc.get('maintenance_mode', False) if doc else False
-        print(r)
         return r
 
     def get_exchange_rates(self) -> dict | None:
@@ -211,7 +209,6 @@ class Admin:
                 '$unset': {f'payments.{payment_id}': payment_id}
             }
         )
-        print(f"Payment {payment_id} moved to successful payments.")
 
     def move_to_failed_payments(self, payment_id: str):
         doc = self.collection.find_one({'payments_queue': True}, {'payments': 1})
@@ -224,7 +221,6 @@ class Admin:
                 '$unset': {f'payments.{payment_id}': payment_id}
             }
         )
-        print(f"Payment {payment_id} moved to failed payments.")
 
     def is_not_paid(self, payment_id: str):
         doc = self.collection.find_one({'payments_queue': True}, {'payments': 1})

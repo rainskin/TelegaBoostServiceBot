@@ -2,18 +2,19 @@ import config
 from core.db import orders
 from core.db.main_orders_que import orders_queue
 from enums.orders.order_status import OrderStatus
+from enums.orders.service_type import ServiceType
 from loader import bot
 
 
 async def return_money_for_canceled_or_partial_order(user_id: int, backend_order_id: str, order_status_info: dict):
     status = order_status_info['status']
-
     notification_for_user_text = ''
     notification_for_admin_text = ''
     currency = 'RUB'
 
     full_order_info = orders.get_order_info(user_id, backend_order_id, current_orders=True)
     internal_order_id = full_order_info['internal_order_id']
+    internal_status = orders_queue.get_status(internal_order_id)
     amount = 0.0
     if status == "Canceled":
 
@@ -58,9 +59,9 @@ async def return_money_for_canceled_or_partial_order(user_id: int, backend_order
 
 
 def update_db(user_id: int, backend_order_id: str, internal_order_id: str, amount: float):
-    orders.return_money_for_current_order(user_id, backend_order_id, amount)
 
     order_item = orders_queue.get(internal_order_id)
+    orders.return_money_for_current_order(user_id, backend_order_id, amount)
     order_item.is_money_returned = True
     orders_queue.update(order_item)
 

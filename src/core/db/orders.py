@@ -41,11 +41,13 @@ class Orders:
 
     def new_order(self, platform: str, order_item: OrderItem):
         user_id = order_item.user_id
-        backend_order_id = str(order_item.backend_order_id)
-
+        backend_order_id = order_item.backend_order_id
+        order_id = str(backend_order_id) if backend_order_id else order_item.internal_order_id
+        print(f"Saving new order {order_id} for user {user_id} in platform {platform}")
+        print(order_item.internal_order_id)
         self.collection.update_one(
             {'user_id': user_id},
-            {'$set': {f'current_orders.{backend_order_id}': order_item.dict()}},
+            {'$set': {f'current_orders.{order_id}': order_item.dict()}},
             upsert=True
         )
 
@@ -156,6 +158,7 @@ class Orders:
                 {f'orders_archive.{backend_order_id}': {"$exists": True}},
                 {"$set": {f'orders_archive.{backend_order_id}.order_status': status.value}}
             )
+
     def update_active_order(self, backend_order_id: str, order_item: OrderItem):
         doc = self.collection.find_one_and_update(
             {f'current_orders.{backend_order_id}': {"$exists": True}},
@@ -166,7 +169,6 @@ class Orders:
                 {f'orders_archive.{backend_order_id}': {"$exists": True}},
                 {"$set": {f'orders_archive.{backend_order_id}': order_item.dict()}}
             )
-
 
     def move_orders_to_archive(self, user_id: int, order_id: str):
         pipeline = [

@@ -47,7 +47,6 @@ async def _(query: CallbackQuery, state: FSMContext):
             error_count += 1
             users.set_active_status(user_id, False)
         except TelegramBadRequest as e:
-            print(e.message)
             error_count += 1
             # if 'chat not found' in e.message:
             #     print('чата нет')

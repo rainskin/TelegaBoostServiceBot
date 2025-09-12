@@ -11,6 +11,9 @@ MONGO_DB_NAME = env.get('MONGO_DB_NAME') if not DEBUG else env.get('TEST_MONGO_D
 API_TOKEN = env.get('API_TOKEN')
 BASE_URL = env.get('BASE_URL')
 
+TG_STARS_API_KEY = env.get('TG_STARS_API_KEY')
+TG_STARS_API_BASE_URL = env.get('TG_STARS_API_BASE_URL')
+
 ADMIN_ID = env.get_int('ADMIN_ID')
 SUPPORT_BOT_URL = env.get('SUPPORT_BOT_URL')
 

@@ -6,6 +6,7 @@ from aiogram.fsm.storage.base import StorageKey
 
 from busines_logic.process_orders.tg_stars_order import calculate_price_rub
 from core.db import users
+from core.localisation.texts import messages
 from core.storage import storage
 from loader import dp, bot
 from utils import states
@@ -29,24 +30,22 @@ async def _(msg: types.Message, state: FSMContext):
         recipient_username = recipient_username[1:]
 
     if not is_valid_username(recipient_username):
-        error_message_text = "Invalid username. Please enter a valid username (5-32 characters, letters, numbers, and underscores only)."
-        error_message = await msg.answer(error_message_text)
+        error_message = await msg.answer(messages.tg_stars_invalid_username[lang])
         msgs_to_delete.append(error_message.message_id)
         await storage.update_data(key, msgs_to_delete=msgs_to_delete + [error_message.message_id])
         return
 
     usdt_to_rub_rate = usdt.to_rub_rate()
-    total_amount = calculate_price_rub(quantity)
-    profit = round(calculate_profit(quantity, total_amount, usdt_to_rub_rate), 2)
-    amount_without_commission = total_amount - profit
-    confirmation_text = (f"You have selected to buy {quantity} stars for @{recipient_username}.\n"
-                         f"\nThe total price is {total_amount} RUB. "
-                         f"Click Yes to confirm or No to cancel.")
+    total_price = calculate_price_rub(quantity)
+    profit = round(calculate_profit(quantity, total_price, usdt_to_rub_rate), 2)
+    amount_without_commission = total_price - profit
+    currency = 'RUB'
+    confirmation_text = messages.tg_stars_confirmation_text[lang].format(quantity=quantity, username=recipient_username, total_price=total_price, currency=currency)
     kb = yes_or_no_kb(lang).as_markup()
     confirmation_message = await msg.answer(confirmation_text, reply_markup=kb)
 
     await state.set_state(states.BuyStars.confirmation)
-    await storage.update_data(key, recipient=recipient_username, amount_without_commission=amount_without_commission, total_amount=total_amount, profit=profit, msgs_to_delete=msgs_to_delete + [confirmation_message.message_id])
+    await storage.update_data(key, recipient=recipient_username, amount_without_commission=amount_without_commission, total_amount=total_price, profit=profit, msgs_to_delete=msgs_to_delete + [confirmation_message.message_id])
     # already in storage: amount, msgs_to_delete
 
 

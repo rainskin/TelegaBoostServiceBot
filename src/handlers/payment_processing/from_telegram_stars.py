@@ -56,15 +56,12 @@ async def pre_checkout_query_handler(pre_checkout_query: types.PreCheckoutQuery)
 
 @dp.message(F.successful_payment)
 async def successful_payment_handler(msg: types.Message, state: FSMContext):
-    print(msg.text)
     telegram_payment_charge_id = msg.successful_payment.telegram_payment_charge_id
-    print(telegram_payment_charge_id)
     payment_id = msg.successful_payment.invoice_payload.replace(template, '')
     payment_info = admin.get_payment_info(payment_id)
 
     user_id = msg.from_user.id
     lang = users.get_user_lang(user_id)
-    print(payment_id)
     invoice_message = int(payment_info.get('payment_url'))
     amount_rub = payment_info.get('amount_rub')
     formatted_amount = f'{amount_rub:.2f}'

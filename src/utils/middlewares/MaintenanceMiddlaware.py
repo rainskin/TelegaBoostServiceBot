@@ -2,7 +2,8 @@ from aiogram import BaseMiddleware, types
 from aiogram.types import CallbackQuery
 from typing import Callable, Dict, Any
 
-from core.db import admin
+from core.db import admin, users
+from core.localisation.texts import messages
 
 
 class CallbackMaintenanceMiddleware(BaseMiddleware):
@@ -21,6 +22,7 @@ class CallbackMaintenanceMiddleware(BaseMiddleware):
 
 
 async def show_maintenance_alert_as_query_answer(query: types.CallbackQuery):
-    text = ("⚠️ Сейчас это действие выполнить невозможно - система находится на техническом обслуживании.\n"
-            "Примерное время работ: 10 минут.\n\n")
+    user_id = query.from_user.id
+    lang = users.get_user_lang(user_id)
+    text = messages.maintenance_mode[lang]
     await query.answer(text, show_alert=True)

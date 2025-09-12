@@ -1,17 +1,17 @@
-welcome = {'ru': "<b>Добро пожаловать!</b>\n\n"
-                 "⭐️ Здесь вы сможете заказать услуги "
-                 "по продвижению вашего телеграм канала или бота\n"
-                 "💯 Личная база аккаунтов позволяет обеспечивать <b>отличную цену</b> и оперативное выполнение\n\n"
-                 "Всегда рады ответить на ваши вопросы!\n"
-                 "Наш бот поддержки (с 10 до 20 по МСК):\n"
-                 "💬 {support_contact}",
-           'en': "<b>Welcome!</b>\n\n"
-                 "⭐️ Here you can order services"
-                 "to promote your telegram channel or bot\n"
-                 "💯 Personal account database allows us to provide the <b>good price</b> and prompt execution\n\n"
-                 "We are always happy to answer your questions!\n"
-                 "Our support bot (from 10 to 20 Moscow time):\n"
-                 "💬 {support_contact}"}
+welcome = {
+    'ru': "<b>Добро пожаловать!</b>\n\n"
+          "🚀 Здесь вы сможете заказать услуги "
+          "по продвижению вашего телеграм канала или бота, а также приобрести <b>⭐️ Telegram звезды</b> по очень выгодной цене!\n\n"
+          "Всегда рады ответить на ваши вопросы!\n"
+          "Контакт поддержки (с 10 до 20 по GMT/UTC+3):\n"
+          "💬 {support_contact}",
+    'en': "<b>Welcome!</b>\n\n"
+          "🚀 Here you can order promotion services "
+          "for your Telegram channel or bot, as well as purchase <b>⭐️ Telegram Stars</b> at a very attractive price!\n\n"
+          "We are always happy to answer your questions!\n"
+          "Support contact (10:00–20:00 GMT/UTC+3):\n"
+          "💬 {support_contact}",
+}
 
 support_contact = {'ru': "💬 <b>Контакт службы поддержки:</b> {support_contact}",
                    'en': "💬 <b>Support contact bot:</b> {support_contact}"}
@@ -98,13 +98,13 @@ plans = {'ru': "Выбери, что тебя интересует:",
 main_menu = {'ru': "🏠 <b>Главное меню:</b>",
              'en': '🏠 <b>Main menu:</b>'}
 
-your_balance = {'ru': "💰 <b>Ваш баланс:</b> {amount} {currency}",
-                'en': '💰 <b>Current balance:</b> {amount} {currency}'}
+your_balance = {'ru': "💰 <b>Ваш баланс:</b> {amount:.2f} {currency}",
+                'en': '💰 <b>Current balance:</b> {amount:.2f} {currency}'}
 
 not_enough_money = {'ru': "Недостаточно средств на балансе\n"
-                          "Доступно {current_balance} {currency}",
+                          "Доступно {current_balance:.2f} {currency}",
                     'en': "Insufficient funds on balance\n"
-                          "Available {current_balance} {currency}"}
+                          "Available {current_balance:.2f} {currency}"}
 order_is_paid = {'ru': "💰 <b>Заказ {internal_order_id} </b> успешно оплачен\n\n",
                  'en': "💰 <b>Order {internal_order_id} </b> has been successfully paid\n\n"}
 
@@ -120,11 +120,68 @@ take_order_into_work = {'ru': "✅ <b>Заказ {internal_order_id}</b> пер�
 take_orders_into_work = {'ru': "✅ <b>Заказы {order_ids} переданы в работу</b>\n\n",
                          'en': "✅ <b>Orders {order_ids} sent to work</b>\n\n"}
 
-spent_amount_from_balance = {'ru': "<b>Списано:</b> {total_amount} {currency}\n"
-                                   "<b>Остаток</b>: {current_balance} {currency}",
+spent_amount_from_balance = {'ru': "<b>Списано:</b> {total_amount:.2f} {currency}\n"
+                                   "<b>Остаток</b>: {current_balance:.2f} {currency}",
 
-                             'en': "<b>Spent:</b> {total_amount} {currency}\n"
-                                   "<b>Current balance</b>: {current_balance} {currency}"}
+                             'en': "<b>Spent:</b> {total_amount:.2f} {currency}\n"
+                                   "<b>Current balance</b>: {current_balance:.2f} {currency}"}
+
+# tg stars
+
+tg_stars_enter_quantity = {
+    'ru': 'Введи количество звезд: от <b>50</b> до <b>1000000</b> (1 млн)',
+    'en': 'Enter the number of stars: from <b>50</b> to <b>1000000</b> (1M)',
+}
+
+tg_stars_enter_username = {
+    'ru': 'Вы выбрали ⭐️<b>{quantity} звезд.</b>\n\n'
+          'Теперь укажите @username',
+    'en': 'You selected ⭐️<b>{quantity} stars.</b>\n\n'
+          'Now enter the @username',
+}
+
+tg_stars_wrong_amount = {
+    'ru': 'Укажите целое число от 50 до 1000000 (1 млн) без пробелов и других символов.',
+    'en': 'Please enter the whole number from 50 to 1000000 (1M) without spaces and other symbols'
+}
+
+tg_stars_not_correct_amount = {
+    'ru': 'Допустимо только целое число от 50 до 1000000 (1 млн).',
+    'en': 'Only an integer from 50 to 1000000 (1M) is allowed.',
+}
+
+tg_stars_invalid_username = {
+    'ru': '<b>Некорректное имя пользователя.</b>\n'
+          'Пожалуйста, введите действительное имя пользователя:\n\n'
+          '<i>5-32 символов. Допускаются только латинские буквы, цифры и символ подчеркивания</i>',
+    'en': '<b>Invalid username.</b>\n'
+          'Please enter a valid username:\n\n'
+          '<i>5-32 characters. Only Latin letters, digits, and underscores are allowed</i>',
+}
+
+tg_stars_confirmation_text = {
+    'ru': '⭐️ <b>{quantity} звезд</b> для @{username}\n'
+          '💵 <b>Итоговая цена:</b> {total_price:.2f} {currency}\n\n'
+          'Нажмите <b>Да</b>, чтобы подтвердить или <b>Нет</b>, чтобы отменить',
+    'en': '⭐️ <b>{quantity} stars</b> for @{username}\n'
+          '💵 <b>Total price:</b> {total_price:.2f} {currency}\n\n'
+          'Press <b>Yes</b> to confirm or <b>No</b> to cancel',
+}
+tg_stars_order_completed = {
+    'ru': '✅ Заказ <b>{internal_order_id}</b> успешно выполнен!\n\n'
+          '⭐️ <b>{amount}</b>  > > >  @{username}',
+    'en': '✅ Order <b>{internal_order_id}</b> has been successfully completed!\n\n'
+          '⭐️ <b>{amount}</b>  > > >  @{username}',
+}
+
+tg_stars_order_invalid_username = {
+    'ru': '❌ Заказ <b>{internal_order_id}</b> отменен.\n'
+          '<i>Неверно указан юзернейм для получения звезд.</i>\n\n'
+          'Средства <b>вернулись на баланс</b>',
+    'en': '❌ Order <b>{internal_order_id}</b> has been canceled.\n'
+          '<i>The username for receiving stars was entered incorrectly.</i>\n\n'
+          'The funds have <b>been returned to the balance</b>',
+}
 
 not_accepted_order = {
     'ru': '<b>Заказы, ожидающие подтверждения:</b>',
@@ -157,6 +214,11 @@ cancel_action = {
     'en': 'Action cancelled',
 }
 
+action_cannot_be_performed = {
+    'ru': 'Данное действие не может быть выполнено',
+    'en': 'This action cannot be performed',
+}
+
 cancel_order = {
     'ru': 'Вы действительно хотите отменить заказ <b>{order_id}</b> ?',
     'en': 'Are you sure you want to cancel order <b>{order_id}</b> ?',
@@ -165,6 +227,25 @@ cancel_order = {
 order_successfully_canceled = {
     'ru': 'Заказ отменён, средства вернулись на баланс',
     'en': 'The order was cancelled, the funds were returned to the balance',
+}
+
+# unpaid orders
+
+unpaid_order_was_deleted = {
+    'ru': '🗑 Ваш неоплаченный заказ <b>{internal_order_id}</b> был удалён.',
+    'en': '🗑 Your unpaid <b>{internal_order_id}</b> order was deleted '
+}
+
+unpaid_order_failed_to_do = {
+    'ru': 'Не удалось выполнить действие для заказа <b>{internal_order_id}</b>\n\n'
+          '<b>Текущий статус:</b> {status}',
+    'en': 'Failed to perform the action for order <b>{internal_order_id}</b>\n\n'
+          '<b>Current status:</b> {status}',
+}
+
+unpaid_order_was_deleted_early = {
+    'ru': 'Этот заказ уже был удален',
+    'en': "This order was deleted early"
 }
 
 active_orders = {'ru': 'Заказы в работе',
@@ -224,6 +305,13 @@ hot_offer_msg = {
     },
 }
 
+maintenance_mode = {
+    'ru': '⚠️ Сейчас это действие выполнить невозможно - система находится на техническом обслуживании.\n'
+          'Примерное время работ: 10 минут.\n\n',
+    'en': '⚠️ This action cannot be performed at the moment – the system is under maintenance.\n'
+          'Estimated downtime: 10 minutes.\n\n',
+}
+
 
 def get_plan_info_text(lang: str, name, description: str, service_info: dict, hot_offer=False):
     currency = 'RUB'
@@ -267,10 +355,10 @@ wrong_quantity = {
     'en': 'Incorrect value. Enter the quantity between <b>{min_value}</b> and <b>{max_value}</b> '}
 
 valid_quantity = {
-    'ru': '💴 <b> Стоимость составит:</b> {total_cost} {currency}\n'
+    'ru': '💴 <b> Стоимость составит:</b> {total_cost:.2f} {currency}\n'
           'Если готовы продолжить, нажмите на кнопку ниже\n\n'
           '<i>Или введите новое количество для повторного расчёта стоимости</i>',
-    'en': '💴 <b>Total cost will be:</b> {total_cost} {currency}\n'
+    'en': '💴 <b>Total cost will be:</b> {total_cost:.2f} {currency}\n'
           "If you're ready to continue, click the button below\n\n"
           '<i>Or enter a new quantity to recalculate the cost</i>'}
 
@@ -289,7 +377,7 @@ correct_url = {
           'Проверьте, пожалуйста, данные заказа\n\n'
           '<b>🔗 Ссылка:</b> {url}\n'
           '<b>🧮 Количество: </b> {quantity}\n'
-          '<b>💴 Сумма: </b> {total_amount} {currency}\n\n'
+          '<b>💴 Сумма: </b> {total_amount:.2f} {currency}\n\n'
           '<i>Если хотите изменить ссылку, отправьте новую ссылку в следующем сообщении</i>\n\n'
           '➕ Для <b>оформления заказа</b> нажмите на соответствующую кнопку ниже',
 
@@ -297,16 +385,16 @@ correct_url = {
           'Please check the order details\n\n'
           '<b>🔗 URL:</b> {url}\n'
           '<b>🧮 Quantity: </b> {quantity}\n'
-          '<b>💴 Total: </b> {total_amount} {currency}\n\n'
+          '<b>💴 Total: </b> {total_amount:.2f} {currency}\n\n'
           '<i>If you want to change the URL, send the new URL in the next message</i>\n\n'
           '➕ To <b>place the order</b>, click the corresponding button below'
 }
 
 confirm_order_payment = {
-    'ru': '<b>Сумма заказа:</b> {total_amount} {currency}\n\n'
-          '<b>💵 Ваш текущий баланс {current_balance} {currency}</b>',
-    'en': '<b>Order price:</b> {total_amount} {currency}\n\n'
-          '<b>💵 Your current balance {current_balance} {currency}</b>'}
+    'ru': '<b>Сумма заказа:</b> {total_amount:.2f} {currency}\n\n'
+          '<b>💵 Ваш текущий баланс {current_balance:.2f} {currency}</b>',
+    'en': '<b>Order price:</b> {total_amount:.2f} {currency}\n\n'
+          '<b>💵 Your current balance {current_balance:.2f} {currency}</b>'}
 
 available_payment_methods = {
     'ru': 'Выберите способ оплаты',

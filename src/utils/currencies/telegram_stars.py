@@ -75,5 +75,3 @@ def convert_to_stars(service_price_rub):
     return int(num_stars)
 
 
-
-

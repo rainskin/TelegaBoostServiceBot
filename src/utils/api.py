@@ -128,7 +128,7 @@ async def get_order_statuses(order_ids: List[str], user_id: int) -> Dict[str, di
 #     order_id: int = response['order']
 #     return order_id
 
-async def create_new_order(user_id: int, service_id: str, link: str, quantity: int):
+async def create_new_order(user_id: int, service_id: str, link: str, quantity: int) -> int | None:
     method = 'add'
     url = (
         f"{BASE_URL}{method}&"

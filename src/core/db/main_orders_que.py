@@ -8,13 +8,12 @@ from enums.orders.order_status import OrderStatus
 class MainOrdersQueue:
 
     def __init__(self):
-        self.collection = loader.db['unpaid_orders']
+        self.collection = loader.db['main_orders_queue']
         self.default_datetime_format = '%d-%m-%Y %H:%M:%S'
 
     def save(self, order_item: OrderItem):
         order_item.creation_date = datetime.now().strftime(self.default_datetime_format)
         order_item.updated_at = order_item.creation_date
-        print(order_item.dict())
         self.collection.update_one({'internal_order_id': order_item.internal_order_id}, {
             '$set': order_item.dict()
         }, upsert=True)

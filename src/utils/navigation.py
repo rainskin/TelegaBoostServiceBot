@@ -21,7 +21,7 @@ async def return_to_menu(user_id: int, state: FSMContext):
         msg_text = messages.main_menu[lang]
     else:
         currency = 'RUB'
-        user_balance_text = messages.your_balance[lang].format(amount=str(user_balance), currency=currency)
+        user_balance_text = messages.your_balance[lang].format(amount=user_balance, currency=currency)
         msg_text = (f'{messages.main_menu[lang]} \n\n'
                     f'{user_balance_text}')
 

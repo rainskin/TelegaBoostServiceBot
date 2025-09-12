@@ -3,6 +3,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.base import StorageKey
 
 from core.db import users
+from core.localisation.texts import messages
 from core.storage import storage
 from loader import dp, bot
 from utils import states
@@ -19,17 +20,15 @@ async def _(msg: types.Message, state: FSMContext):
     try:
         quantity = int(msg.text)
     except ValueError:
-        wrong_amount_message_text = 'Укажите целое число от 50 до 1000000 (1 млн) без пробелов и других символов.'
-        wrong_amount_msg = await msg.answer(wrong_amount_message_text)
+        wrong_amount_msg = await msg.answer(messages.tg_stars_wrong_amount[lang])
         await storage.update_data(key, msgs_to_delete=msgs_to_delete + [wrong_amount_msg.message_id])
         return
     if not is_correct_amount(quantity):
-        not_correct_amount_message_text = 'Допустимо только целое число от 50 до 1000000 (1 млн).'
-        not_correct_amount_message = await msg.answer(not_correct_amount_message_text)
+        not_correct_amount_message = await msg.answer(messages.tg_stars_not_correct_amount[lang])
         await storage.update_data(key, msgs_to_delete=msgs_to_delete + [not_correct_amount_message.message_id])
         return
 
-    confirmation_text = f'Вы выбрали {quantity} звезд.\nТеперь укажите @username'
+    confirmation_text = messages.tg_stars_enter_username[lang].format(quantity=quantity)
 
     confirmation_message = await msg.answer(confirmation_text)
     await storage.update_data(key, quantity=quantity, msgs_to_delete=msgs_to_delete + [confirmation_message.message_id])

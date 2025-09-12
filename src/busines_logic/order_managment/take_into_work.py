@@ -14,14 +14,19 @@ from utils import api
 
 
 def try_get_orders_for_execution() -> dict | None:
-    orders_to_execution = admin.get_orders_for_execution()
-    if orders_to_execution:
-        return orders_to_execution
+    # orders_to_execution = admin.get_orders_for_execution()
+    # if orders_to_execution:
+    #     return orders_to_execution
 
     orders_queue = admin.get_orders_queue()
     if orders_queue:
         admin.move_orders_to_execution_queue(orders_queue)
-    return orders_queue
+
+    orders_to_execution = admin.get_orders_for_execution()
+    if not orders_to_execution:
+        return None
+
+    return orders_to_execution
 
 
 def get_total_amount(orders: dict) -> float:
@@ -110,10 +115,8 @@ async def take_orders_into_work(orders: dict):
     total_amount_without_commission = 0.0
     spend_by_users = 0.0
     profit = 0.0
-    available_balance = await api.get_account_balance()
+
     for internal_order_id, order_info in orders.items():
-        print(internal_order_id)
-        print(order_info)
 
         service_type = ServiceType(order_info.get('service_type', ServiceType.STANDARD))
 
@@ -134,21 +137,30 @@ async def take_orders_into_work(orders: dict):
             order_status=order_info.get('order_status', OrderStatus.PENDING),
             deleted=order_info.get('deleted'),
         )
-        print(order_item.dict())
+
         if ServiceType(order_item.service_type) == ServiceType.TG_STARS:
-            process_tg_stars_order(order_item)
+            try:
+                await process_tg_stars_order(order_item)
+            except Exception as e:
+                await bot.send_message(config.ADMIN_ID, text=f'{e}')
+                continue
         elif ServiceType(order_item.service_type) == ServiceType.STANDARD:
-            await process_standard_order(order_item)
+
+            try:
+                await process_standard_order(order_item)
+            except Exception as e:
+                await send_report_to_admin(f'{e}')
+                continue
+
+            try:
+                await send_notification_to_user(order_item.user_id, order_item.internal_order_id)
+            except Exception as e:
+
+                non_active_users_number += 1
+                raise Exception(f"Error sending notification to user {order_item.user_id}: {e}")
         else:
             print(f"Unknown service type for order {internal_order_id}, skipping...")
             continue
-
-        try:
-            await send_notification_to_user(order_item.user_id, order_item.internal_order_id)
-        except Exception as e:
-
-            non_active_users_number += 1
-            raise Exception(f"Error sending notification to user {order_item.user_id}: {e}")
 
         count += 1
         spend_by_users += order_item.total_amount
@@ -157,7 +169,10 @@ async def take_orders_into_work(orders: dict):
 
     non_active_users_stats_text = (f'Заблокировали бота: '
                                    f'{non_active_users_number}') if non_active_users_number > 0 else ''
+    if count <= 0:
+        return
 
+    available_balance = await api.get_account_balance()
     text = (f'Оформил {count} заказ(ов)\n\n'
             f'Потрачено пользователями: {spend_by_users:.2f}\n'
             f'Прибыль: {round(profit, 2)}\n\n'
@@ -179,15 +194,15 @@ async def try_take_orders_into_work():
     # text = get_summary_text(orders, available_balance)
     # await send_report_to_admin(text)
 
-    total_amount = get_total_amount(orders)
-    available_balance = await api.get_account_balance()
-
-    if total_amount > available_balance:
-        text = (f'<b>Недостаточно средств для оформления заказов.</b>\n'
-                f'Текущий баланс: <b>{available_balance:.2f} руб.</b>\n'
-                f'Необходимо пополнить счет еще минимум на <b>{round((total_amount - available_balance), 2)} руб.</b>')
-        await send_report_to_admin(text)
-        return
+    # total_amount = get_total_amount(orders)
+    # available_balance = await api.get_account_balance()
+    #
+    # if total_amount > available_balance:
+    #     text = (f'<b>Недостаточно средств для оформления заказов.</b>\n'
+    #             f'Текущий баланс: <b>{available_balance:.2f} руб.</b>\n'
+    #             f'Необходимо пополнить счет еще минимум на <b>{round((total_amount - available_balance), 2)} руб.</b>')
+    #     await send_report_to_admin(text)
+    #     return
 
     # Если достаточно средств, то берем заказы в работу
     await take_orders_into_work(orders)

@@ -14,7 +14,9 @@ from handlers.new_order.create import place_order
 from loader import dp, bot
 from utils import navigation
 from utils.keyboards import navigation_kb
+from utils.navigation import return_to_menu
 from utils.states import Payment
+
 
 # TODO: удалить старый закомментированный код после проверки работоспособности нового
 
@@ -57,8 +59,7 @@ from utils.states import Payment
 
 
 @dp.callback_query(F.data == 'payment_method_internal_balance', Payment.choosing_method)
-async def _(query: types.CallbackQuery, state: FSMContext, **kwargs):
-    print('Processing payment from internal balance...')
+async def _(query: types.CallbackQuery, state: FSMContext):
     user_id = query.from_user.id
     chat_id = query.message.chat.id
     key = StorageKey(bot.id, chat_id, user_id)
@@ -66,16 +67,21 @@ async def _(query: types.CallbackQuery, state: FSMContext, **kwargs):
     data = await storage.get_data(key)
     internal_order_id = data['internal_order_id']
     message_with_order_info_id = data.get('message_with_order_info_id')
-    order = orders_queue.get(internal_order_id)
-    total_amount: float = order.total_amount
+    order_item = orders_queue.get(internal_order_id)
+    total_amount: float = order_item.total_amount
+
+    if order_item.deleted:
+        await query.answer(messages.unpaid_order_was_deleted_early[lang], show_alert=True)
+        await query.message.delete()
+        return
 
     currency = 'RUB'
     await query.answer()
     user_balance = users.get_balance(user_id)
     if user_balance >= total_amount:
 
-        await pay_order(user_id, order)
-        await place_paid_order(order)
+        await pay_order(user_id, order_item)
+        await place_paid_order(order_item)
 
         await query.message.answer(messages.order_is_paid[lang].format(internal_order_id=internal_order_id))
         await query.message.delete()
@@ -92,6 +98,15 @@ async def _(query: types.CallbackQuery, state: FSMContext, **kwargs):
     else:
         await query.message.answer(not_enough_money[lang].format(current_balance=user_balance, currency=currency),
                                    reply_markup=navigation_kb.balance_recharge_button(lang).as_markup())
+
+
+@dp.callback_query(F.data == 'payment_method_internal_balance')
+async def _(query: types.CallbackQuery):
+    user_id = query.from_user.id
+    lang = users.get_user_lang(user_id)
+
+    await query.answer(messages.action_cannot_be_performed[lang], show_alert=True)
+    await query.message.delete()
 
 
 async def pay_order(user_id: int, order: OrderItem):

@@ -3,7 +3,6 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.base import StorageKey
 from aiogram.types import InlineKeyboardButton
 
-
 from core.db import users, orders
 from core.localisation.texts import messages
 from core.storage import storage
@@ -146,7 +145,6 @@ async def get_order_statuses_text(user_id: int, lang: str, order_ids: list, curr
     print('orders_statuses:', current_order_statuses)
 
     # if current_orders:
-
 
     orders_text = f'{orders_text}\n\n{orders_statuses_text}'
 
