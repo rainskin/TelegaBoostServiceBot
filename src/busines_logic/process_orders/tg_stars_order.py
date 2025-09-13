@@ -14,21 +14,8 @@ from loader import bot
 
 API_KEY = config.TG_STARS_API_KEY
 BASE_URL = config.TG_STARS_API_BASE_URL
+# BASE_URL = 'http://127.0.0.1:8000/api/v1'
 
-
-# def buy_stars(recipient: str, amount: int) -> dict | None:
-#     header = {'X-API-KEY': API_KEY}
-#     body = {'recipient': recipient,
-#             'amount': amount
-#             }
-#     method = 'buy_stars'
-#
-#     try:
-#         response = requests.post(f'{BASE_URL}/{method}', headers=header, json=body, timeout=10)
-#         return response.json()
-#
-#     except Exception:
-#         return None
 
 async def get_balance():
     header = {'X-API-KEY': API_KEY}
@@ -39,7 +26,7 @@ async def get_balance():
     for attempt in range(1, 4):  # 3 попытки
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.post(url, headers=header, json=body, timeout=10) as response:
+                async with session.post(url, headers=header, json=body, timeout=50) as response:
                     response.raise_for_status()
                     return await response.json()
 
@@ -57,32 +44,36 @@ async def get_balance():
         except Exception:
             return None
 
-async def buy_stars(recipient: str, amount: int) -> dict | None:
+async def buy_stars(recipient: str, amount: int) -> dict:
     header = {'X-API-KEY': API_KEY}
     body = {'recipient': recipient, 'amount': amount}
-    method = 'buy_stars'
-    url = f'{BASE_URL}/{method}'
+    url = f'{BASE_URL}/buy_stars'
 
-    for attempt in range(1, 4):  # 3 попытки
+    for attempt in range(1, 4):
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.post(url, headers=header, json=body, timeout=10) as response:
-                    response.raise_for_status()
-                    return await response.json()
+                async with session.post(url, headers=header, json=body, timeout=100) as response:
+                    try:
+                        data = await response.json()
+                    except Exception:
+                        data = {"error": f"Failed to parse JSON, status={response.status}", "status": response.status}
+
+                    if response.status >= 400:
+                        # возвращаем тело ошибки, чтобы process_tg_stars_order мог обработать
+                        return data
+
+                    return data
 
         except (aiohttp.ClientError, asyncio.TimeoutError) as e:
             if attempt < 3:
-                error_message = (
-                    f"❌ Ошибка HTTP-запроса к stars-api (попытка {attempt}).\n"
-                    f"Ошибка: {str(e)}"
-                )
-                await bot.send_message(chat_id=config.ADMIN_ID, text=error_message)
+                await bot.send_message(config.ADMIN_ID,
+                                       f"❌ Ошибка HTTP-запроса к stars-api (попытка {attempt}): {str(e)}")
                 await asyncio.sleep(5 * attempt)
                 continue
-            return None
+            return {"error": str(e)}
 
-        except Exception:
-            return None
+        except Exception as e:
+            return {"error": str(e)}
 
 
 async def process_tg_stars_order(order_item: OrderItem):
