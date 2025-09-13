@@ -78,7 +78,7 @@ async def buy_stars(recipient: str, amount: int) -> dict:
 
 async def process_tg_stars_order(order_item: OrderItem):
     result = await buy_stars(order_item.url, order_item.quantity)
-
+    print(result)
     # result = {'Successful': True}
     # result = {'error': 'Not enough balance'}
     # result = {'error': 'No Telegram users found'}
@@ -128,7 +128,7 @@ async def process_tg_stars_order(order_item: OrderItem):
             orders_db.update_active_order(order_item.internal_order_id, order_item)
             orders_db.move_orders_to_archive(order_item.user_id, order_item.internal_order_id)
             text = messages.tg_stars_order_completed[lang].format(internal_order_id=order_item.internal_order_id,
-                                                                  amount=order_item.total_amount,
+                                                                  amount=order_item.quantity,
                                                                   username=order_item.url)
             await bot.send_message(chat_id=order_item.user_id, text=text)
 
