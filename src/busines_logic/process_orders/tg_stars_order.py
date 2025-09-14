@@ -116,6 +116,9 @@ async def process_tg_stars_order(order_item: OrderItem):
             error_message = f'Заказ на звезды {order_item.internal_order_id} отменен. Invalid username'
             raise InvalidUsernameError(error_message)
 
+        else:
+            raise OrderProcessingError(error_message)
+
     elif 'Successful' in result:
         successful = result.get('Successful')
         if successful:
@@ -136,6 +139,9 @@ async def process_tg_stars_order(order_item: OrderItem):
         else:
             error_message = f"⚠️ При попытке купить звезды не удалось отправить транзакцию. Заказ {order_item.internal_order_id}"
             raise OrderExecutionError(error_message)
+
+    else:
+        raise OrderProcessingError(f'Неизвестная ошибка при попытке купить звезды. Ответ АПИ:\n{result}')
 
     # print(f"Skipping non-standard service type for order {order_item.internal_order_id}")
     # order_item.order_status = OrderStatus.CANCELED
