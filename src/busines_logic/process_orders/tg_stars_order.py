@@ -17,7 +17,7 @@ BASE_URL = config.TG_STARS_API_BASE_URL
 # BASE_URL = 'http://127.0.0.1:8000/api/v1'
 
 
-async def get_balance():
+async def get_ton_balance():
     header = {'X-API-KEY': API_KEY}
     body = {'in_ton': True}
     method = 'get_balance'
@@ -33,7 +33,7 @@ async def get_balance():
         except (aiohttp.ClientError, asyncio.TimeoutError) as e:
             if attempt < 3:
                 error_message = (
-                    f"❌ Ошибка HTTP-запроса к stars-api (попытка {attempt}).\n"
+                    f"❌ Ошибка HTTP-запроса к stars-api при запросе баланса (попытка {attempt}).\n"
                     f"Ошибка: {str(e)}"
                 )
                 await bot.send_message(chat_id=config.ADMIN_ID, text=error_message)
@@ -134,8 +134,6 @@ async def process_tg_stars_order(order_item: OrderItem):
                                                                   amount=order_item.quantity,
                                                                   username=order_item.url)
             await bot.send_message(chat_id=order_item.user_id, text=text)
-
-            await bot.send_message(config.ADMIN_ID, text="New #Telegram_Stars_Order")
         else:
             error_message = f"⚠️ При попытке купить звезды не удалось отправить транзакцию. Заказ {order_item.internal_order_id}"
             raise OrderExecutionError(error_message)

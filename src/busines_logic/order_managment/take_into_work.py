@@ -2,7 +2,7 @@ import asyncio
 
 import config
 from busines_logic.process_orders.standard_order import process_standard_order
-from busines_logic.process_orders.tg_stars_order import process_tg_stars_order
+from busines_logic.process_orders.tg_stars_order import process_tg_stars_order, get_ton_balance
 from core.db import admin, users
 from core.db import orders as orders_db
 from core.db.models.order_item import OrderItem
@@ -141,9 +141,15 @@ async def take_orders_into_work(orders: dict):
 
         if ServiceType(order_item.service_type) == ServiceType.TG_STARS:
             try:
+
                 await process_tg_stars_order(order_item)
+                current_balance = await get_ton_balance()
+                text = ("<b>New #Telegram_Stars_Order</b>\n"
+                        f"Текущий баланс кошелька {current_balance} TON")
+                await send_report_to_admin(text)
+                return
             except Exception as e:
-                await bot.send_message(config.ADMIN_ID, text=f'{e}')
+                await bot.send_message(config.ADMIN_ID, text=f'⚠ <b>ОШИБКА при покупке телеграм звезд:</b>\n{e}')
                 continue
         elif ServiceType(order_item.service_type) == ServiceType.STANDARD:
 
