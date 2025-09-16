@@ -7,3 +7,8 @@ support = {
     'ru': 'Поддержка',
     'en': 'Get support',
 }
+
+buy_stars = {
+    'ru': 'Купить Телеграм Звёзды',
+    'en': 'Buy Telegram Stars',
+}

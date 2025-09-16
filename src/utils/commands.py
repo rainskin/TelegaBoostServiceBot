@@ -15,7 +15,11 @@ async def set_commands(lang: str, bot: Bot):
         BotCommand(
             command='support',
             description=f'{commands_description.support[lang]}'
-        )
+        ),
+        BotCommand(
+            command='buy_stars',
+            description=f'{commands_description.buy_stars[lang]}'
+        ),
     ]
 
     await bot.set_my_commands(commands, BotCommandScopeAllPrivateChats())
