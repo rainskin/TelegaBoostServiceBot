@@ -1,8 +1,5 @@
-from typing import List
-
-from core.db import users
-
 import loader
+from core.db import users
 from core.db.models.order_item import OrderItem
 from enums.orders.order_status import OrderStatus
 
@@ -69,7 +66,7 @@ class Orders:
     def remove_not_accepted_order(self, user_id: int, order_id):
         self.collection.update_one({'user_id': user_id}, {'$unset': {f'not_accepted_orders.{order_id}': ''}})
 
-    def cancel_order(self, user_id: int, order_id: str, not_accepted_orders=False):
+    def cancel_order(self, user_id: int, order_id: str, not_accepted_orders=False, referral_reward=None):
         if not_accepted_orders:
             field_name = 'not_accepted_orders'
         else:
@@ -83,18 +80,10 @@ class Orders:
         self.collection.update_one({'user_id': user_id}, {
             '$unset': {f'{field_name}.{order_id}': ''}
         })
+
         users.add_balance(user_id, float(total_amount))
 
     def return_money_for_current_order(self, user_id: int, order_id: str, amount: float):
-        # doc = self.collection.find_one({'user_id': user_id}, {'current_orders': 1})
-        # _orders = doc.get('current_orders')
-        # order_info = _orders.get(order_id)
-        # is_money_returned = order_info.get('is_money_returned')
-        # if not is_money_returned:
-        #     amount = order_info.get('total_amount')
-        #     users.add_balance(user_id, amount)
-        #     self.collection.update_one({'user_id': user_id}, {
-        #         '$set': {f'current_orders.{order_id}: is_money_returned': True}}, upsert=True)
 
         doc = self.collection.find_one_and_update(
             {'user_id': user_id, f'current_orders.{order_id}.is_money_returned': {'$ne': True}},

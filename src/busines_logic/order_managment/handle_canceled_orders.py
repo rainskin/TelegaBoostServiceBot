@@ -1,8 +1,11 @@
 import config
-from core.db import orders
+from core.db import orders, users
 from core.db.main_orders_queue import orders_queue
+from core.db.models.transaction_item import TransactionItem
+from core.db.transactions import transactions
+from core.localisation.texts import messages
 from enums.orders.order_status import OrderStatus
-from enums.orders.service_type import ServiceType
+from enums.transaction_type import TransactionType
 from loader import bot
 
 
@@ -14,15 +17,13 @@ async def return_money_for_canceled_or_partial_order(user_id: int, backend_order
 
     full_order_info = orders.get_order_info(user_id, backend_order_id, current_orders=True)
     internal_order_id = full_order_info['internal_order_id']
-    internal_status = orders_queue.get_status(internal_order_id)
-    amount = 0.0
     if status == "Canceled":
 
         amount = full_order_info['total_amount']
 
-
-        update_db(user_id, backend_order_id, internal_order_id, amount)
-        notification_for_user_text = f'Заказ <b>{internal_order_id}</b> был отменен. Возвращено на баланс: {amount} {currency}'
+        await update_db(user_id, backend_order_id, internal_order_id, amount, status)
+        lang = users.get_user_lang(user_id)
+        notification_for_user_text = messages.order_was_canceled[lang].format(internal_order_id=internal_order_id, amount=amount, currency=currency)
         notification_for_admin_text = f'типа вернул {amount} за заказ {internal_order_id} ({backend_order_id}) пользователя {user_id}'
     if status == 'Partial':
 
@@ -45,6 +46,7 @@ async def return_money_for_canceled_or_partial_order(user_id: int, backend_order
 
         notification_for_user_text = f'Заказ <b>{internal_order_id}</b> выполнен частично. Возвращено на баланс: {amount} {currency}'
 
+        await update_db(user_id, backend_order_id, internal_order_id, amount, status)
     try:
         if notification_for_admin_text:
             await bot.send_message(config.ADMIN_ID, notification_for_admin_text)
@@ -53,17 +55,33 @@ async def return_money_for_canceled_or_partial_order(user_id: int, backend_order
     except Exception as e:
         pass
 
-    update_db(user_id, backend_order_id, internal_order_id, amount)
 
 
 
+async def update_db(user_id: int, backend_order_id: str, internal_order_id: str, amount: float, order_status: str):
+    meta = {"note": f"Refund for {order_status} order"}
+    try:
+        order_item = orders_queue.get(internal_order_id)
+        order_item.order_status = OrderStatus.CANCELED if order_status == 'Canceled' else OrderStatus.PARTIAL
+        order_item.is_money_returned = True
+        orders_queue.update(order_item)
+    except Exception:
+        pass
 
-def update_db(user_id: int, backend_order_id: str, internal_order_id: str, amount: float):
-
-    order_item = orders_queue.get(internal_order_id)
     orders.return_money_for_current_order(user_id, backend_order_id, amount)
-    order_item.is_money_returned = True
-    orders_queue.update(order_item)
+
+    user_balance = users.get_balance(user_id)
+
+    transaction_item = TransactionItem(
+        user_id=user_id,
+        transaction_type=TransactionType.REFUND,
+        amount=amount,
+        balance_after=round((user_balance + amount), 2),
+        meta=meta
+    )
+    await transactions.save(transaction_item)
+
+
 
 async def remove_orders_to_history_and_return_money_for_canceled_orders(user_id: int, _orders: dict):
     for order_id, order_status_info in _orders.items():

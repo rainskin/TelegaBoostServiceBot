@@ -6,8 +6,15 @@ from aiogram.enums import ParseMode
 
 from config import BOT_TOKEN, MONGO_URL, MONGO_DB_NAME
 
-dp: Dispatcher = Dispatcher()
+motor_client = None
 
+
+def init():
+    global motor_client
+    motor_client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URL)
+
+
+dp: Dispatcher = Dispatcher()
 
 default = DefaultBotProperties(parse_mode=ParseMode.HTML, link_preview_is_disabled=True)
 bot: Bot = Bot(BOT_TOKEN, default=default)
@@ -16,6 +23,3 @@ db_client = pymongo.MongoClient(MONGO_URL)
 db = db_client[MONGO_DB_NAME]
 db_users = db['users']
 db_orders = db['orders']
-
-motor_client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URL)
-

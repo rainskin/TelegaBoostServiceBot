@@ -8,4 +8,6 @@ class TransactionType(str, Enum):
     PAYMENT = 'PAYMENT',
     WITHDRAW = 'WITHDRAW',
     REFUND = 'REFUND'
+    REVERSAL = 'REVERSAL',
+    PROMO = "PROMO"
     ADJUSTMENT = 'ADJUSTMENT'

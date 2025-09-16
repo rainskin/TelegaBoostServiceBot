@@ -1,16 +1,18 @@
-
-
 from aiogram import types, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.base import StorageKey
 
-from core.db.main_orders_queue import orders_queue
-from core.storage import storage
-from loader import dp, bot
 from core.db import users, orders, admin
-from utils import  callback_templates
-from utils.keyboards import navigation_kb
+from core.db.main_orders_queue import orders_queue
+from core.db.models.transaction_item import TransactionItem
+from core.db.transactions import transactions
 from core.localisation.texts import messages
+from core.storage import storage
+from enums.orders.order_status import OrderStatus
+from enums.transaction_type import TransactionType
+from loader import dp, bot
+from utils import callback_templates
+from utils.keyboards import navigation_kb
 from utils.states import ManageOrders
 
 template = callback_templates.cancel_order()
@@ -23,8 +25,9 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     lang = users.get_user_lang(user_id)
     key = StorageKey(bot_id=bot.id, chat_id=user_id, user_id=user_id)
     status = orders_queue.get_status(internal_order_id)
-    if is_not_accepted_order(user_id, internal_order_id) and not status.IN_PROGRESS:
-        if not orders.is_order_exist(user_id, internal_order_id, not_accepted_order=True) or admin.is_order_in_execution_queue(internal_order_id):
+    if is_not_accepted_order(user_id, internal_order_id) and status != OrderStatus.IN_PROGRESS:
+        if not orders.is_order_exist(user_id, internal_order_id,
+                                     not_accepted_order=True) or admin.is_order_in_execution_queue(internal_order_id):
             text = messages.canceling_not_accepted_order_is_not_available[lang]
             kb = None
         else:
@@ -46,11 +49,32 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     key = StorageKey(bot_id=bot.id, chat_id=user_id, user_id=user_id)
     lang = users.get_user_lang(user_id)
     data = await storage.get_data(key)
-    order_id = data.get('order_id')
+    internal_order_id = data.get('order_id')
 
-    if is_not_accepted_order(user_id, order_id):
-        orders.cancel_order(user_id, order_id, not_accepted_orders=True)
-        admin.remove_order_from_main_queue(order_id)
+    if is_not_accepted_order(user_id, internal_order_id):
+        not_accepted_orders = orders.get_not_accepted_orders(user_id)
+        order = not_accepted_orders.get(internal_order_id)
+        amount = order.get('total_amount')
+        user_balance = users.get_balance(user_id)
+
+        transaction_item = TransactionItem(
+            user_id=user_id,
+            transaction_type=TransactionType.REVERSAL,
+            amount=amount,
+            balance_after=round((user_balance + amount), 2),
+        )
+        await transactions.save(transaction_item)
+
+        orders.cancel_order(user_id, internal_order_id, not_accepted_orders=True)
+
+        try:
+            order_item = orders_queue.get(internal_order_id)
+            order_item.order_status = OrderStatus.CANCELED
+            orders_queue.update(order_item)
+        except Exception:
+            pass
+
+        admin.remove_order_from_main_queue(internal_order_id)
 
     await query.message.edit_text(messages.order_successfully_canceled[lang])
 

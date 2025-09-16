@@ -5,12 +5,12 @@ from aiogram.fsm.context import FSMContext
 import config
 from busines_logic.referrals_managment import register_new_referral
 from core.db import users, promo
+from core.localisation.lang import default_language
+from core.localisation.texts import messages
 from loader import dp, bot
 from utils import commands
 from utils.keyboards import navigation_kb
-from core.localisation.lang import default_language
 from utils.navigation import return_to_menu
-from core.localisation.texts import messages
 
 
 @dp.message(Command('start'))
@@ -38,7 +38,7 @@ async def _(msg: types.Message, command: CommandObject, state: FSMContext):
             await register_new_referral(inviter_id, user_id)
 
         if not promo.is_completed(promo_name):
-            promo.add_participant(promo_name, user_id)
+            await promo.add_participant(promo_name, user_id)
             await msg.answer(messages.promo_activated[lang])
     else:
         if users.is_inactive_user(user_id):

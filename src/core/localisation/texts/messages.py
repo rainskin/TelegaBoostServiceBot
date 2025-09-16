@@ -119,6 +119,9 @@ order_is_paid = {'ru': "💰 <b>Заказ {internal_order_id} </b> успешн
 order_is_created = {'ru': "✅ <b>Заказ {order_id} оформлен</b>\n\n",
                     'en': "✅ <b>Order {order_id} has been placed</b>\n\n"}
 
+order_was_canceled = {'ru': 'Заказ <b>{internal_order_id}</b> был отменен. Возвращено на баланс: {amount:.2f} {currency}',
+                      'en': 'Order <b>{internal_order_id}</b> has been canceled. Returned to balance: {amount:.2f} {currency}'}
+
 # orders_is_created = {'ru': "✅ <b>Заказы {order_ids} оформлены</b>\n\n",
 #                      'en': "✅ <b>Orders {order_ids} has been placed</b>\n\n"}
 

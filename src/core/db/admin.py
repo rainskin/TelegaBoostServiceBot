@@ -126,34 +126,6 @@ class Admin:
                 {'$unset': {f'orders.{order_id}': ''}}
             )
 
-    # TODO: Переделать
-
-    #     def put_order_to_queue(self, user_id: int, internal_order_id: str, data: dict):
-    #         date = datetime.now().strftime(self.default_datetime_format)
-    #         quantity = data['quantity']
-    #         service_id = data['service_id']
-    #         url = data['url']
-    #         amount_without_commission = data.get('amount_without_commission')
-    #         profit = data['profit']
-    #         total_amount = data['total_amount']
-    #         canceling_is_available = data.get('canceling_is_available')
-    #
-    #         order_info = {
-    #             'date': date,
-    #             'user_id': user_id,
-    #             'service_id': service_id,
-    #             'url': url,
-    #             'quantity': quantity,
-    #             'amount_without_commission': amount_without_commission,
-    #             'total_amount': total_amount,
-    #             'profit': profit,
-    #             'canceling_is_available': canceling_is_available
-    #         }
-    #         self.collection.update_one({'order_queue': True}, {'$set': {
-    #             f'orders.{internal_order_id}': order_info
-    #         }}, upsert=True)
-    #
-    #         orders.add_not_accepted_order(user_id, internal_order_id, order_info)
 
     def put_order_to_queue(self, order_item: OrderItem):
 

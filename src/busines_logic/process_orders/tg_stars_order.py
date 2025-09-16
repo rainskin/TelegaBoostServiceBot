@@ -8,8 +8,11 @@ from core.db import admin, users
 from core.db import orders as orders_db
 from core.db.main_orders_queue import orders_queue
 from core.db.models.order_item import OrderItem
+from core.db.models.transaction_item import TransactionItem
+from core.db.transactions import transactions
 from core.localisation.texts import messages
 from enums.orders.order_status import OrderStatus
+from enums.transaction_type import TransactionType
 from loader import bot
 
 API_KEY = config.TG_STARS_API_KEY
@@ -107,6 +110,18 @@ async def process_tg_stars_order(order_item: OrderItem):
             admin.remove_order_from_execution_queue(order_item.internal_order_id)
             orders_db.return_money_for_current_order(order_item.user_id, order_item.internal_order_id,
                                                      order_item.total_amount)
+
+            user_balance = users.get_balance(order_item.user_id.user_id)
+            meta = {"note": "Invalid username"}
+            transaction_item = TransactionItem(
+                user_id=order_item.user_id,
+                transaction_type=TransactionType.REVERSAL,
+                amount=order_item.total_amount,
+                balance_after=round((user_balance + order_item.total_amount), 2),
+                meta=meta
+            )
+            await transactions.save(transaction_item)
+
             orders_db.update_active_order(order_item.internal_order_id, order_item)
             orders_db.move_orders_to_archive(order_item.user_id, order_item.internal_order_id)
             orders_db.remove_not_accepted_order(order_item.user_id, order_item.internal_order_id)

@@ -2,6 +2,9 @@ from datetime import datetime
 
 import loader
 from core.db import users
+from core.db.models.transaction_item import TransactionItem
+from core.db.transactions import transactions
+from enums.transaction_type import TransactionType
 
 
 class Promo:
@@ -32,7 +35,7 @@ class Promo:
     def is_completed(self, promo_name: str):
         return self.collection.find_one({'promo_name': promo_name})['completed']
 
-    def add_participant(self, promo_name: str, user_id: int):
+    async def add_participant(self, promo_name: str, user_id: int):
         doc = self.collection.find_one({'promo_name': promo_name})
         total_users = doc['total_users']
         remains = doc['remains']
@@ -44,6 +47,14 @@ class Promo:
             self.collection.update_one({'promo_name': promo_name}, {'$push': {'participants': user_id},
                                                                     '$set': {'remains': remains}})
 
+            user_balance = users.get_balance(user_id)
+            transaction_item = TransactionItem(
+                user_id=user_id,
+                transaction_type=TransactionType.PROMO,
+                amount=amount,
+                balance_after=round((user_balance + amount), 2),
+            )
+            await transactions.save(transaction_item)
             users.add_balance(user_id, amount)
         if remains == 0:
             self.collection.update_one({'promo_name': promo_name}, {'$set': {'completed': True}})

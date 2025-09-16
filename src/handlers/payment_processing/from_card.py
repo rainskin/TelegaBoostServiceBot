@@ -6,8 +6,11 @@ from busines_logic.calculate_commission import get_amount_minus_commission
 from busines_logic.referrals_managment import add_referral_reward
 from core.db import users, orders, admin
 from core.db.admin import build_payment_info
+from core.db.models.transaction_item import TransactionItem
+from core.db.transactions import transactions
 from core.localisation.texts import messages
 from core.storage import storage
+from enums.transaction_type import TransactionType
 from handlers.new_order.st4_make_order import get_internal_order_id
 from loader import dp, bot
 from utils import callback_templates, navigation, states
@@ -32,10 +35,11 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     internal_order_id = await get_internal_order_id(user_id)
     payment_id = f'P{internal_order_id}'
     text = messages.payment_by_card[lang].format(
-        transaction_id=payment_id, amount=f'{amount_with_commission: .2f}', currency=currency,)
+        transaction_id=payment_id, amount=f'{amount_with_commission: .2f}', currency=currency, )
 
     payment_url = await get_payment_url(payment_id, amount, lang)
-    payment_info = build_payment_info(user_id, amount_rub=amount_with_commission, currency='RUB', amount_original=amount,
+    payment_info = build_payment_info(user_id, amount_rub=amount_with_commission, currency='RUB',
+                                      amount_original=amount,
                                       payment_url=payment_url, balance_recharge=True)
 
     admin.save_payment(payment_id, payment_info)
@@ -90,7 +94,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
         # else:
         #     amount = amount
 
-        await add_balance(user_id, amount)
+        await _add_balance(user_id, amount, payment_id)
         admin.update_payment_status(payment_id, status)
         admin.move_to_successful_payments(payment_id)
         currency = 'RUB'
@@ -107,8 +111,19 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     await query.answer()
 
 
-async def add_balance(user_id: int, amount: float):
+async def _add_balance(user_id: int, amount: float, payment_id: str):
     users.add_balance(user_id, amount)
     inviter_id = users.get_inviter_id(user_id)
     if inviter_id:
         await add_referral_reward(inviter_id, amount)
+
+    user_balance = users.get_balance(user_id)
+    meta = {"note": "Invalid username"}
+    transaction_item = TransactionItem(
+        user_id=user_id,
+        transaction_type=TransactionType.DEPOSIT,
+        amount=amount,
+        balance_after=round((user_balance + amount), 2),
+        meta={"payment_id": payment_id}
+    )
+    await transactions.save(transaction_item)
