@@ -183,7 +183,7 @@ async def take_orders_into_work(orders: dict):
     text = (f'Оформил {count} заказ(ов)\n\n'
             f'Потрачено пользователями: {spend_by_users:.2f}\n'
             f'Прибыль: {round(profit, 2)}\n\n'
-            f'{available_balance - total_amount_without_commission}\n\n'
+            f'Доступный баланс: {round(available_balance - total_amount_without_commission), 2}\n\n'
             f'{non_active_users_stats_text}')
 
     await send_report_to_admin(text)
