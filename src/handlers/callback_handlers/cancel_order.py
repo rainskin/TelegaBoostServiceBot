@@ -4,7 +4,7 @@ from aiogram import types, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.base import StorageKey
 
-from core.db.main_orders_que import orders_queue
+from core.db.main_orders_queue import orders_queue
 from core.storage import storage
 from loader import dp, bot
 from core.db import users, orders, admin

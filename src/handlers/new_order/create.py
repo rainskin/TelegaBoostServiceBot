@@ -6,7 +6,7 @@ from aiogram.fsm.storage.base import StorageKey
 import config
 from core.db import orders, users, admin
 from core.db.models.order_item import OrderItem
-from core.db.main_orders_que import orders_queue
+from core.db.main_orders_queue import orders_queue
 from core.localisation.texts import messages
 from core.storage import storage
 from enums.orders.service_type import ServiceType

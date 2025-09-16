@@ -5,11 +5,15 @@ from aiogram.fsm.storage.base import StorageKey
 from busines_logic.order_managment.place_paid_orders_to_que import place_paid_order
 from core.db import users
 from core.db.models.order_item import OrderItem
-from core.db.main_orders_que import orders_queue
+from core.db.main_orders_queue import orders_queue
+from core.db.models.transaction_item import TransactionItem
+from core.db.transactions import transactions
 from core.localisation.texts import messages
 from core.localisation.texts.messages import not_enough_money
 from core.storage import storage
 from enums.orders.order_status import OrderStatus
+from enums.orders.payment_methods import PaymentMethod
+from enums.transaction_type import TransactionType
 from handlers.new_order.create import place_order
 from loader import dp, bot
 from utils import navigation
@@ -110,9 +114,20 @@ async def _(query: types.CallbackQuery):
 
 
 async def pay_order(user_id: int, order: OrderItem):
-    current_balance = users.get_balance(user_id)
-
-    new_balance = round((current_balance - order.total_amount), 2)
+    user_balance = users.get_balance(user_id)
+    meta = {
+        'internal_order_id': order.internal_order_id,
+        'payment_method': PaymentMethod.FROM_BALANCE.value,
+    }
+    transaction_item = TransactionItem(
+        user_id=user_id,
+        transaction_type=TransactionType.PAYMENT,
+        amount=-abs(order.total_amount),
+        balance_after=user_balance-order.total_amount,
+        meta=meta
+    )
+    await transactions.save(transaction_item)
+    new_balance = round((user_balance - order.total_amount), 2)
     users.update_balance(user_id, new_balance)
     order.order_status = OrderStatus.PAID
     orders_queue.update(order)

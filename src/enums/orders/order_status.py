@@ -11,4 +11,3 @@ class OrderStatus(str, Enum):
     COMPLETED = 'completed'
     CANCELED = 'canceled'
     FAIL = 'fail'
-

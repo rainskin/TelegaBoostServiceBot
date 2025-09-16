@@ -3,7 +3,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.base import StorageKey
 from aiogram.types import Message
 
-from core.db.main_orders_que import orders_queue
+from core.db.main_orders_queue import orders_queue
 from core.localisation.texts import messages
 from core.storage import storage
 from enums.orders.order_status import OrderStatus

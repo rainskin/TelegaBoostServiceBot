@@ -1,6 +1,6 @@
 import config
 from core.db import orders
-from core.db.main_orders_que import orders_queue
+from core.db.main_orders_queue import orders_queue
 from enums.orders.order_status import OrderStatus
 from enums.orders.service_type import ServiceType
 from loader import bot

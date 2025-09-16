@@ -1,7 +1,7 @@
 from aiogram import types, F
 from aiogram.fsm.context import FSMContext
 
-from core.db.main_orders_que import orders_queue
+from core.db.main_orders_queue import orders_queue
 from core.localisation.texts import messages
 from enums.orders.order_status import OrderStatus
 from loader import dp

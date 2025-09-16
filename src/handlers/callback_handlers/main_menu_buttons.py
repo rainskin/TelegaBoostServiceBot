@@ -4,7 +4,7 @@ from aiogram.fsm.storage.base import StorageKey
 
 from aiogram.fsm.context import FSMContext
 
-from core.db.main_orders_que import orders_queue
+from core.db.main_orders_queue import orders_queue
 from core.storage import storage
 from enums.orders.service_type import ServiceType
 from handlers.callback_handlers.orders_navigation_buttons import get_order_statuses_text, get_order_ids, try_get_orders

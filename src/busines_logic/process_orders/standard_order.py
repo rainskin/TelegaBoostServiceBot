@@ -1,7 +1,7 @@
 import config
 from busines_logic.process_orders.tg_stars_order import InsufficientBalanceError, OrderProcessingError
 from core.db import admin, orders as orders_db, users
-from core.db.main_orders_que import orders_queue
+from core.db.main_orders_queue import orders_queue
 from core.db.models.order_item import OrderItem
 from enums.orders.order_status import OrderStatus
 from loader import bot

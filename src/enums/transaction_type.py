@@ -1,0 +1,11 @@
+from enum import Enum
+
+
+class TransactionType(str, Enum):
+    INITIAL_DEPOSIT = 'INITIAL_DEPOSIT',
+    DEPOSIT = 'TOP_UP',
+    REFERRAL_REWARD = 'REFERRAL_REWARD',
+    PAYMENT = 'PAYMENT',
+    WITHDRAW = 'WITHDRAW',
+    REFUND = 'REFUND'
+    ADJUSTMENT = 'ADJUSTMENT'

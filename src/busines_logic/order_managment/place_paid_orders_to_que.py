@@ -1,6 +1,6 @@
 import asyncio
 
-from core.db.main_orders_que import orders_queue
+from core.db.main_orders_queue import orders_queue
 from core.db.models.order_item import OrderItem
 from enums.orders.order_status import OrderStatus
 from handlers.new_order.create import place_order

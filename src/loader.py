@@ -17,5 +17,5 @@ db = db_client[MONGO_DB_NAME]
 db_users = db['users']
 db_orders = db['orders']
 
-storage_client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URL)
+motor_client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URL)
 

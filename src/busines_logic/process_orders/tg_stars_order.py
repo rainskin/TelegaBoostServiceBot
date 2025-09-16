@@ -6,7 +6,7 @@ import requests
 import config
 from core.db import admin, users
 from core.db import orders as orders_db
-from core.db.main_orders_que import orders_queue
+from core.db.main_orders_queue import orders_queue
 from core.db.models.order_item import OrderItem
 from core.localisation.texts import messages
 from enums.orders.order_status import OrderStatus

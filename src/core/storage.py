@@ -7,7 +7,7 @@ from config import MONGO_DB_NAME
 
 class MongoStorage(BaseStorage):
     def __init__(self):
-        self.client = loader.storage_client
+        self.client = loader.motor_client
         self.db = self.client[MONGO_DB_NAME]
         self.collection = self.db['storage']
 
