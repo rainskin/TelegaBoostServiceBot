@@ -17,10 +17,10 @@ from utils.callback_templates import balance_recharge_template
 
 @dp.callback_query(F.data == buy_stars_button.get('callback'))
 async def handle_payment(query: types.CallbackQuery, state: FSMContext):
-    user_id = query.from_user.id
-    if user_id != config.ADMIN_ID:
-        await query.answer('Will available soon')
-        return
+    # user_id = query.from_user.id
+    # if user_id != config.ADMIN_ID:
+    #     await query.answer('Will available soon')
+    #     return
     await cmd_handler(query.message, state)
     await query.answer()
     await query.message.delete()
@@ -30,8 +30,8 @@ async def handle_payment(query: types.CallbackQuery, state: FSMContext):
 @dp.message(Command('buy_stars'))
 async def cmd_handler(msg: types.Message, state: FSMContext):
     user_id = msg.chat.id
-    if user_id != config.ADMIN_ID:
-        return
+    # if user_id != config.ADMIN_ID:
+    #     return
 
     key = StorageKey(bot.id, user_id, user_id)
     data = await storage.get_data(key)

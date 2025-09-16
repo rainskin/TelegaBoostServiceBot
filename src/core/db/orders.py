@@ -43,8 +43,6 @@ class Orders:
         user_id = order_item.user_id
         backend_order_id = order_item.backend_order_id
         order_id = str(backend_order_id) if backend_order_id else order_item.internal_order_id
-        print(f"Saving new order {order_id} for user {user_id} in platform {platform}")
-        print(order_item.internal_order_id)
         self.collection.update_one(
             {'user_id': user_id},
             {'$set': {f'current_orders.{order_id}': order_item.dict()}},

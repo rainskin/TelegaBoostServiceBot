@@ -17,20 +17,26 @@ support_contact = {'ru': "💬 <b>Контакт службы поддержки
                    'en': "💬 <b>Support contact bot:</b> {support_contact}"}
 
 balance_recharge_limits = {
-    'ru': "<b>💵 ДОСТУПНЫЕ СПОСОБЫ ОПЛАТЫ</b>\n\n"
-          "⭐ <b>Телеграм звёзды</b>\n"
-          "💸 <b>Платёжная система AAIO</b>\n\n"
-          "<i>ЛИМИТЫ И СПОСОБЫ ОПЛАТЫ AAIO</i>\n\n"
-          "🔼 <b>СБП</b> - от 500 руб\n"
-          "💳 <b>Банковские карты</b> - от 1000 руб\n\n"
-          "❗ Суммы до 500 руб. можно оплатить только <b>телеграм звёздами</b> либо <b>криптовалютой</b>",
-    'en': "<b>💵 AVAILABLE PAYMENT METHODS</b>\n\n"
-          "⭐ <b>Telegram stars</b>\n"
-          "💸 <b>AAIO payment system</b>\n\n"
-          "<i>AAIO PAYMENT LIMITS AND METHODS</i>\n\n"
-          "🔼 <b>SBP</b> - from 500 rub\n"
-          "💳 <b>Bank cards</b> - from 1000 rub\n\n"
-          "❗ Amounts up to 500 rub can only be paid with <b>telegram stars</b> or <b>cryptocurrency</b>"}
+    'ru': "<b>ДОСТУПНЫЕ СПОСОБЫ ОПЛАТЫ</b>\n\n"
+          "<b>1. ⭐ Телеграм звёзды</b>\n"
+          "<b>2. 💵 Платёжная система AAIO</b>\n"
+          "<i>    СБП - от 100 руб</i>\n"
+          "<i>    Банковские карты - от 1000 руб</i>\n\n"
+          "<blockquote>❗️ Суммы до 100 руб. можно оплатить только телеграм звёздами либо криптовалютой</blockquote>\n\n"
+          "<b>Комиссия на пополнение:</b> {topup_commission}%\n"
+          "_____\n"
+          "<b>От 500 руб</b> можно пополнить баланс <b>без комиссии</b> через поддержку: {support_contact}",
+
+    'en': "<b>AVAILABLE PAYMENT METHODS</b>\n\n"
+          "<b>1. ⭐ Telegram Stars</b>\n"
+          "<b>2. 💵 Payment system AAIO</b>\n"
+          "<i>    SBP – from 100 RUB</i>\n"
+          "<i>    Bank cards – from 1000 RUB</i>\n\n"
+          "<blockquote>❗️ Amounts up to 100 RUB can only be paid with Telegram Stars or cryptocurrency</blockquote>\n\n"
+          "<b>Top-up commission:</b> {topup_commission}%\n"
+          "_____\n"
+          "<b>From 500 RUB</b> you can top up your balance <b>without commission</b> via support: {support_contact}",
+}
 
 balance_recharge_input_amount = {'ru': "Минимальная сумма для пополнения - "
                                        "<b>{minimal_recharge_amount} {currency}</b>\n\n"
@@ -53,16 +59,18 @@ balance_recharge_amount_too_small = {'ru': "Сумма пополнения до
 balance_recharge_accept_amount = {'ru': "Пополнить баланс на <b>{amount} {currency}?</b>",
                                   'en': "Top up your balance with <b>{amount} {currency}?</b>"}
 
-balance_recharge_accept_amount_with_commission = {'ru': "Комиссия {commission_amount}%\n"
-                                                        "Будет зачислено <b>{amount} {currency}</b>\n\n"
-                                                        "Пополнить баланс?\n\n"
-                                                        "<i>Если хотите изменить сумму пополнения,"
-                                                        "отправьте ее следующим сообщением</i>",
-                                                  'en': "Commission {commission_amount}%\n"
-                                                        "Will <b>{amount} {currency} be credited</b>\n\n"
-                                                        "Top up balance?\n\n"
-                                                        "<i>If you want to change the top-up amount,"
-                                                        "send it with the following message</i>"}
+balance_recharge_accept_amount_with_commission = {
+    'ru': "Будет зачислено <b>{amount} {currency}</b>\n\n"
+          "Пополнить баланс?\n\n"
+          "<i>Если хотите изменить сумму пополнения,"
+          "отправьте ее следующим сообщением</i>",
+
+    'en': "<b>{amount} {currency}</b> will be credited\n\n"
+          "Top up the balance?\n\n"
+          "<i>If you want to change the top-up amount,"
+          "send it in the next message</i>",
+}
+
 
 balance_recharge_already_paid = {'ru': "<b>Ошибка.</b>\n\n"
                                        "Этот счет уже был оплачен. Проверьте баланс",
@@ -493,9 +501,9 @@ current_order_status = {
 }
 
 about_referral_system = {
-    'ru': 'Приглашай пользователей по своей ссылке и<b> зарабатывай 10%</b> от каждого пополнения баланса.\n\n'
+    'ru': 'Приглашай пользователей по своей ссылке и<b> зарабатывай {reward_percent}%</b> от каждого пополнения баланса.\n\n'
           '<b>Твоя реф. ссылка:</b> {link}',
-    'en': 'Invite users using your link<b> and earn 10%</b> from each balance replenishment.\n\n'
+    'en': 'Invite users using your link<b> and earn {reward_percent}%</b> from each balance replenishment.\n\n'
           '<b>Your ref. link:</b> {link}'}
 
 referral_statistics = {
