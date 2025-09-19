@@ -48,7 +48,7 @@ balance_recharge_input_amount = {'ru': "Минимальная сумма для
 balance_recharge_wrong_amount = {'ru': "Введите число в формате:\n"
                                        "<b>100</b> или <b>100.50</b>",
                                  'en': "Enter a number in the format:\n"
-                                       "<b>350<b> or <b>490.50<b>"}
+                                       "<b>350</b> or <b>490.50</b>"}
 
 balance_recharge_amount_too_small = {'ru': "Сумма пополнения должна быть не менее "
                                            "<b>{minimal_recharge_amount} {currency}</b>\n\n"
@@ -74,7 +74,7 @@ balance_recharge_accept_amount_with_commission = {
 
 balance_recharge_already_paid = {'ru': "<b>Ошибка.</b>\n\n"
                                        "Этот счет уже был оплачен. Проверьте баланс",
-                                 'en': "<b>Error.<b>\n\n"
+                                 'en': "<b>Error.</b>\n\n"
                                        "This invoice has already been paid. Please check your balance"}
 
 balance_recharge_successfully_paid = {
@@ -424,14 +424,14 @@ payment_by_card = {
 }
 current_payment_status = {
     'ru': '<b>Текущий статус платежа</b>',
-    'en': '<b>Current payment status<b>',
+    'en': '<b>Current payment status</b>',
 }
 
 some_error_try_again = {
     'ru': '<b>❗️ Возникла какая-то ошибка.</b>\n'
           'Попробуйте, пожалуйста, заново.\n'
           'Если проблема сохраняется, обратитесь в поддержку',
-    'en': '<b>❗️ Some error occurred.<b>\n'
+    'en': '<b>❗️ Some error occurred.</b>\n'
           'Please try again.\n'
           'If the problem persists, contact support',
 }
