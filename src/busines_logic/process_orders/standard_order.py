@@ -38,7 +38,7 @@ async def create_order(order_item: OrderItem):
 
     platform = users.get_user_platform(user_id)
 
-    backend_order_id = await api.create_new_order(user_id, str(service_id), url, quantity)
+    backend_order_id = await api.create_new_order(str(service_id), url, quantity)
 
     if backend_order_id is None:
         await bot.send_message(config.ADMIN_ID,

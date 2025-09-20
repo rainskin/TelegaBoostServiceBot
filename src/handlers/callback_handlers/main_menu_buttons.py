@@ -67,7 +67,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
                                    reply_markup=navigation_kb.orders(lang, current_orders=current_orders).as_markup())
         return
 
-    current_order_statuses = await get_order_statuses(order_ids, user_id)
+    current_order_statuses = await get_order_statuses(order_ids)
 
     update_statuses(user_id, current_order_statuses)
     await remove_orders_to_history_and_return_money_for_canceled_orders(user_id, current_order_statuses)

@@ -11,7 +11,7 @@ from utils.keyboards.navigation_kb import navigation
 
 
 async def get_categories(user_id, lang: str):
-    available_categories = await api.get_available_services(user_id)
+    available_categories = await api.get_available_categories()
     builder = InlineKeyboardBuilder()
     if special_offers_is_available():
         builder.button(text=buttons.hot_offers[lang],
@@ -30,7 +30,7 @@ async def get_categories(user_id, lang: str):
 
 async def get_services(lang: str, category_name: str, user_id: int):
     builder = InlineKeyboardBuilder()
-    tariffs = await api.get_tariffs(category_name, user_id)
+    tariffs = await api.get_services_by_category(category_name)
     for tariff in tariffs:
         text = tariff['name']
         _id = tariff['service']

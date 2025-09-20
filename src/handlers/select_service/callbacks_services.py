@@ -19,7 +19,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     lang = users.get_user_lang(user_id)
 
     service_id = query.data.replace(callback_template, '')
-    service = await api.get_service(int(service_id), user_id)
+    service = await api.get_service(int(service_id))
 
     plan_info: str = service['description']
 

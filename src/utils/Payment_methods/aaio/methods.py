@@ -13,7 +13,6 @@ from utils.Payment_methods.aaio.config import MERCHANT_ID, SECRET_KEY1, API_KEY
 
 async def check_payment_status(user_id: int, order_id: str) -> str:
     base_url = 'https://aaio.so/api/info-pay'
-
     params = {
         'merchant_id': MERCHANT_ID,
         'order_id': order_id
