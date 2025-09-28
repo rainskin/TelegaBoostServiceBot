@@ -112,7 +112,9 @@ async def process_tg_stars_order(order_item: OrderItem):
                                                      order_item.total_amount)
 
             user_balance = users.get_balance(order_item.user_id.user_id)
-            meta = {"note": "Invalid username"}
+            meta = {
+                "order_id": order_item.internal_order_id,
+                "note": "Invalid username"}
             transaction_item = TransactionItem(
                 user_id=order_item.user_id,
                 transaction_type=TransactionType.REVERSAL,

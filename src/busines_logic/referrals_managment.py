@@ -16,16 +16,22 @@ async def register_new_referral(inviter_id: int, referral_id: int):
     await asyncio.sleep(10)
 
 
-async def add_referral_reward(inviter_id: int, deposit_amount: float):
+async def add_referral_reward(inviter_id: int, deposit_amount: float, referral_id: int, payment_id: str):
     referral_deposit_reward_percent = admin.get_referral_deposit_reward()
     referral_reward = await get_referral_reward(deposit_amount, referral_deposit_reward_percent)
     user_balance = users.get_balance(inviter_id)
 
+    meta = {
+        "referral_id": referral_id,
+        "payment_id": payment_id,
+        "note": ''
+    }
     transaction_item = TransactionItem(
         user_id=inviter_id,
         transaction_type=TransactionType.REFERRAL_REWARD,
         amount=-referral_reward,
         balance_after=round((user_balance + referral_reward), 2),
+        meta=meta
     )
     await transactions.save(transaction_item)
     users.add_balance(inviter_id, referral_reward)

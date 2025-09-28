@@ -115,10 +115,9 @@ async def _add_balance(user_id: int, amount: float, payment_id: str):
     users.add_balance(user_id, amount)
     inviter_id = users.get_inviter_id(user_id)
     if inviter_id:
-        await add_referral_reward(inviter_id, amount)
+        await add_referral_reward(inviter_id, amount, referral_id=user_id, payment_id=payment_id)
 
     user_balance = users.get_balance(user_id)
-    meta = {"note": "Invalid username"}
     transaction_item = TransactionItem(
         user_id=user_id,
         transaction_type=TransactionType.DEPOSIT,

@@ -59,7 +59,9 @@ async def return_money_for_canceled_or_partial_order(user_id: int, backend_order
 
 
 async def update_db(user_id: int, backend_order_id: str, internal_order_id: str, amount: float, order_status: str):
-    meta = {"note": f"Refund for {order_status} order"}
+    meta = {
+        "order_id": backend_order_id,
+        "note": f"Refund for {order_status} order"}
     try:
         order_item = orders_queue.get(internal_order_id)
         order_item.order_status = OrderStatus.CANCELED if order_status == 'Canceled' else OrderStatus.PARTIAL
