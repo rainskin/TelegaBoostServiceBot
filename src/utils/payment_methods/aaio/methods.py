@@ -8,7 +8,7 @@ import requests
 from requests import ReadTimeout, ConnectTimeout
 
 from loader import bot
-from utils.Payment_methods.aaio.config import MERCHANT_ID, SECRET_KEY1, API_KEY
+from utils.payment_methods.aaio.config import MERCHANT_ID, SECRET_KEY1, API_KEY
 
 
 async def check_payment_status(user_id: int, order_id: str) -> str:

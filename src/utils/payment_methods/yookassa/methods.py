@@ -2,7 +2,7 @@ import uuid
 
 from yookassa.domain.response import PaymentResponse
 
-from utils.Payment_methods.yookassa import config
+from utils.payment_methods.yookassa import config
 from src import config as main_config
 from yookassa import Configuration, Payment
 

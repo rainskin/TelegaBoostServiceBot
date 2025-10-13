@@ -9,7 +9,7 @@ from core.storage import storage
 from handlers.new_order.st4_make_order import get_internal_order_id
 from loader import dp, bot
 from utils import states, navigation
-from utils.Payment_methods.aaio.methods import get_payment_url
+from utils.payment_methods.aaio.methods import get_payment_url
 from utils.keyboards import payment_methods
 
 

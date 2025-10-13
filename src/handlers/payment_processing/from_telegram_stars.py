@@ -8,10 +8,10 @@ from core.db.admin import build_payment_info, admin
 from core.localisation.texts import messages
 from core.storage import storage
 from handlers.new_order.st4_make_order import get_internal_order_id
-from handlers.payment_processing.from_card import _add_balance
+from handlers.payment_processing.from_aaio import _add_balance
 from loader import bot, dp
 from utils import states
-from utils.Payment_methods.telegram_stars.methods import send_invoice
+from utils.payment_methods.telegram_stars.methods import send_invoice
 from utils.callback_templates import balance_recharge_template
 from utils.currencies.telegram_stars import convert_to_stars
 from utils.navigation import return_to_menu

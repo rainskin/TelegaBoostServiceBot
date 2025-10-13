@@ -14,9 +14,9 @@ from enums.transaction_type import TransactionType
 from handlers.new_order.st4_make_order import get_internal_order_id
 from loader import dp, bot
 from utils import callback_templates, navigation, states
-from utils.Payment_methods.aaio.methods import get_payment_url, check_payment_status
-from utils.Payment_methods.aaio.payment_statuses import current_payment_status_translated
+from utils.payment_methods.SWork import payment_url, payment_status
 from utils.keyboards.payment_methods import card_payment
+from utils.payment_methods.SWork.payment_statuses import current_payment_status_translated
 from utils.states import Payment
 
 
@@ -33,18 +33,18 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 
     currency = data.get('currency')
     internal_order_id = await get_internal_order_id(user_id)
-    payment_id = f'P{internal_order_id}'
+    payment_id = f'SW{internal_order_id}'
     text = messages.payment_by_card[lang].format(
         transaction_id=payment_id, amount=f'{amount_with_commission: .2f}', currency=currency, )
 
-    payment_url = await get_payment_url(payment_id, amount, lang)
+    url = await payment_url.get(user_id, payment_id, amount)
     payment_info = build_payment_info(user_id, amount_rub=amount_with_commission, currency='RUB',
                                       amount_original=amount,
-                                      payment_url=payment_url, balance_recharge=True)
+                                      payment_url=url, balance_recharge=True)
 
     admin.save_payment(payment_id, payment_info)
 
-    kb = card_payment(lang, payment_url, payment_id, balance_recharge=True)
+    kb = card_payment(lang, url, payment_id, balance_recharge=True)
     await query.message.answer(text, reply_markup=kb.as_markup())
     await query.answer()
     await query.message.delete()
@@ -62,14 +62,20 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     lang = users.get_user_lang(user_id)
     payment_id = query.data.replace(template, '')
 
-    status = await check_payment_status(user_id, payment_id)
+    try:
+        status = await payment_status.get(payment_id)
+    except Exception as e:
+        print(f'Error checking payment status for {payment_id}: {e}')
+        await query.message.answer(messages.cannot_check_payment_status[lang])
+        await query.answer()
+        return
     status_msg_ids = []
 
     if not status:
         await query.answer()
         return
 
-    if status != 'success' and status != 'hold':
+    if status != 'succeeded':
         text = (f'{messages.current_payment_status[lang]}:\n\n'
                 f'{current_payment_status_translated[status][lang]}')
 

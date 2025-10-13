@@ -1,5 +1,3 @@
-available_statuses = ['in_process', 'success', 'expired', 'hold']
-
 current_payment_status_translated = {
     'in_process': {
         'ru': 'В процессе (Не оплачен)',

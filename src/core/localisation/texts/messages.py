@@ -19,25 +19,26 @@ support_contact = {'ru': "💬 <b>Контакт службы поддержки
 balance_recharge_limits = {
     'ru': "<b>ДОСТУПНЫЕ СПОСОБЫ ОПЛАТЫ</b>\n\n"
           "<b>1. ⭐ Телеграм звёзды</b>\n"
-          "<b>2. 💵 Платёжная система AAIO</b>\n"
-          "<i>    СБП - от 100 руб</i>\n"
-          "<i>    Банковские карты - от 1000 руб</i>\n\n"
-          "<blockquote>❗️ Суммы до 100 руб. можно оплатить только телеграм звёздами либо криптовалютой</blockquote>\n\n"
-          "<b>Комиссия на пополнение:</b> {topup_commission}%\n"
-          "_____\n"
-          "<b>От 500 руб</b> можно пополнить баланс <b>без комиссии</b> через поддержку: {support_contact}",
+          "<b>2. 💳 Банковская карта</b>\n"
+          "<i>    Только Ру карты</i>\n"
+          "<i>    СБП недоступен (в работе)</i>\n\n",
 
     'en': "<b>AVAILABLE PAYMENT METHODS</b>\n\n"
           "<b>1. ⭐ Telegram Stars</b>\n"
-          "<b>2. 💵 Payment system AAIO</b>\n"
-          "<i>    SBP – from 100 RUB</i>\n"
-          "<i>    Bank cards – from 1000 RUB</i>\n\n"
-          "<blockquote>❗️ Amounts up to 100 RUB can only be paid with Telegram Stars or cryptocurrency</blockquote>\n\n"
-          "<b>Top-up commission:</b> {topup_commission}%\n"
+          "<b>2. 💳 Bank card</b>\n"
+          "<i>    Only Ru cards</i>\n"
+          "<i>    SBP is not available (in progress)</i>\n\n"
+}
+
+balance_recharge_commission_info = {
+    'ru': "<b>Комиссия на пополнение:</b> {topup_commission}%\n"
+          "_____\n"
+          "<b>От 500 руб</b> можно пополнить баланс <b>без комиссии</b> через поддержку: {support_contact}",
+
+    'en': "<b>Top-up commission:</b> {topup_commission}%\n"
           "_____\n"
           "<b>From 500 RUB</b> you can top up your balance <b>without commission</b> via support: {support_contact}",
 }
-
 balance_recharge_input_amount = {'ru': "Минимальная сумма для пополнения - "
                                        "<b>{minimal_recharge_amount} {currency}</b>\n\n"
                                        "Укажите желаемую сумму пополнения",
@@ -70,7 +71,6 @@ balance_recharge_accept_amount_with_commission = {
           "<i>If you want to change the top-up amount,"
           "send it in the next message</i>",
 }
-
 
 balance_recharge_already_paid = {'ru': "<b>Ошибка.</b>\n\n"
                                        "Этот счет уже был оплачен. Проверьте баланс",
@@ -119,8 +119,9 @@ order_is_paid = {'ru': "💰 <b>Заказ {internal_order_id} </b> успешн
 order_is_created = {'ru': "✅ <b>Заказ {order_id} оформлен</b>\n\n",
                     'en': "✅ <b>Order {order_id} has been placed</b>\n\n"}
 
-order_was_canceled = {'ru': 'Заказ <b>{internal_order_id}</b> был отменен. Возвращено на баланс: {amount:.2f} {currency}',
-                      'en': 'Order <b>{internal_order_id}</b> has been canceled. Returned to balance: {amount:.2f} {currency}'}
+order_was_canceled = {
+    'ru': 'Заказ <b>{internal_order_id}</b> был отменен. Возвращено на баланс: {amount:.2f} {currency}',
+    'en': 'Order <b>{internal_order_id}</b> has been canceled. Returned to balance: {amount:.2f} {currency}'}
 
 # orders_is_created = {'ru': "✅ <b>Заказы {order_ids} оформлены</b>\n\n",
 #                      'en': "✅ <b>Orders {order_ids} has been placed</b>\n\n"}
@@ -309,13 +310,6 @@ plan_info = {
     }
 }
 
-hot_offer_msg = {
-    'price': {
-        'ru': 'Стоимость',
-        'en': 'Price',
-    },
-}
-
 maintenance_mode = {
     'ru': '⚠️ Сейчас это действие выполнить невозможно - система находится на техническом обслуживании.\n'
           'Примерное время работ: 10 минут.\n\n',
@@ -326,32 +320,27 @@ maintenance_mode = {
 
 def get_plan_info_text(lang: str, name, description: str, service_info: dict, hot_offer=False):
     currency = 'RUB'
-    if not hot_offer:
-        rate = service_info['rate']
-        min_count = service_info['min_count']
-        max_count = service_info['max_count']
-        canceling_is_available = service_info['canceling_is_available']
-        canceling_is_available = plan_info['canceling_is_available'][lang] if canceling_is_available else \
-            plan_info['canceling_is_not_available'][lang]
 
-        if description.startswith('\n'):
-            description = description[1:]
+    rate = service_info['rate']
+    min_count = service_info['min_count']
+    max_count = service_info['max_count']
+    canceling_is_available = service_info['canceling_is_available']
+    canceling_is_available = plan_info['canceling_is_available'][lang] if canceling_is_available else \
+        plan_info['canceling_is_not_available'][lang]
 
-        name += '\n\n' if description else '\n'
-        description += '\n\n' if description else '\n'
+    if description.startswith('\n'):
+        description = description[1:]
 
-        msg = (f'<b>{name}</b>'
-               f'{description}'
-               f'<b>{plan_info["price_rate"][lang]}:</b> {rate} {currency}\n\n'
-               f'<b>{plan_info["min_count"][lang]}:</b> {min_count}\n'
-               f'<b>{plan_info["max_count"][lang]}:</b> {max_count}\n\n'
-               f'{canceling_is_available}')
+    name += '\n\n' if description else '\n'
+    description += '\n\n' if description else '\n'
 
-    else:
-        price: float = service_info['price']
-        msg = (f'<b>{name}</b>\n\n'
-               f'{description}\n\n'
-               f'<b>{hot_offer_msg["price"][lang]}:</b> {round(price)} {currency}')
+    msg = (f'<b>{name}</b>'
+           f'{description}'
+           f'<b>{plan_info["price_rate"][lang]}:</b> {rate} {currency}\n\n'
+           f'<b>{plan_info["min_count"][lang]}:</b> {min_count}\n'
+           f'<b>{plan_info["max_count"][lang]}:</b> {max_count}\n\n'
+           f'{canceling_is_available}')
+
     return msg
 
 
@@ -425,6 +414,13 @@ payment_by_card = {
 current_payment_status = {
     'ru': '<b>Текущий статус платежа</b>',
     'en': '<b>Current payment status</b>',
+}
+
+cannot_check_payment_status = {
+    'ru': '<b>Не удалось проверить статус платежа.</b>\n'
+          'Если оплата была совершена, обратитесь в поддержку - /support',
+    'en': '<b>Failed to check payment status.</b>\n'
+          'If the payment was made, contact support - /support',
 }
 
 some_error_try_again = {
