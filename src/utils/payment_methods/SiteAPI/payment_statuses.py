@@ -3,7 +3,7 @@ current_payment_status_translated = {
         'ru': 'В процессе (Не оплачен)',
         'en': 'In progress (Not paid)',
     },
-    'succeeded': {
+    'successful': {
         'ru': 'Успешно оплачен',
         'en': 'Successfully paid',
     },

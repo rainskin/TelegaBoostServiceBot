@@ -14,9 +14,9 @@ from enums.transaction_type import TransactionType
 from handlers.new_order.st4_make_order import get_internal_order_id
 from loader import dp, bot
 from utils import callback_templates, navigation, states
-from utils.payment_methods.SWork import payment_url, payment_status
+from utils.payment_methods.SiteAPI import payment_url, payment_status
 from utils.keyboards.payment_methods import card_payment
-from utils.payment_methods.SWork.payment_statuses import current_payment_status_translated
+from utils.payment_methods.SiteAPI.payment_statuses import current_payment_status_translated
 from utils.states import Payment
 
 
@@ -64,6 +64,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 
     try:
         status = await payment_status.get(payment_id)
+
     except Exception as e:
         print(f'Error checking payment status for {payment_id}: {e}')
         await query.message.answer(messages.cannot_check_payment_status[lang])
@@ -75,7 +76,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
         await query.answer()
         return
 
-    if status != 'succeeded':
+    if status != 'successful':
         text = (f'{messages.current_payment_status[lang]}:\n\n'
                 f'{current_payment_status_translated[status][lang]}')
 

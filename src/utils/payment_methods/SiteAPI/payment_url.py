@@ -36,17 +36,12 @@ async def generate_payment_token(telegram_id, order_id, amount_rubles):
     return token
 
 
-test_telegram_id = 123456789
-test_order_id = "bot-topup-002"
-test_amount = 1.00  # 150.75 RUB
-
-
 async def get(user_id: int, order_id: str, amount: float):
 
     token = await generate_payment_token(user_id, order_id, amount)
 
     # Example of how to construct the full URL
-    base_url = config.DOMAIN_BASE_PAYMENT_URL  # Replace with your actual domain
-    full_url = f"{base_url}{token}/"
+    base_url = config.DOMAIN_BASE_URL
+    full_url = f"{base_url}/top-up/{token}/"
     return full_url
 
