@@ -28,7 +28,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     else:
         name, description = service['name'], ''
 
-    old_rate: int | float = service['rate']
+    old_rate: float = float(service['rate'])
     new_rate: int = get_rate_with_commission(old_rate, service_id)
     service_info = {
         'service_id': service_id,
@@ -59,8 +59,9 @@ def is_correct_info(plan_info):
     return plan_info and ('\n' in plan_info)
 
 
-def get_rate_with_commission(rate: int, service_id: str):
+def get_rate_with_commission(rate: float, service_id: str):
 
     commission = db.admin.get_commission_percentage(service_id)
+    print('rate', rate)
     rate = rate * (1 + (commission / 100))
     return round(rate)
