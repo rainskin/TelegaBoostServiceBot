@@ -85,8 +85,9 @@ async def process_tg_stars_order(order_item: OrderItem):
     # result = {'Successful': True}
     # result = {'error': 'Not enough balance'}
     # result = {'error': 'No Telegram users found'}
-    lang = users.get_user_lang(order_item.user_id)
-    orders_db.new_order('telegram', order_item)
+    lang = await users.get_user_lang(order_item.user_id)
+    await orders_db.new_order('telegram', order_item)
+
     if not result:
         error_message = f"⚠️ Не удалось купить звезды. Заказ {order_item.internal_order_id}. Ответ от API: {result}"
         raise OrderProcessingError(error_message)
@@ -104,14 +105,14 @@ async def process_tg_stars_order(order_item: OrderItem):
             order_item.order_status = OrderStatus.CANCELED
             order_item.deleted = True
             order_item.is_money_returned = True
-            orders_queue.update(order_item)
-            order_item = orders_queue.get(order_item.internal_order_id)
+            await orders_queue.update(order_item)
+            order_item = await orders_queue.get(order_item.internal_order_id)
 
-            admin.remove_order_from_execution_queue(order_item.internal_order_id)
-            orders_db.return_money_for_current_order(order_item.user_id, order_item.internal_order_id,
+            await admin.remove_order_from_execution_queue(order_item.internal_order_id)
+            await orders_db.return_money_for_current_order(order_item.user_id, order_item.internal_order_id,
                                                      order_item.total_amount)
 
-            user_balance = users.get_balance(order_item.user_id.user_id)
+            user_balance = await users.get_balance(order_item.user_id.user_id)
             meta = {
                 "order_id": order_item.internal_order_id,
                 "note": "Invalid username"}
@@ -124,9 +125,9 @@ async def process_tg_stars_order(order_item: OrderItem):
             )
             await transactions.save(transaction_item)
 
-            orders_db.update_active_order(order_item.internal_order_id, order_item)
-            orders_db.move_orders_to_archive(order_item.user_id, order_item.internal_order_id)
-            orders_db.remove_not_accepted_order(order_item.user_id, order_item.internal_order_id)
+            await orders_db.update_active_order(order_item.internal_order_id, order_item)
+            await orders_db.move_orders_to_archive(order_item.user_id, order_item.internal_order_id)
+            await orders_db.remove_not_accepted_order(order_item.user_id, order_item.internal_order_id)
             text = messages.tg_stars_order_invalid_username[lang].format(internal_order_id=order_item.internal_order_id)
             await bot.send_message(chat_id=order_item.user_id, text=text)
 
@@ -140,13 +141,13 @@ async def process_tg_stars_order(order_item: OrderItem):
         successful = result.get('Successful')
         if successful:
             order_item.order_status = OrderStatus.COMPLETED
-            orders_queue.update(order_item)
-            order_item = orders_queue.get(order_item.internal_order_id)
+            await orders_queue.update(order_item)
+            order_item = await orders_queue.get(order_item.internal_order_id)
 
-            admin.remove_order_from_execution_queue(order_item.internal_order_id)
-            orders_db.remove_not_accepted_order(order_item.user_id, order_item.internal_order_id)
-            orders_db.update_active_order(order_item.internal_order_id, order_item)
-            orders_db.move_orders_to_archive(order_item.user_id, order_item.internal_order_id)
+            await admin.remove_order_from_execution_queue(order_item.internal_order_id)
+            await orders_db.remove_not_accepted_order(order_item.user_id, order_item.internal_order_id)
+            await orders_db.update_active_order(order_item.internal_order_id, order_item)
+            await orders_db.move_orders_to_archive(order_item.user_id, order_item.internal_order_id)
             text = messages.tg_stars_order_completed[lang].format(internal_order_id=order_item.internal_order_id,
                                                                   amount=order_item.quantity,
                                                                   username=order_item.url)
@@ -161,18 +162,18 @@ async def process_tg_stars_order(order_item: OrderItem):
     # print(f"Skipping non-standard service type for order {order_item.internal_order_id}")
     # order_item.order_status = OrderStatus.CANCELED
     # order_item.deleted = True
-    # orders_queue.update(order_item)
+    # await orders_queue.update(order_item)
     # admin.remove_order_from_execution_queue(order_item.internal_order_id)
     # orders_db.remove_not_accepted_order(order_item.user_id, order_item.internal_order_id)
 
 
-def calculate_price_rub(stars: int) -> int:
+async def calculate_price_rub(stars: int) -> int:
     """
     Рассчитывает цену в рублях, прибыль и маржу за заданное количество звёзд,
     с учётом курса доллара к рублю.
     """
     # Таблица диапазонов: (минимум звёзд, цена за 1 звезду в рублях)
-    price_ranges = admin.get_tg_stars_price_ranges_in_rub()
+    price_ranges = await admin.get_tg_stars_price_ranges_in_rub()
 
     price_per_star = price_ranges[0][1]
     for min_stars, rub_price in price_ranges:

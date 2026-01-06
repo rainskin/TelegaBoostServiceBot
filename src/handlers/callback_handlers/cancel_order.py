@@ -22,12 +22,12 @@ template = callback_templates.cancel_order()
 async def _(query: types.CallbackQuery, state: FSMContext):
     user_id = query.from_user.id
     internal_order_id: str = query.data.replace(template, '')
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
     key = StorageKey(bot_id=bot.id, chat_id=user_id, user_id=user_id)
-    status = orders_queue.get_status(internal_order_id)
+    status = await orders_queue.get_status(internal_order_id)
     if is_not_accepted_order(user_id, internal_order_id) and status != OrderStatus.IN_PROGRESS:
-        if not orders.is_order_exist(user_id, internal_order_id,
-                                     not_accepted_order=True) or admin.is_order_in_execution_queue(internal_order_id):
+        if not await orders.is_order_exist(user_id, internal_order_id,
+                                     not_accepted_order=True) or await admin.is_order_in_execution_queue(internal_order_id):
             text = messages.canceling_not_accepted_order_is_not_available[lang]
             kb = None
         else:
@@ -47,15 +47,15 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 async def _(query: types.CallbackQuery, state: FSMContext):
     user_id = query.from_user.id
     key = StorageKey(bot_id=bot.id, chat_id=user_id, user_id=user_id)
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
     data = await storage.get_data(key)
     internal_order_id = data.get('order_id')
 
     if is_not_accepted_order(user_id, internal_order_id):
-        not_accepted_orders = orders.get_not_accepted_orders(user_id)
+        not_accepted_orders = await orders.get_not_accepted_orders(user_id)
         order = not_accepted_orders.get(internal_order_id)
         amount = order.get('total_amount')
-        user_balance = users.get_balance(user_id)
+        user_balance = await users.get_balance(user_id)
 
         transaction_item = TransactionItem(
             user_id=user_id,
@@ -65,16 +65,16 @@ async def _(query: types.CallbackQuery, state: FSMContext):
         )
         await transactions.save(transaction_item)
 
-        orders.cancel_order(user_id, internal_order_id, not_accepted_orders=True)
+        await orders.cancel_order(user_id, internal_order_id, not_accepted_orders=True)
 
         try:
-            order_item = orders_queue.get(internal_order_id)
+            order_item = await orders_queue.get(internal_order_id)
             order_item.order_status = OrderStatus.CANCELED
-            orders_queue.update(order_item)
+            await orders_queue.update(order_item)
         except Exception:
             pass
 
-        admin.remove_order_from_main_queue(internal_order_id)
+        await admin.remove_order_from_main_queue(internal_order_id)
 
     await query.message.edit_text(messages.order_successfully_canceled[lang])
 
@@ -87,7 +87,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 async def _(query: types.CallbackQuery, state: FSMContext):
     user_id = query.from_user.id
     key = StorageKey(bot_id=bot.id, chat_id=user_id, user_id=user_id)
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
     await query.message.answer(messages.cancel_action[lang])
 
     await storage.delete_data(key)

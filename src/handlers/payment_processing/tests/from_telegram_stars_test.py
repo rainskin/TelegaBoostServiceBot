@@ -16,7 +16,7 @@ async def test_stars_callback_creates_payment():
     mock_user_id = 42
     amount = 100.0
     amount_with_commission = 105.0
-    amount_in_starts = telegram_stars.convert_to_stars(amount)  # пусть ваша реализация
+    amount_in_starts = await telegram_stars.convert_to_stars(amount)  # пусть ваша реализация
 
     # Мокаем CallbackQuery
     query = MagicMock(spec=CallbackQuery)

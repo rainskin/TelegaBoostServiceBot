@@ -13,16 +13,16 @@ from loader import bot
 from utils import api
 
 
-def try_get_orders_for_execution() -> dict | None:
+async def try_get_orders_for_execution() -> dict | None:
     # orders_to_execution = admin.get_orders_for_execution()
     # if orders_to_execution:
     #     return orders_to_execution
 
-    orders_queue = admin.get_orders_queue()
+    orders_queue = await admin.get_orders_queue()
     if orders_queue:
-        admin.move_orders_to_execution_queue(orders_queue)
+        await admin.move_orders_to_execution_queue(orders_queue)
 
-    orders_to_execution = admin.get_orders_for_execution()
+    orders_to_execution = await admin.get_orders_for_execution()
     if not orders_to_execution:
         return None
 
@@ -78,7 +78,7 @@ def get_summary_text(orders: dict, available_balance: float) -> str:
 
 
 async def send_notification_to_user(user_id, internal_order_id):
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
     text = messages.take_order_into_work[lang].format(internal_order_id=internal_order_id)
     await bot.send_message(user_id, text)
 
@@ -194,7 +194,7 @@ async def send_report_to_admin(text):
 
 
 async def try_take_orders_into_work():
-    orders = try_get_orders_for_execution()
+    orders = await try_get_orders_for_execution()
     if not orders:
         return
 

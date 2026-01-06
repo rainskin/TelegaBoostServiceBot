@@ -17,7 +17,7 @@ from utils.keyboards.navigation_kb import yes_or_no_kb
 @dp.message(states.BuyStars.waiting_for_username)
 async def _(msg: types.Message, state: FSMContext):
     user_id = msg.chat.id
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
     key = StorageKey(bot.id, user_id, user_id)
     data = await storage.get_data(key)
     quantity = data.get('quantity')
@@ -35,8 +35,8 @@ async def _(msg: types.Message, state: FSMContext):
         await storage.update_data(key, msgs_to_delete=msgs_to_delete + [error_message.message_id])
         return
 
-    usdt_to_rub_rate = usdt.to_rub_rate()
-    total_price = calculate_price_rub(quantity)
+    usdt_to_rub_rate = await usdt.to_rub_rate()
+    total_price = await calculate_price_rub(quantity)
     profit = round(calculate_profit(quantity, total_price, usdt_to_rub_rate), 2)
     amount_without_commission = total_price - profit
     currency = 'RUB'

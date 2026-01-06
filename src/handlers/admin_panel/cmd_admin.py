@@ -41,7 +41,7 @@ async def users_cmd(msg: types.Message):
     if user_id != config.ADMIN_ID:
         return
 
-    user_ids = users.get_all_users_ids()
+    user_ids = await users.get_all_users_ids()
 
     count = 0
     for user_id in user_ids:
@@ -53,7 +53,7 @@ async def users_cmd(msg: types.Message):
             doc = {'username': username,
                    'name': name}
             
-            users.update_user(user_id, doc)
+            await users.update_user(user_id, doc)
             count += 1
         except Exception as e:
             await bot.send_message(config.ADMIN_ID, f"Error updating username for user {user_id}: {e}")
@@ -67,7 +67,7 @@ async def _ (query: CallbackQuery, state: FSMContext):
     user_id = query.from_user.id
     key = StorageKey(bot_id=bot.id, chat_id=user_id, user_id=user_id)
 
-    orders = try_get_orders_for_execution()
+    orders = await try_get_orders_for_execution()
     available_balance = await api.get_account_balance()
     if orders:
         total_amount = get_total_amount(orders)

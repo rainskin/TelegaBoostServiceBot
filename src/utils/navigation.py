@@ -11,8 +11,8 @@ from core.localisation.texts import messages
 
 async def return_to_menu(user_id: int, state: FSMContext):
     await state.set_state(None)
-    lang = users.get_user_lang(user_id)
-    user_balance = users.get_balance(user_id)
+    lang = await users.get_user_lang(user_id)
+    user_balance = await users.get_balance(user_id)
 
     key = StorageKey(bot_id=bot.id, chat_id=user_id, user_id=user_id)
     await storage.delete_data(key)
@@ -29,7 +29,7 @@ async def return_to_menu(user_id: int, state: FSMContext):
 
 
 async def get_categories(user_id: int):
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
     kb = await categories.get_categories(user_id, lang)
     await bot.send_message(user_id, messages.plans[lang], reply_markup=kb.as_markup())
 

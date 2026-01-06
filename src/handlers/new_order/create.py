@@ -31,8 +31,8 @@ async def start_creating_new_order(lang, key: StorageKey, state: FSMContext, ser
                            service_msg_ids=[service_msg.message_id])
     await state.set_state(states.NewOrder.choosing_quantity)
 
-def save_unpaid_order(order_item: OrderItem):
-    orders_queue.save(order_item)
+async def save_unpaid_order(order_item: OrderItem):
+    await orders_queue.save(order_item)
 
 # async def place_order(user_id: int, internal_order_id: str, data: dict, payment_method: str):
 #     data['payment_method'] = payment_method
@@ -43,4 +43,4 @@ def save_unpaid_order(order_item: OrderItem):
 
 
 async def place_order(order_item: OrderItem):
-    admin.put_order_to_queue(order_item)
+    await admin.put_order_to_queue(order_item)

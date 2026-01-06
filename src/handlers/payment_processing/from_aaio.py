@@ -25,7 +25,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     user_id = query.from_user.id
 
     key = StorageKey(bot.id, user_id, user_id)
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
 
     data = await storage.get_data(key)
     amount = data.get('amount')
@@ -42,7 +42,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
                                       amount_original=amount,
                                       payment_url=payment_url, balance_recharge=True)
 
-    admin.save_payment(payment_id, payment_info)
+    await admin.save_payment(payment_id, payment_info)
 
     kb = card_payment(lang, payment_url, payment_id, balance_recharge=True)
     await query.message.answer(text, reply_markup=kb.as_markup())
@@ -59,7 +59,7 @@ template = callback_templates.balance_recharge()
 @dp.callback_query(F.data.startswith(template))
 async def _(query: types.CallbackQuery, state: FSMContext):
     user_id = query.from_user.id
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
     payment_id = query.data.replace(template, '')
 
     status = await check_payment_status(user_id, payment_id)
@@ -78,13 +78,13 @@ async def _(query: types.CallbackQuery, state: FSMContext):
         await query.answer()
         return
 
-    if not admin.is_not_paid(payment_id):
+    if not await admin.is_not_paid(payment_id):
         text = messages.balance_recharge_already_paid[lang]
         await query.message.answer(text)
         await query.message.delete()
         return
 
-    payment_info = admin.get_payment_info(payment_id)
+    payment_info = await admin.get_payment_info(payment_id)
 
     if payment_info:
         amount = payment_info.get('amount_rub')
@@ -95,8 +95,8 @@ async def _(query: types.CallbackQuery, state: FSMContext):
         #     amount = amount
 
         await _add_balance(user_id, amount, payment_id)
-        admin.update_payment_status(payment_id, status)
-        admin.move_to_successful_payments(payment_id)
+        await admin.update_payment_status(payment_id, status)
+        await admin.move_to_successful_payments(payment_id)
         currency = 'RUB'
 
         formatted_amount = f'{amount:.2f}'
@@ -112,12 +112,12 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 
 
 async def _add_balance(user_id: int, amount: float, payment_id: str):
-    users.add_balance(user_id, amount)
-    inviter_id = users.get_inviter_id(user_id)
+    await users.add_balance(user_id, amount)
+    inviter_id = await users.get_inviter_id(user_id)
     if inviter_id:
         await add_referral_reward(inviter_id, amount, referral_id=user_id, payment_id=payment_id)
 
-    user_balance = users.get_balance(user_id)
+    user_balance = await users.get_balance(user_id)
     transaction_item = TransactionItem(
         user_id=user_id,
         transaction_type=TransactionType.DEPOSIT,

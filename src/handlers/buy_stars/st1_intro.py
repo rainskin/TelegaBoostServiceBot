@@ -37,7 +37,7 @@ async def cmd_handler(msg: types.Message, state: FSMContext):
     data = await storage.get_data(key)
     msgs_to_delete = data.get('msgs_to_delete', [])
 
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
 
     await state.set_state(None)
     answer = await msg.answer(messages.tg_stars_enter_quantity[lang])

@@ -31,7 +31,7 @@ from utils.keyboards import payment_methods
 #     user_id = query.from_user.id
 #
 #     key = StorageKey(bot.id, user_id, user_id)
-#     lang = users.get_user_lang(user_id)
+#     lang = await users.get_user_lang(user_id)
 #
 #     data = await storage.get_data(key)
 #     amount = data.get('amount')
@@ -54,7 +54,7 @@ from utils.keyboards import payment_methods
 @dp.callback_query(F.data == 'no', states.BalanceRecharge.choosing_amount)
 async def _(query: types.CallbackQuery, state: FSMContext):
     user_id = query.from_user.id
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
     text = messages.cancel_action[lang]
 
     await query.message.answer(text)

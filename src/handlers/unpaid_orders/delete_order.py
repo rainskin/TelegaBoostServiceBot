@@ -23,14 +23,14 @@ callback_template = callback_templates.delete_unpaid_order_template()
 @dp.callback_query(F.data.startswith(callback_template))
 async def _(query: types.CallbackQuery, state: FSMContext):
     user_id = query.from_user.id
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
     internal_order_id = query.data.replace(callback_template, '')
 
-    order_status = OrderStatus(orders_queue.get_status(internal_order_id))
+    order_status = await orders_queue.get_status(internal_order_id)
 
     if order_status == OrderStatus.UNPAID:
 
-        orders_queue.delete(internal_order_id)
+        await orders_queue.delete(internal_order_id)
 
         text = messages.unpaid_order_was_deleted[lang].format(internal_order_id=internal_order_id)
         await query.answer()

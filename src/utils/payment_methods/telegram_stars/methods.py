@@ -23,7 +23,7 @@ async def send_invoice(chat_id: int, title: str, description: str, payload: str,
         payload: unique string identifier for the invoice
         amount: amount in XTR to be charged
     """
-    lang = users.get_user_lang(chat_id)
+    lang = await users.get_user_lang(chat_id)
     prices = [LabeledPrice(label=title, amount=amount)]
 
     return await bot.send_invoice(

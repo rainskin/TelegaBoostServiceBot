@@ -4,8 +4,8 @@ from core.db import admin
 from utils.currency_api import get_actual_usdt_price
 
 
-def to_rub_rate():
-    exchange_rates: dict = admin.get_exchange_rates()
+async def to_rub_rate():
+    exchange_rates: dict = await admin.get_exchange_rates()
     usdt_rate_from_db = exchange_rates.get('usdt_to_rub_rate')
     updated_at = exchange_rates.get('updated_at')
 
@@ -27,6 +27,6 @@ def to_rub_rate():
         r = usdt_rate_from_db
     else:
         r = get_actual_usdt_price()
-        admin.update_exchange_rates(r)
+        await admin.update_exchange_rates(r)
     return r
 

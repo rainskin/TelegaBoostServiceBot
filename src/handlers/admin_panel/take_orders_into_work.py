@@ -15,7 +15,7 @@ async def _(query: CallbackQuery):
     user_id = query.from_user.id
     key = StorageKey(bot_id=bot.id, chat_id=user_id, user_id=user_id)
     data = await storage.get_data(key)
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
     total_orders = data.get('total_orders')
     total_amount: float = data.get('total_amount')
 
@@ -41,7 +41,7 @@ async def _(query: CallbackQuery):
     await query.answer()
     await query.message.delete()
 
-    _orders = admin.get_orders_for_execution()
+    _orders = await admin.get_orders_for_execution()
 
     await take_orders_into_work(_orders)
 

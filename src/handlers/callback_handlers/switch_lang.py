@@ -14,7 +14,7 @@ callback_template = callback_templates.select_lang()
 async def _(query: types.CallbackQuery, state: FSMContext):
     user_id = query.from_user.id
     lang_code = query.data.replace(callback_template, '')
-    users.switch_lang(user_id, lang_code)
+    await users.switch_lang(user_id, lang_code)
     await query.answer(messages.lang_is_changed[lang_code], show_alert=True)
     await return_to_menu(user_id, state)
     await query.message.delete()

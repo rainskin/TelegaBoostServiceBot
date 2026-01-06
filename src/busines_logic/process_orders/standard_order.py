@@ -22,21 +22,25 @@ async def process_standard_order(order_item: OrderItem):
 
     order_item.backend_order_id = backend_order_id
     order_item.order_status = OrderStatus.IN_PROGRESS
-    orders_queue.update(order_item)
+
+    # сохранение заказа в current_orders
+    platform = await users.get_user_platform(order_item.user_id)
+    await orders_db.new_order(platform, order_item)
+
+    await orders_queue.update(order_item)
 
     # TODO : через время поменять сигнатуру методов под order_item
-    admin.remove_order_from_execution_queue(order_item.internal_order_id)
-    orders_db.remove_not_accepted_order(order_item.user_id, order_item.internal_order_id)
+    await admin.remove_order_from_execution_queue(order_item.internal_order_id)
+    await orders_db.remove_not_accepted_order(order_item.user_id, order_item.internal_order_id)
     # ------       ------        ------        ------        ------
 
 
 async def create_order(order_item: OrderItem):
-    user_id = order_item.user_id
     service_id = order_item.service_id
     url = order_item.url
     quantity = order_item.quantity
 
-    platform = users.get_user_platform(user_id)
+
 
     backend_order_id = await api.create_new_order(str(service_id), url, quantity)
 
@@ -45,7 +49,6 @@ async def create_order(order_item: OrderItem):
                                f"Не удалось создать заказ {order_item.internal_order_id}. backend_order_id is None")
         return
 
-    order_item.backend_order_id = backend_order_id
-    orders_db.new_order(platform, order_item)
+
 
     return backend_order_id

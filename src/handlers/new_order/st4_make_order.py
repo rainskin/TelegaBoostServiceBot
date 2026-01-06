@@ -18,7 +18,7 @@ from utils.states import NewOrder
 @dp.callback_query(F.data == 'make_order', NewOrder.waiting_for_url)
 async def _(query: types.CallbackQuery, state: FSMContext):
     user_id = query.from_user.id
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
     chat_id = query.message.chat.id
     key = StorageKey(bot.id, chat_id, user_id)
 
@@ -50,7 +50,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
         profit=data.get('profit')
     )
 
-    save_unpaid_order(order_item)
+    await save_unpaid_order(order_item)
     await state.set_state(None)
     await storage.reset_data(key)
     await delete_messages(chat_id, service_msg_ids)
@@ -64,7 +64,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 # async def _(query: types.CallbackQuery, state: FSMContext):
 #     print('make order handler...')
 #     user_id = query.from_user.id
-#     lang = users.get_user_lang(user_id)
+#     lang = await users.get_user_lang(user_id)
 #     chat_id = query.message.chat.id
 #     key = StorageKey(bot.id, chat_id, user_id)
 #     data = await storage.get_data(key)
@@ -115,16 +115,18 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 
 
 async def get_internal_order_id(user_id: int):
-    internal_order = orders.get_last_internal_order(user_id)
+    internal_order = await orders.get_last_internal_order(user_id)
+
     template = f'{user_id}_N0017'
     if internal_order:
+        print(f'internal_order: {internal_order}')
         order_number = int(internal_order.replace(template, ''))
         new_internal_order = order_number + 1
     else:
         new_internal_order = 1
 
     result = f'{template}{new_internal_order}'
-    orders.update_last_internal_order(user_id, result)
+    await orders.update_last_internal_order(user_id, result)
     return result
 
 

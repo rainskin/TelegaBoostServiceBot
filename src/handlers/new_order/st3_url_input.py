@@ -13,7 +13,7 @@ from utils.states import NewOrder
 @dp.callback_query(F.data == 'to_continue', NewOrder.choosing_quantity)
 async def _(query: types.CallbackQuery, state: FSMContext):
     user_id = query.from_user.id
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
     chat_id = query.message.chat.id
     key = StorageKey(bot.id, chat_id, user_id)
     data = await storage.get_data(key)
@@ -29,7 +29,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 @dp.message(NewOrder.waiting_for_url)
 async def _(msg: types.Message, state: FSMContext):
     user_id = msg.from_user.id
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
     currency = 'RUB'
     chat_id = msg.chat.id
     key = StorageKey(bot.id, chat_id, user_id)

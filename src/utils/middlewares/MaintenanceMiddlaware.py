@@ -14,7 +14,7 @@ class CallbackMaintenanceMiddleware(BaseMiddleware):
             data: Dict[str, Any]
     ) -> Any:
 
-        if admin.is_maintenance_mode():
+        if await admin.is_maintenance_mode():
             await show_maintenance_alert_as_query_answer(query)
             return
 
@@ -23,6 +23,6 @@ class CallbackMaintenanceMiddleware(BaseMiddleware):
 
 async def show_maintenance_alert_as_query_answer(query: types.CallbackQuery):
     user_id = query.from_user.id
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
     text = messages.maintenance_mode[lang]
     await query.answer(text, show_alert=True)

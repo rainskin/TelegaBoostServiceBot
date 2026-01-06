@@ -6,15 +6,15 @@ from core.localisation.texts import messages
 from core.localisation.texts.messages import translate_status_key
 
 
-def get_order_status_text(user_id: int, lang: str, _orders: Dict[str, dict]) -> str:
+async def get_order_status_text(user_id: int, lang: str, _orders: Dict[str, dict]) -> str:
 
     internal_order_ids, backend_order_ids, orders_info = [], [], []
     msgs = []
 
     for backend_order_id, order_info in _orders.items():
-        additional_order_info = orders.get_order_info(user_id, backend_order_id, current_orders=True)
+        additional_order_info = await orders.get_order_info(user_id, backend_order_id, current_orders=True)
         if not additional_order_info:
-            additional_order_info = orders.get_order_info(user_id, backend_order_id, current_orders=False)
+            additional_order_info = await orders.get_order_info(user_id, backend_order_id, current_orders=False)
 
         for _key, _value in additional_order_info.items():
             order_info[_key] = _value

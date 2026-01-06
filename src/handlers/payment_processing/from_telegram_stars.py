@@ -22,12 +22,12 @@ template = balance_recharge_template()
 @dp.callback_query(F.data == 'payment_method_telegram_stars', states.Payment.choosing_method)
 async def handle_payment(query: types.CallbackQuery):
     user_id = query.from_user.id
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
     key = StorageKey(bot.id, user_id, user_id)
     data = await storage.get_data(key)
     amount_in_rub = data.get('amount')
     amount_in_rub_with_commission = data.get('amount_with_commission')
-    amount_in_stars = convert_to_stars(amount_in_rub)
+    amount_in_stars = await convert_to_stars(amount_in_rub)
 
     internal_order_id = await get_internal_order_id(user_id)
     payment_id = f'S{internal_order_id}'
@@ -41,7 +41,7 @@ async def handle_payment(query: types.CallbackQuery):
 
     payment_info = build_payment_info(user_id, amount_in_rub_with_commission, 'XTR', amount_original=amount_in_stars,
                                       payment_url=msg.message_id, balance_recharge=True)
-    admin.save_payment(payment_id, payment_info)
+    await admin.save_payment(payment_id, payment_info)
     await query.answer()
     await query.message.delete()
 
@@ -59,10 +59,10 @@ async def pre_checkout_query_handler(pre_checkout_query: types.PreCheckoutQuery)
 async def successful_payment_handler(msg: types.Message, state: FSMContext):
     telegram_payment_charge_id = msg.successful_payment.telegram_payment_charge_id
     payment_id = msg.successful_payment.invoice_payload.replace(template, '')
-    payment_info = admin.get_payment_info(payment_id)
+    payment_info = await admin.get_payment_info(payment_id)
 
     user_id = msg.from_user.id
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
     invoice_message = int(payment_info.get('payment_url'))
     amount_rub = payment_info.get('amount_rub')
     formatted_amount = f'{amount_rub:.2f}'
@@ -70,8 +70,8 @@ async def successful_payment_handler(msg: types.Message, state: FSMContext):
     await _add_balance(user_id, amount_rub, payment_id)
 
     status = 'successful'
-    admin.update_payment_status(payment_id, status, telegram_payment_charge_id)
-    admin.move_to_successful_payments(payment_id)
+    await admin.update_payment_status(payment_id, status, telegram_payment_charge_id)
+    await admin.move_to_successful_payments(payment_id)
 
     await msg.answer(
         messages.balance_recharge_successfully_paid[lang].format(amount=formatted_amount, currency='RUB'),

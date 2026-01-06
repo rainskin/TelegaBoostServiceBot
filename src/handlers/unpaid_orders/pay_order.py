@@ -27,10 +27,10 @@ callback_template = callback_templates.pay_unpaid_order_template()
 async def _(query: types.CallbackQuery, state: FSMContext):
     user_id = query.from_user.id
     key = StorageKey(bot.id, user_id, user_id)
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
 
     internal_order_id = query.data.replace(callback_template, '')
-    order_status = orders_queue.get_status(internal_order_id)
+    order_status = await orders_queue.get_status(internal_order_id)
 
     await query.answer()
 
@@ -45,10 +45,10 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 
 
 async def send_payment_keyboard(user_id: int, internal_order_id: str, state: FSMContext):
-    lang = users.get_user_lang(user_id)
-    order_item = orders_queue.get(internal_order_id)
+    lang = await users.get_user_lang(user_id)
+    order_item = await orders_queue.get(internal_order_id)
     currency = 'RUB'
-    user_balance = users.get_balance(user_id)
+    user_balance = await users.get_balance(user_id)
 
     kb = payment_methods.kb(lang, from_balance=True)
     text = messages.confirm_order_payment[lang].format(total_amount=order_item.total_amount,

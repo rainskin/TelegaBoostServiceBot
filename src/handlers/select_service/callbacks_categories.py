@@ -15,7 +15,7 @@ callback_template = callback_templates.categories()
 @dp.callback_query(F.data.startswith(callback_template))
 async def _(query: types.CallbackQuery):
     user_id = query.from_user.id
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
 
     category = query.data.replace(callback_template, '')
 

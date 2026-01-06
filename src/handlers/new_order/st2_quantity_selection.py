@@ -14,7 +14,7 @@ from utils.keyboards import navigation_kb
 @dp.message(F.content_type == ContentType.TEXT, states.NewOrder.choosing_quantity)
 async def _(msg: types.Message, state: FSMContext):
     user_id = msg.from_user.id
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
     chat_id = msg.chat.id
     key = StorageKey(bot.id, chat_id, user_id)
     data = await storage.get_data(key)

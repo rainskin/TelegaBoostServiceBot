@@ -16,7 +16,7 @@ async def _(msg: types.Message, state: FSMContext):
     data = await storage.get_data(key)
     msgs_to_delete = data.get('msgs_to_delete', [])
     await storage.update_data(key, msgs_to_delete=msgs_to_delete + [msg.message_id])
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
     try:
         quantity = int(msg.text)
     except ValueError:

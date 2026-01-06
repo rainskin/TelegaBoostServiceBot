@@ -1,10 +1,12 @@
 import asyncio
 
+import core.db
 import loader
 
 
 async def main():
-    loader.init()
+    await loader.init_db()
+    await core.db.init()
 
     import background_tasks
     import handlers
@@ -19,4 +21,5 @@ async def main():
 
 
 if __name__ == "__main__":
+
     asyncio.run(main())

@@ -1,5 +1,4 @@
 from datetime import datetime
-
 import loader
 from core.db.models.order_item import OrderItem
 from enums.orders.order_status import OrderStatus
@@ -8,50 +7,74 @@ from enums.orders.order_status import OrderStatus
 class MainOrdersQueue:
 
     def __init__(self):
-        self.collection = loader.db['main_orders_queue']
+        # Используем default_datetime_format, но обращение к коллекции
+        # сделаем через свойство, чтобы не упасть при импорте
         self.default_datetime_format = '%d-%m-%Y %H:%M:%S'
 
-    def save(self, order_item: OrderItem):
-        order_item.creation_date = datetime.now().strftime(self.default_datetime_format)
-        order_item.updated_at = order_item.creation_date
-        self.collection.update_one({'internal_order_id': order_item.internal_order_id}, {
-            '$set': order_item.dict()
-        }, upsert=True)
+    @property
+    def collection(self):
+        if loader.db is None:
+            raise RuntimeError("Database not initialized. Call await loader.init_db() first.")
+        return loader.db['main_orders_queue']
 
-    def update(self, order_item: OrderItem):
+    async def save(self, order_item: OrderItem):
+        now = datetime.now().strftime(self.default_datetime_format)
+        order_item.creation_date = now
+        order_item.updated_at = now
+
+        await self.collection.update_one(
+            {'internal_order_id': order_item.internal_order_id},
+            {'$set': order_item.dict()},
+            upsert=True
+        )
+
+    async def update(self, order_item: OrderItem):
         order_item.updated_at = datetime.now().strftime(self.default_datetime_format)
-        self.collection.update_one({'internal_order_id': order_item.internal_order_id}, {
-            '$set': order_item.dict()
-        }, upsert=True)
+        await self.collection.update_one(
+            {'internal_order_id': order_item.internal_order_id},
+            {'$set': order_item.dict()},
+            upsert=True
+        )
 
-    def get(self, internal_order_id: str) -> OrderItem | None:
-        data: dict = self.collection.find_one({'internal_order_id': internal_order_id})
+    async def get(self, internal_order_id: str) -> OrderItem | None:
+        data = await self.collection.find_one({'internal_order_id': internal_order_id})
         if data:
-            data.pop('_id')
+            data.pop('_id', None)
             return OrderItem(**data)
         return None
 
-    def delete(self, internal_order_id: str):
-        if not self.deleted(internal_order_id):
-            self.collection.update_one({'internal_order_id': internal_order_id}, {
-                '$set': {
+    async def delete(self, internal_order_id: str):
+        # Вызываем асинхронный метод через await
+        is_deleted = await self.deleted(internal_order_id)
+        if not is_deleted:
+            await self.collection.update_one(
+                {'internal_order_id': internal_order_id},
+                {'$set': {
                     'deleted': True,
-                    'updated_at': datetime.now().strftime(self.default_datetime_format)}})
+                    'updated_at': datetime.now().strftime(self.default_datetime_format)
+                }}
+            )
 
-    def deleted(self, internal_order_id: str) -> bool:
-        return self.collection.find_one({'internal_order_id': internal_order_id}).get('deleted', False)
+    async def deleted(self, internal_order_id: str) -> bool:
+        doc = await self.collection.find_one({'internal_order_id': internal_order_id})
+        return doc.get('deleted', False) if doc else False
 
-    def get_status(self, internal_order_id: str) -> OrderStatus:
-        status = self.collection.find_one({'internal_order_id': internal_order_id}).get('order_status', 'unpaid')
+    async def get_status(self, internal_order_id: str) -> OrderStatus:
+        doc = await self.collection.find_one({'internal_order_id': internal_order_id})
+        status = doc.get('order_status', 'unpaid') if doc else 'unpaid'
         return OrderStatus(status)
 
-    def get_paid_orders(self) -> list[OrderItem]:
+    async def get_paid_orders(self) -> list[OrderItem]:
         paid_orders = []
+        # В Motor .find() возвращает асинхронный курсор
         cursor = self.collection.find({'order_status': OrderStatus.PAID.value})
-        for data in cursor:
-            data.pop('_id')
+
+        async for data in cursor:
+            data.pop('_id', None)
             paid_orders.append(OrderItem(**data))
+
         return paid_orders
 
 
+# Создаем экземпляр
 orders_queue = MainOrdersQueue()

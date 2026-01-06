@@ -28,7 +28,7 @@ from utils.states import Payment
 #     user_id = query.from_user.id
 #     chat_id = query.message.chat.id
 #     key = StorageKey(bot.id, chat_id, user_id)
-#     lang = users.get_user_lang(user_id)
+#     lang = await users.get_user_lang(user_id)
 #     data = await storage.get_data(key)
 #     print(data)
 #     internal_order_id = data['internal_order_id']
@@ -65,11 +65,11 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     user_id = query.from_user.id
     chat_id = query.message.chat.id
     key = StorageKey(bot.id, chat_id, user_id)
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
     data = await storage.get_data(key)
     internal_order_id = data['internal_order_id']
     message_with_order_info_id = data.get('message_with_order_info_id')
-    order_item = orders_queue.get(internal_order_id)
+    order_item = await orders_queue.get(internal_order_id)
     total_amount: float = order_item.total_amount
 
     if order_item.deleted:
@@ -79,7 +79,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 
     currency = 'RUB'
     await query.answer()
-    user_balance = users.get_balance(user_id)
+    user_balance = await users.get_balance(user_id)
     if user_balance >= total_amount:
 
         await pay_order(user_id, order_item)
@@ -105,14 +105,14 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 @dp.callback_query(F.data == 'payment_method_internal_balance')
 async def _(query: types.CallbackQuery):
     user_id = query.from_user.id
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
 
     await query.answer(messages.action_cannot_be_performed[lang], show_alert=True)
     await query.message.delete()
 
 
 async def pay_order(user_id: int, order: OrderItem):
-    user_balance = users.get_balance(user_id)
+    user_balance = await users.get_balance(user_id)
     meta = {
         'internal_order_id': order.internal_order_id,
         'payment_method': PaymentMethod.FROM_BALANCE.value,
@@ -126,6 +126,6 @@ async def pay_order(user_id: int, order: OrderItem):
     )
     await transactions.save(transaction_item)
     new_balance = round((user_balance - order.total_amount), 2)
-    users.update_balance(user_id, new_balance)
+    await users.update_balance(user_id, new_balance)
     order.order_status = OrderStatus.PAID
-    orders_queue.update(order)
+    await orders_queue.update(order)

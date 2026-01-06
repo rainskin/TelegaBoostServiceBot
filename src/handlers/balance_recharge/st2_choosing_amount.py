@@ -14,7 +14,7 @@ from utils.keyboards.navigation_kb import yes_or_no_kb
 @dp.message(F.content_type == ContentType.TEXT, states.BalanceRecharge.choosing_amount)
 async def _(msg: types.Message):
     user_id = msg.from_user.id
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
     chat_id = msg.chat.id
     key = StorageKey(bot.id, chat_id, user_id)
     text = msg.text
@@ -39,7 +39,7 @@ async def _(msg: types.Message):
         await storage.update_data(key, msgs_to_delete=msgs_to_delete)
         return
 
-    recharge_commission = admin.get_balance_recharge_commission()
+    recharge_commission = await admin.get_balance_recharge_commission()
     if recharge_commission:
         amount_with_commission = await get_amount_minus_commission(value, recharge_commission)
 

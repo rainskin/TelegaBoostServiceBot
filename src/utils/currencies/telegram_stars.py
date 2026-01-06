@@ -4,7 +4,7 @@ from core.db import admin
 from utils.currencies import usdt
 
 
-def convert_to_stars(service_price_rub):
+async def convert_to_stars(service_price_rub):
     """
    Calculates the price of the service in Telegram Stars, taking into account the basic USD/RUB course from the API
     and P2P invoice, as well as all commissions.
@@ -16,7 +16,7 @@ def convert_to_stars(service_price_rub):
         Int: The number of Telegram Stars, rounded up, or None in case of error.
     """
 
-    commissions = admin.get_recharge_xtr_commissions()
+    commissions = await admin.get_recharge_xtr_commissions()
     telegram_star_to_usd_equivalent = commissions.get('telegram_star_to_usd_equivalent')  # TODO: избавиться от п2п курса и, возможно, других комиссий. Сейчас в БД значение п2п комсы = 0
     ton_to_usdt_spot_fee_percent = commissions.get('ton_to_usdt_spot_fee_percent')
     ton_network_fee_percent = commissions.get('ton_network_fee_percent')
@@ -27,7 +27,7 @@ def convert_to_stars(service_price_rub):
         return None
 
     # 1. Получаем актуальный базовый курс USDT/RUB
-    usd_to_rub_rate = usdt.to_rub_rate()
+    usd_to_rub_rate = await usdt.to_rub_rate()
     if usd_to_rub_rate is None:
         print("It was not possible to get the base course of the USD/RUB. The calculation is impossible.")
         return None

@@ -24,7 +24,7 @@ async def _(msg: types.Message, command: CommandObject, state: FSMContext):
 
     user_lang_code = msg.from_user.language_code
     lang = default_language(user_lang_code)
-    if users.is_new(user_id):
+    if await users.is_new(user_id):
 
         name = msg.from_user.full_name
         username = msg.from_user.username
@@ -37,12 +37,12 @@ async def _(msg: types.Message, command: CommandObject, state: FSMContext):
             inviter_id = int(start_link_args.replace('ref', ''))
             await register_new_referral(inviter_id, user_id)
 
-        if not promo.is_completed(promo_name):
+        if not await promo.is_completed(promo_name):
             await promo.add_participant(promo_name, user_id)
             await msg.answer(messages.promo_activated[lang])
     else:
-        if users.is_inactive_user(user_id):
-            users.set_active_status(user_id, True)
+        if await users.is_inactive_user(user_id):
+            await users.set_active_status(user_id, True)
         await return_to_menu(user_id, state)
 
     await commands.set_commands(lang, bot)

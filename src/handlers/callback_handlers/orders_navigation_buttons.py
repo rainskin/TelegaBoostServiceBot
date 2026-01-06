@@ -21,7 +21,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 
     user_id = query.from_user.id
     key = StorageKey(bot_id=bot.id, chat_id=user_id, user_id=user_id)
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
 
     data = await storage.get_data(key)
     current_orders = data['current_orders']
@@ -45,7 +45,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 
     user_id = query.from_user.id
     key = StorageKey(bot_id=bot.id, chat_id=user_id, user_id=user_id)
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
 
     data = await storage.get_data(key)
     current_orders = data['current_orders']
@@ -98,11 +98,11 @@ async def try_get_orders(user_id: int, lang: str, current_orders: bool = False) 
     # take orders from database
 
     if current_orders:
-        _orders = orders.get_current_orders(user_id)
+        _orders = await orders.get_current_orders(user_id)
         no_orders_text = messages.no_active_orders[lang]
 
     else:
-        _orders = orders.get_orders_from_archive(user_id)
+        _orders = await orders.get_orders_from_archive(user_id)
         no_orders_text = messages.no_history_of_orders[lang]
 
     # if there are no orders in database, then we will not send message
@@ -141,7 +141,7 @@ async def get_order_statuses_text(user_id: int, lang: str, order_ids: list, curr
     _order_ids = get_orders_for_page(order_ids, current_page, orders_per_page)
     current_order_statuses = await get_order_statuses(_order_ids)
 
-    orders_statuses_text: str = get_order_status_text(user_id, lang, current_order_statuses)
+    orders_statuses_text: str = await get_order_status_text(user_id, lang, current_order_statuses)
     print('orders_statuses:', current_order_statuses)
 
     # if current_orders:

@@ -13,16 +13,16 @@ from utils import states
 @dp.callback_query(F.data == 'balance_recharge')
 async def _(query: types.CallbackQuery, state: FSMContext):
     user_id = query.from_user.id
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
     key = StorageKey(bot.id, user_id, user_id)
     await storage.delete_data(key)
     # data = await storage.get_data(key)
 
     currency = 'RUB'
-    minimal_recharge_amount = admin.get_minimal_recharge_amount()
+    minimal_recharge_amount = await admin.get_minimal_recharge_amount()
 
     text = messages.balance_recharge_limits[lang]
-    topup_commission = admin.get_balance_recharge_commission()
+    topup_commission = await admin.get_balance_recharge_commission()
     if topup_commission > 0:
         text += f'\n\n{messages.balance_recharge_commission_info[lang].format(topup_commission=topup_commission, support_contact=config.SUPPORT_BOT_URL)}'
     limits_msg = await query.message.answer(text)

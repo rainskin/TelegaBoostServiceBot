@@ -16,7 +16,7 @@ callback_template = callback_templates.services()
 @dp.callback_query(F.data.startswith(callback_template))
 async def _(query: types.CallbackQuery, state: FSMContext):
     user_id = query.from_user.id
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
 
     service_id = query.data.replace(callback_template, '')
     service = await api.get_service(int(service_id))
@@ -29,7 +29,7 @@ async def _(query: types.CallbackQuery, state: FSMContext):
         name, description = service['name'], ''
 
     old_rate: float = float(service['rate'])
-    new_rate: int = get_rate_with_commission(old_rate, service_id)
+    new_rate: int = await get_rate_with_commission(old_rate, service_id)
     service_info = {
         'service_id': service_id,
         'service_name': service.get('name'),
@@ -59,9 +59,9 @@ def is_correct_info(plan_info):
     return plan_info and ('\n' in plan_info)
 
 
-def get_rate_with_commission(rate: float, service_id: str):
+async def get_rate_with_commission(rate: float, service_id: str):
 
-    commission = db.admin.get_commission_percentage(service_id)
+    commission = await db.admin.get_commission_percentage(service_id)
     print('rate', rate)
     rate = rate * (1 + (commission / 100))
     return round(rate)

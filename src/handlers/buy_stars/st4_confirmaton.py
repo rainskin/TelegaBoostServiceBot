@@ -22,7 +22,7 @@ from utils.navigation import return_to_menu
 @dp.callback_query(F.data == 'yes', states.BuyStars.confirmation)
 async def handle_payment(query: types.CallbackQuery, state: FSMContext):
     user_id = query.message.chat.id
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
     key = StorageKey(bot.id, user_id, user_id)
     data = await storage.get_data(key)
 
@@ -47,7 +47,7 @@ async def handle_payment(query: types.CallbackQuery, state: FSMContext):
         profit=profit
     )
 
-    save_unpaid_order(order_item)
+    await save_unpaid_order(order_item)
 
     currency = "RUB"
     order_summary_text = unpaid_order_summary.TG_STARS_ORDER[lang].format(internal_order_id=internal_order_id,
@@ -65,7 +65,7 @@ async def handle_payment(query: types.CallbackQuery, state: FSMContext):
 @dp.callback_query(F.data == 'no', states.BuyStars.confirmation)
 async def handle_payment(query: types.CallbackQuery, state: FSMContext):
     user_id = query.message.chat.id
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
     key = StorageKey(bot.id, user_id, user_id)
     data = await storage.get_data(key)
     msgs_to_delete = data.get('msgs_to_delete', [])

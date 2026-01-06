@@ -14,7 +14,7 @@ from utils.methods import delete_messages
 @dp.callback_query(F.data == 'yes', states.BalanceRecharge.choosing_amount)
 async def _(query: types.CallbackQuery, state: FSMContext):
     user_id = query.from_user.id
-    lang = users.get_user_lang(user_id)
+    lang = await users.get_user_lang(user_id)
     key = StorageKey(bot.id, user_id, user_id)
     data = await storage.get_data(key)
     msgs_to_delete = data.get('msgs_to_delete', [])
