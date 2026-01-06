@@ -37,9 +37,10 @@ async def get_active_users() -> list[int]:
     #     active_user_ids.remove(2222223)
     #     print('Удален тестовый пользователь 2222223 из списка активных пользователей')
     #
-    # print(f"Найдено пользователей с активными заказами: {len(active_user_ids)}")
-    # return list(active_user_ids)
-    #
+
+    print(f"Найдено пользователей с активными заказами: {len(active_user_ids)}")
+    return list(active_user_ids)
+
 
 async def update(user_id):
     _orders: dict = await orders.get_current_orders(user_id)
