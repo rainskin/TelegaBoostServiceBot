@@ -42,6 +42,6 @@ async def get(user_id: int, order_id: str, amount: float):
 
     # Example of how to construct the full URL
     base_url = config.DOMAIN_BASE_URL
-    full_url = f"{base_url}/top-up/{token}/"
+    full_url = f"{base_url}/pay/{token}/"
     return full_url
 
