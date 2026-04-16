@@ -1,4 +1,5 @@
 import asyncio
+import traceback
 
 import core
 import loader
@@ -76,22 +77,29 @@ async def update(user_id):
 
 
 async def run():
-
     active_user_ids = await get_active_users()
 
     for user_id in active_user_ids:
-        print(f'Обновляю статусы заказов для пользователя {user_id}')
-        await update(user_id)
+        try:
+            print(f'Обновляю статусы заказов для пользователя {user_id}')
+            await update(user_id)
+        except Exception as e:
+            print(f"[update_status_of_orders] Failed to process user {user_id}: {e}")
+            print(traceback.format_exc())
 
 
 async def run_repeatedly(cooldown: int = 60):
     while True:
-        print('Запускаю обновление статусов заказов для всех активных пользователей')
-        await run()
-        print(f'Завершил обновление статусов заказов. Жду {cooldown} секунд до следующего запуска.')
+        try:
+            print('Запускаю обновление статусов заказов для всех активных пользователей')
+            await run()
+            print(f'Завершил обновление статусов заказов. Жду {cooldown} секунд до следующего запуска.')
+        except Exception as e:
+            print(f"[update_status_of_orders] Worker iteration failed: {e}")
+            print(traceback.format_exc())
+
         await asyncio.sleep(cooldown)
 
 #
 # if __name__ == "__main__":
 #     asyncio.run(run_repeatedly())
-

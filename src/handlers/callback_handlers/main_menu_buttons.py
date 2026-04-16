@@ -15,6 +15,7 @@ from utils import navigation
 from utils.api import get_order_statuses
 from utils.keyboards import navigation_kb
 from utils.keyboards.navigation_kb import cancel_order
+from utils.methods import safe_delete_callback_message
 from utils.states import ManageOrders
 
 
@@ -25,7 +26,6 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     key = StorageKey(bot_id=bot.id, chat_id=user_id, user_id=user_id)
     not_accepted_orders = await orders.get_not_accepted_orders(user_id)
     if not_accepted_orders:
-        print('у пользователя есть не принятые заказы')
         await query.message.answer(messages.not_accepted_order[lang])
         for internal_order_id, _order_info in not_accepted_orders.items():
             print(internal_order_id)
@@ -153,7 +153,7 @@ async def _(query: types.CallbackQuery):
     await storage.delete_data(key)
     await navigation.get_categories(user_id)
     await query.answer()
-    await query.message.delete()
+    await safe_delete_callback_message(query)
 
 
 @dp.callback_query(F.data == 'change_language')
@@ -163,7 +163,7 @@ async def _(query: types.CallbackQuery):
 
     await query.message.answer(messages.change_lang[lang], reply_markup=navigation_kb.select_lang().as_markup())
     await query.answer()
-    await query.message.delete()
+    await safe_delete_callback_message(query)
 
 
 async def get_orders_without_tg_stars_orders(order_ids: list[str]):

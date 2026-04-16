@@ -1,4 +1,5 @@
 import asyncio
+import traceback
 
 import config
 from busines_logic.process_orders.standard_order import process_standard_order
@@ -118,61 +119,76 @@ async def take_orders_into_work(orders: dict):
     profit = 0.0
 
     for internal_order_id, order_info in orders.items():
+        print(f"[take_into_work] Start processing order: {internal_order_id}")
 
-        service_type = ServiceType(order_info.get('service_type', ServiceType.STANDARD))
+        try:
+            service_type = ServiceType(order_info.get('service_type', ServiceType.STANDARD))
 
-        order_item = OrderItem(
-            internal_order_id=internal_order_id,
-            user_id=order_info.get('user_id'),
-            service_type=service_type,
-            url=order_info.get('url'),
-            quantity=order_info.get('quantity'),
-            amount_without_commission=order_info.get('amount_without_commission'),
-            total_amount=order_info.get('total_amount'),
-            profit=order_info.get('profit'),
-            creation_date=order_info.get('creation_date'),
-            updated_at=order_info.get('updated_at'),
-            service_id=order_info.get('service_id'),
-            service_name=order_info.get('service_name'),
-            canceling_is_available=order_info.get('canceling_is_available'),
-            order_status=order_info.get('order_status', OrderStatus.PENDING),
-            deleted=order_info.get('deleted'),
-        )
+            order_item = OrderItem(
+                internal_order_id=internal_order_id,
+                user_id=order_info.get('user_id'),
+                service_type=service_type,
+                url=order_info.get('url'),
+                quantity=order_info.get('quantity'),
+                amount_without_commission=order_info.get('amount_without_commission'),
+                total_amount=order_info.get('total_amount'),
+                profit=order_info.get('profit'),
+                creation_date=order_info.get('creation_date'),
+                updated_at=order_info.get('updated_at'),
+                service_id=order_info.get('service_id'),
+                service_name=order_info.get('service_name'),
+                canceling_is_available=order_info.get('canceling_is_available'),
+                order_status=order_info.get('order_status', OrderStatus.PENDING),
+                deleted=order_info.get('deleted'),
+            )
 
-        if ServiceType(order_item.service_type) == ServiceType.TG_STARS:
-            try:
+            if ServiceType(order_item.service_type) == ServiceType.TG_STARS:
+                try:
+                    await process_tg_stars_order(order_item)
+                    current_balance = await get_ton_balance()
+                    text = ("<b>New #Telegram_Stars_Order</b>\n"
+                            f"Текущий баланс кошелька {current_balance} TON")
+                    await send_report_to_admin(text)
+                    print(f"[take_into_work] Telegram Stars order is processed: {internal_order_id}")
+                except Exception as e:
+                    await send_report_to_admin(
+                        f"⚠ <b>ОШИБКА при покупке телеграм звезд:</b>\n"
+                        f"order={internal_order_id}\n{e}"
+                    )
+                    continue
 
-                await process_tg_stars_order(order_item)
-                current_balance = await get_ton_balance()
-                text = ("<b>New #Telegram_Stars_Order</b>\n"
-                        f"Текущий баланс кошелька {current_balance} TON")
-                await send_report_to_admin(text)
-                return
-            except Exception as e:
-                await bot.send_message(config.ADMIN_ID, text=f'⚠ <b>ОШИБКА при покупке телеграм звезд:</b>\n{e}')
+            elif ServiceType(order_item.service_type) == ServiceType.STANDARD:
+                try:
+                    await process_standard_order(order_item)
+                    print(f"[take_into_work] Standard order sent to backend: {internal_order_id}")
+                except Exception as e:
+                    await send_report_to_admin(
+                        f"⚠ Ошибка оформления стандартного заказа {internal_order_id}: {e}"
+                    )
+                    continue
+
+                try:
+                    await send_notification_to_user(order_item.user_id, order_item.internal_order_id)
+                except Exception as e:
+                    non_active_users_number += 1
+                    print(
+                        f"[take_into_work] Notification error for user={order_item.user_id}, "
+                        f"order={internal_order_id}: {e}"
+                    )
+            else:
+                print(f"Unknown service type for order {internal_order_id}, skipping...")
                 continue
-        elif ServiceType(order_item.service_type) == ServiceType.STANDARD:
 
-            try:
-                await process_standard_order(order_item)
-            except Exception as e:
-                await send_report_to_admin(f'{e}')
-                continue
+            count += 1
+            spend_by_users += order_item.total_amount
+            profit += order_item.profit
+            total_amount_without_commission += order_item.amount_without_commission
+            print(f"[take_into_work] Order processed successfully: {internal_order_id}")
 
-            try:
-                await send_notification_to_user(order_item.user_id, order_item.internal_order_id)
-            except Exception as e:
-
-                non_active_users_number += 1
-                raise Exception(f"Error sending notification to user {order_item.user_id}: {e}")
-        else:
-            print(f"Unknown service type for order {internal_order_id}, skipping...")
+        except Exception as e:
+            print(f"[take_into_work] Unexpected error for order {internal_order_id}: {e}")
+            print(traceback.format_exc())
             continue
-
-        count += 1
-        spend_by_users += order_item.total_amount
-        profit += order_item.profit
-        total_amount_without_commission += order_item.amount_without_commission
 
     non_active_users_stats_text = (f'Заблокировали бота: '
                                    f'{non_active_users_number}') if non_active_users_number > 0 else ''
@@ -190,13 +206,19 @@ async def take_orders_into_work(orders: dict):
 
 
 async def send_report_to_admin(text):
-    await bot.send_message(config.ADMIN_ID, text)
+    try:
+        await bot.send_message(config.ADMIN_ID, text)
+    except Exception as e:
+        # Не роняем фоновый воркер, если Telegram API временно недоступен.
+        print(f"[take_into_work] Failed to send admin report: {e}")
 
 
 async def try_take_orders_into_work():
     orders = await try_get_orders_for_execution()
     if not orders:
         return
+
+    print(f"[take_into_work] Orders fetched for execution: {len(orders)}")
 
     # text = get_summary_text(orders, available_balance)
     # await send_report_to_admin(text)
@@ -217,5 +239,10 @@ async def try_take_orders_into_work():
 
 async def try_take_orders_into_work_repeatedly(cooldown: int = 60):
     while True:
-        await try_take_orders_into_work()
+        try:
+            await try_take_orders_into_work()
+        except Exception as e:
+            print(f"[take_into_work] Worker iteration failed: {e}")
+            print(traceback.format_exc())
+
         await asyncio.sleep(cooldown)

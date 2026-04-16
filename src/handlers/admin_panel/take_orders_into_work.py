@@ -8,6 +8,7 @@ from core.storage import storage
 from loader import dp, bot
 from utils import states, api
 from utils.keyboards import navigation_kb
+from utils.methods import safe_delete_callback_message
 
 
 @dp.callback_query(F.data == 'to_take_all_orders', states.AdminStates.to_take_orders_into_work)
@@ -31,7 +32,7 @@ async def _(query: CallbackQuery):
         kb = None
 
     await query.message.answer(text, reply_markup=kb)
-    await query.message.delete()
+    await safe_delete_callback_message(query)
     await query.answer()
 
 
@@ -39,7 +40,7 @@ async def _(query: CallbackQuery):
 async def _(query: CallbackQuery):
     await query.message.answer('Начинаю оформление заказов')
     await query.answer()
-    await query.message.delete()
+    await safe_delete_callback_message(query)
 
     _orders = await admin.get_orders_for_execution()
 
@@ -49,5 +50,5 @@ async def _(query: CallbackQuery):
 @dp.callback_query(F.data == 'no', states.AdminStates.to_take_orders_into_work)
 async def _(query: CallbackQuery):
     await query.message.answer('Действие отменено')
-    await query.message.delete()
+    await safe_delete_callback_message(query)
     await query.answer()
