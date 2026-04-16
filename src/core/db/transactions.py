@@ -19,6 +19,7 @@ class Transactions:
         """Метод для асинхронной инициализации (например, создания индексов)"""
         # Создание индекса — асинхронная операция
         await self.collection.create_index('user_id')
+        await self.collection.create_index('meta.manual_deposit_operation_id', unique=True, sparse=True)
 
     async def save(self, transaction_item: TransactionItem):
         # Устанавливаем текущее время в UTC
@@ -35,3 +36,4 @@ class Transactions:
 
 # Экземпляр класса
 transactions = Transactions()
+

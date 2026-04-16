@@ -30,8 +30,12 @@ class Payment(StatesGroup):
 
 class AdminStates(StatesGroup):
     to_take_orders_into_work = State()
+    waiting_for_balance_user_id = State()
+    waiting_for_balance_amount = State()
+    waiting_for_balance_confirmation = State()
 
 
 class Newsletter(StatesGroup):
     wait_for_message = State()
     confirm_message = State()
+

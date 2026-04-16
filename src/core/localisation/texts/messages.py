@@ -81,6 +81,11 @@ balance_recharge_successfully_paid = {
     'ru': "Баланс успешно пополнен на <b>{amount} {currency}</b>",
     'en': "The balance has been successfully replenished with <b>{amount} {currency}</b>"}
 
+manual_balance_deposit_received = {
+    'ru': '➕Вам начислен баланс: <b>{amount} руб</b>',
+    'en': '➕Your balance has been credited: <b>{amount} RUB</b>',
+}
+
 balance_recharge_invoice_title = {
     'ru': "Пополнение баланса",
     'en': "Top up balance"}
