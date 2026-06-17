@@ -1,8 +1,9 @@
 import asyncio
+import html
 import traceback
 
 import config
-from busines_logic.process_orders.standard_order import process_standard_order
+from busines_logic.process_orders.standard_order import process_standard_order, OrderProcessingAlreadyLoggedError
 from busines_logic.process_orders.tg_stars_order import process_tg_stars_order, get_ton_balance
 from core.db import admin, users
 from core.db import orders as orders_db
@@ -12,6 +13,7 @@ from enums.orders.order_status import OrderStatus
 from enums.orders.service_type import ServiceType
 from loader import bot
 from utils import api
+from utils.keyboards import navigation_kb
 
 
 async def try_get_orders_for_execution() -> dict | None:
@@ -137,6 +139,12 @@ async def take_orders_into_work(orders: dict):
                 updated_at=order_info.get('updated_at'),
                 service_id=order_info.get('service_id'),
                 service_name=order_info.get('service_name'),
+                provider_service_type=order_info.get('provider_service_type'),
+                provider_http_status=order_info.get('provider_http_status'),
+                provider_error_message=order_info.get('provider_error_message'),
+                subscription_posts=order_info.get('subscription_posts'),
+                subscription_min=order_info.get('subscription_min'),
+                subscription_max=order_info.get('subscription_max'),
                 canceling_is_available=order_info.get('canceling_is_available'),
                 order_status=order_info.get('order_status', OrderStatus.PENDING),
                 deleted=order_info.get('deleted'),
@@ -161,6 +169,13 @@ async def take_orders_into_work(orders: dict):
                 try:
                     await process_standard_order(order_item)
                     print(f"[take_into_work] Standard order sent to backend: {internal_order_id}")
+                except api.ProviderOrderCreateError as e:
+                    order_item.provider_http_status = e.status_code
+                    order_item.provider_error_message = e.provider_message
+                    await send_provider_rejection_to_admin(order_item, e)
+                    continue
+                except OrderProcessingAlreadyLoggedError:
+                    continue
                 except Exception as e:
                     await send_report_to_admin(
                         f"⚠ Ошибка оформления стандартного заказа {internal_order_id}: {e}"
@@ -211,6 +226,23 @@ async def send_report_to_admin(text):
     except Exception as e:
         # Не роняем фоновый воркер, если Telegram API временно недоступен.
         print(f"[take_into_work] Failed to send admin report: {e}")
+
+
+async def send_provider_rejection_to_admin(order_item: OrderItem, error: api.ProviderOrderCreateError):
+    message = (
+        f"⚠ <b>Провайдер отклонил заказ {order_item.internal_order_id}</b>\n\n"
+        f"<b>Пояснение:</b> {html.escape(error.provider_message)}\n"
+        f"<b>HTTP status:</b> {error.status_code}\n"
+        f"<b>URL:</b> {html.escape(error.request_url_redacted)}\n"
+        f"<b>Content-Type:</b> {html.escape(error.content_type or 'unknown')}\n\n"
+        f"<b>Response body:</b>\n<pre>{html.escape(error.formatted_body)}</pre>"
+    )
+    keyboard = navigation_kb.admin_cancel_broken_order('ru', order_item.internal_order_id).as_markup()
+
+    try:
+        await bot.send_message(config.ADMIN_ID, message, reply_markup=keyboard)
+    except Exception as exc:
+        print(f"[take_into_work] Failed to send provider rejection admin report: {exc}")
 
 
 async def try_take_orders_into_work():

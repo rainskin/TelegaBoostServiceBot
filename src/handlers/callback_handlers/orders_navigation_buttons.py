@@ -8,7 +8,7 @@ from core.localisation.texts import messages
 from core.storage import storage
 from loader import dp, bot
 from utils import states
-from utils.api import get_order_statuses
+from utils.api import get_order_statuses_for_order_records
 from utils.keyboards import navigation_kb
 from utils.order_status import get_order_status_text
 
@@ -139,7 +139,13 @@ async def get_order_statuses_text(user_id: int, lang: str, order_ids: list, curr
 
     # Which orders have not yet been shown
     _order_ids = get_orders_for_page(order_ids, current_page, orders_per_page)
-    current_order_statuses = await get_order_statuses(_order_ids)
+    order_records = {}
+    for order_id in _order_ids:
+        order_info = await orders.get_order_info(user_id, order_id, current_orders=current_orders)
+        if order_info:
+            order_records[order_id] = order_info
+
+    current_order_statuses = await get_order_statuses_for_order_records(order_records)
 
     orders_statuses_text: str = await get_order_status_text(user_id, lang, current_order_statuses)
     print('orders_statuses:', current_order_statuses)

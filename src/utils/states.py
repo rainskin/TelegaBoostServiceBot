@@ -5,6 +5,9 @@ from aiogram.fsm.state import StatesGroup, State
 
 class NewOrder(StatesGroup):
     choosing_quantity = State()
+    choosing_subscription_posts = State()
+    choosing_subscription_min = State()
+    choosing_subscription_max = State()
     waiting_for_url = State()
     check_details = State()
 

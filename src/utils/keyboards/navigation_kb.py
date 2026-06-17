@@ -235,6 +235,17 @@ def cancel_order(lang, order_id: str):
     return builder
 
 
+def admin_cancel_broken_order(lang: str, order_id: str):
+    builder = InlineKeyboardBuilder()
+
+    callback_template = callback_templates.admin_cancel_broken_order()
+    text = buttons.admin_cancel_broken_order[lang]
+    callback = f'{callback_template}{order_id}'
+
+    builder.button(text=text, callback_data=callback)
+    return builder
+
+
 async def accept_button():
     builder = InlineKeyboardBuilder()
 

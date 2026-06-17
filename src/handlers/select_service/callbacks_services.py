@@ -20,6 +20,9 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 
     service_id = query.data.replace(callback_template, '')
     service = await api.get_service(int(service_id))
+    if not service:
+        await query.answer(messages.action_is_not_available[lang], show_alert=True)
+        return
 
     plan_info: str = service['description']
 
@@ -33,11 +36,12 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     service_info = {
         'service_id': service_id,
         'service_name': service.get('name'),
+        'provider_service_type': service.get('type'),
         'old_rate': old_rate,
         'rate': new_rate,
         'min_count': service['min'],
         'max_count': service['max'],
-        'canceling_is_available': service['canceling_is_available']
+        'canceling_is_available': service.get('canceling_is_available', service.get('cancel', False))
     }
 
     service_info_text = messages.get_plan_info_text(lang, name, description, service_info)

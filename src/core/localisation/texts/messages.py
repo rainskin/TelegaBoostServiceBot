@@ -217,6 +217,22 @@ not_accepted_order_status = {
           '<b>Amount:</b> {total_amount}',
 }
 
+not_accepted_subscription_order_status = {
+    'ru': '<b>Заказ {order_id}</b>\n\n'
+          '<b>Ссылка:</b> {url}\n'
+          '<b>Постов:</b> {posts}\n'
+          '<b>Просмотров на пост:</b> от {min_views} до {max_views}\n'
+          '<b>Расчетное количество:</b> {quantity}\n'
+          '<b>Сумма:</b> {total_amount}',
+
+    'en': '<b>Order {order_id}</b>\n\n'
+          '<b>Link:</b> {url}\n'
+          '<b>Posts:</b> {posts}\n'
+          '<b>Views per post:</b> from {min_views} to {max_views}\n'
+          '<b>Calculated quantity:</b> {quantity}\n'
+          '<b>Amount:</b> {total_amount}',
+}
+
 action_is_not_available = {
     'ru': 'Это действие не возможно выполнить сейчас',
     'en': 'This action cannot be performed at this time'
@@ -367,6 +383,71 @@ valid_quantity = {
           "If you're ready to continue, click the button below\n\n"
           '<i>Or enter a new quantity to recalculate the cost</i>'}
 
+ask_subscription_posts = {
+    'ru': 'Укажите количество будущих постов от <b>{min_value}</b>',
+    'en': 'Enter the number of future posts from <b>{min_value}</b>',
+}
+
+subscription_posts_is_not_number = {
+    'ru': 'Количество постов должно быть целым числом от <b>{min_value}</b>',
+    'en': 'The number of posts must be an integer from <b>{min_value}</b>',
+}
+
+wrong_subscription_posts = {
+    'ru': 'Количество постов должно быть не меньше <b>{min_value}</b>',
+    'en': 'The number of posts must be at least <b>{min_value}</b>',
+}
+
+ask_subscription_min = {
+    'ru': 'Укажите минимальное количество просмотров на пост от <b>{min_value}</b>',
+    'en': 'Enter the minimum views per post from <b>{min_value}</b>',
+}
+
+subscription_min_is_not_number = {
+    'ru': 'Минимум просмотров должен быть целым числом от <b>{min_value}</b>',
+    'en': 'Minimum views must be an integer from <b>{min_value}</b>',
+}
+
+wrong_subscription_min = {
+    'ru': 'Минимум просмотров должен быть не меньше <b>{min_value}</b>',
+    'en': 'Minimum views must be at least <b>{min_value}</b>',
+}
+
+ask_subscription_max = {
+    'ru': 'Укажите максимальное количество просмотров на пост до <b>{max_value}</b>',
+    'en': 'Enter the maximum views per post up to <b>{max_value}</b>',
+}
+
+subscription_max_is_not_number = {
+    'ru': 'Максимум просмотров должен быть целым числом до <b>{max_value}</b>',
+    'en': 'Maximum views must be an integer up to <b>{max_value}</b>',
+}
+
+wrong_subscription_max = {
+    'ru': 'Максимум просмотров должен быть не больше <b>{max_value}</b>',
+    'en': 'Maximum views must be no more than <b>{max_value}</b>',
+}
+
+subscription_min_greater_than_max = {
+    'ru': 'Максимум просмотров должен быть больше минимума. Укажите новый максимум',
+    'en': 'Maximum views must be greater than minimum views. Enter a new maximum',
+}
+
+valid_subscription_quantity = {
+    'ru': '💴 <b>Стоимость составит:</b> {total_cost:.2f} {currency}\n\n'
+          '<b>Постов:</b> {posts}\n'
+          '<b>Просмотров на пост:</b> от {min_views} до {max_views}\n'
+          '<b>Расчетное количество:</b> {quantity}\n\n'
+          'Если готовы продолжить, нажмите на кнопку ниже\n\n'
+          '<i>Или введите новый максимум просмотров для повторного расчёта стоимости</i>',
+    'en': '💴 <b>Total cost will be:</b> {total_cost:.2f} {currency}\n\n'
+          '<b>Posts:</b> {posts}\n'
+          '<b>Views per post:</b> from {min_views} to {max_views}\n'
+          '<b>Calculated quantity:</b> {quantity}\n\n'
+          "If you're ready to continue, click the button below\n\n"
+          '<i>Or enter a new maximum views value to recalculate the cost</i>',
+}
+
 ask_url = {
     'ru': 'Укажите ссылку\n\n',
     'en': 'Input the URL'}
@@ -393,6 +474,28 @@ correct_url = {
           '<b>💴 Total: </b> {total_amount:.2f} {currency}\n\n'
           '<i>If you want to change the URL, send the new URL in the next message</i>\n\n'
           '➕ To <b>place the order</b>, click the corresponding button below'
+}
+
+correct_subscription_url = {
+    'ru': '✔️<b>Ссылка принята.</b>\n\n'
+          'Проверьте, пожалуйста, данные заказа\n\n'
+          '<b>🔗 Ссылка:</b> {url}\n'
+          '<b>🧾 Постов:</b> {posts}\n'
+          '<b>👁 Просмотров на пост:</b> от {min_views} до {max_views}\n'
+          '<b>🧮 Расчетное количество:</b> {quantity}\n'
+          '<b>💴 Сумма: </b> {total_amount:.2f} {currency}\n\n'
+          '<i>Если хотите изменить ссылку, отправьте новую ссылку в следующем сообщении</i>\n\n'
+          '➕ Для <b>оформления заказа</b> нажмите на соответствующую кнопку ниже',
+
+    'en': '✔️<b>URL accepted.</b>\n\n'
+          'Please check the order details\n\n'
+          '<b>🔗 URL:</b> {url}\n'
+          '<b>🧾 Posts:</b> {posts}\n'
+          '<b>👁 Views per post:</b> from {min_views} to {max_views}\n'
+          '<b>🧮 Calculated quantity:</b> {quantity}\n'
+          '<b>💴 Total: </b> {total_amount:.2f} {currency}\n\n'
+          '<i>If you want to change the URL, send the new URL in the next message</i>\n\n'
+          '➕ To <b>place the order</b>, click the corresponding button below',
 }
 
 confirm_order_payment = {

@@ -9,11 +9,17 @@ class OrderItem(BaseModel):
     creation_date: Optional[str]
     updated_at: Optional[str]
     internal_order_id: str
-    backend_order_id: Optional[int]
+    backend_order_id: Optional[str | int]
     user_id: int
     service_type: ServiceType
     service_id: Optional[int]
     service_name: Optional[str]
+    provider_service_type: Optional[str] = None
+    provider_http_status: Optional[int] = None
+    provider_error_message: Optional[str] = None
+    subscription_posts: Optional[int] = None
+    subscription_min: Optional[int] = None
+    subscription_max: Optional[int] = None
     url: str
     quantity: int
     amount_without_commission: float
@@ -36,9 +42,15 @@ class OrderItem(BaseModel):
         profit: float,
         creation_date: Optional[str] = None,
         updated_at: Optional[str] = None,
-        backend_order_id: Optional[int] = None,
+        backend_order_id: Optional[str | int] = None,
         service_id: Optional[int] = None,
         service_name: Optional[str] = None,
+        provider_service_type: Optional[str] = None,
+        provider_http_status: Optional[int] = None,
+        provider_error_message: Optional[str] = None,
+        subscription_posts: Optional[int] = None,
+        subscription_min: Optional[int] = None,
+        subscription_max: Optional[int] = None,
         canceling_is_available: Optional[bool] = None,
         order_status: OrderStatus = OrderStatus.UNPAID,
         deleted: bool = False,
@@ -54,6 +66,12 @@ class OrderItem(BaseModel):
             service_type=service_type,
             service_id=service_id,
             service_name=service_name,
+            provider_service_type=provider_service_type,
+            provider_http_status=provider_http_status,
+            provider_error_message=provider_error_message,
+            subscription_posts=subscription_posts,
+            subscription_min=subscription_min,
+            subscription_max=subscription_max,
             url=url,
             quantity=quantity,
             amount_without_commission=amount_without_commission,

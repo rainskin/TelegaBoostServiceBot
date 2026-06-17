@@ -2,3 +2,7 @@ __pycache__/
 .idea/
 *.session*
 .env
+logs/
+docs/
+test.py
+tools/local_testing/

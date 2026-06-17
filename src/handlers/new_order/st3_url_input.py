@@ -6,10 +6,12 @@ from core.db import users
 from core.localisation.texts import messages
 from core.storage import storage
 from loader import dp, bot
+from utils import api
 from utils.keyboards import navigation_kb
 from utils.states import NewOrder
 
 
+@dp.callback_query(F.data == 'to_continue', NewOrder.choosing_subscription_max)
 @dp.callback_query(F.data == 'to_continue', NewOrder.choosing_quantity)
 async def _(query: types.CallbackQuery, state: FSMContext):
     user_id = query.from_user.id
@@ -50,8 +52,19 @@ async def _(msg: types.Message, state: FSMContext):
     quantity = data['quantity']
     total_amount = data['total_amount']
 
-    msg_text = messages.correct_url[lang].format(url=url, quantity=quantity, total_amount=total_amount,
-                                                 currency=currency)
+    if data.get('provider_service_type') == api.SUBSCRIPTIONS_PROVIDER_SERVICE_TYPE:
+        msg_text = messages.correct_subscription_url[lang].format(
+            url=url,
+            posts=data.get('subscription_posts'),
+            min_views=data.get('subscription_min'),
+            max_views=data.get('subscription_max'),
+            quantity=quantity,
+            total_amount=total_amount,
+            currency=currency,
+        )
+    else:
+        msg_text = messages.correct_url[lang].format(url=url, quantity=quantity, total_amount=total_amount,
+                                                     currency=currency)
 
     # await state.set_state(NewOrder.check_details)
     service_msg = await msg.answer(msg_text,

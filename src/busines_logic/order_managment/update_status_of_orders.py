@@ -7,7 +7,7 @@ from busines_logic.order_managment.handle_canceled_orders import \
     remove_orders_to_history_and_return_money_for_canceled_orders, update_statuses
 from core.db import orders
 from handlers.callback_handlers.main_menu_buttons import get_orders_without_tg_stars_orders
-from utils.api import get_order_statuses
+from utils.api import get_order_statuses_for_order_records
 
 
 async def get_active_users() -> list[int]:
@@ -70,7 +70,9 @@ async def update(user_id):
             continue
 
         # Получаем текущие статусы заказов
-        current_order_statuses = await get_order_statuses(order_ids_part)
+        current_order_statuses = await get_order_statuses_for_order_records(
+            {order_id: _orders[order_id] for order_id in order_ids_part if order_id in _orders}
+        )
         print('Обновляю статусы')
         await update_statuses(user_id, current_order_statuses)
         await remove_orders_to_history_and_return_money_for_canceled_orders(user_id, current_order_statuses)

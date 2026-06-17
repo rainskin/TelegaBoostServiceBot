@@ -52,31 +52,11 @@ async def _(query: types.CallbackQuery, state: FSMContext):
     internal_order_id = data.get('order_id')
 
     if is_not_accepted_order(user_id, internal_order_id):
-        not_accepted_orders = await orders.get_not_accepted_orders(user_id)
-        order = not_accepted_orders.get(internal_order_id)
-        amount = order.get('total_amount')
-        user_balance = await users.get_balance(user_id)
-
-        transaction_item = TransactionItem(
-            user_id=user_id,
-            transaction_type=TransactionType.REVERSAL,
-            amount=amount,
-            balance_after=round((user_balance + amount), 2),
-        )
-        await transactions.save(transaction_item)
-
-        await orders.cancel_order(user_id, internal_order_id, not_accepted_orders=True)
-
-        try:
-            order_item = await orders_queue.get(internal_order_id)
-            order_item.order_status = OrderStatus.CANCELED
-            await orders_queue.update(order_item)
-        except Exception:
-            pass
-
-        await admin.remove_order_from_main_queue(internal_order_id)
-
-    await query.message.edit_text(messages.order_successfully_canceled[lang])
+        is_canceled, _ = await cancel_not_accepted_order_by_internal_order_id(user_id, internal_order_id)
+        if is_canceled:
+            await query.message.edit_text(messages.order_successfully_canceled[lang])
+        else:
+            await query.message.edit_text(messages.canceling_not_accepted_order_is_not_available[lang])
 
     await storage.delete_data(key)
     await state.set_state(None)
@@ -98,3 +78,63 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 
 def is_not_accepted_order(user_id: int, order_id: str):
     return order_id.startswith(str(user_id))
+
+
+async def cancel_not_accepted_order_by_internal_order_id(
+        user_id: int,
+        internal_order_id: str,
+        provider_error_message: str | None = None,
+        send_user_notification: bool = False,
+) -> tuple[bool, float | None]:
+    not_accepted_orders = await orders.get_not_accepted_orders(user_id) or {}
+    order = not_accepted_orders.get(internal_order_id)
+    order_item = await orders_queue.get(internal_order_id)
+
+    if order_item and (order_item.is_money_returned or order_item.order_status == OrderStatus.CANCELED):
+        return False, None
+
+    if not order:
+        return False, None
+
+    amount = float(order.get('total_amount', 0))
+    user_balance = await users.get_balance(user_id)
+
+    transaction_item = TransactionItem(
+        user_id=user_id,
+        transaction_type=TransactionType.REVERSAL,
+        amount=amount,
+        balance_after=round((user_balance + amount), 2),
+        meta={
+            'internal_order_id': internal_order_id,
+            'provider_error_message': provider_error_message,
+        },
+    )
+    await transactions.save(transaction_item)
+
+    await orders.cancel_order(user_id, internal_order_id, not_accepted_orders=True)
+
+    if order_item:
+        order_item.order_status = OrderStatus.CANCELED
+        order_item.is_money_returned = True
+        if provider_error_message:
+            order_item.provider_error_message = provider_error_message
+        await orders_queue.update(order_item)
+
+    await admin.remove_order_from_main_queue(internal_order_id)
+    await admin.remove_order_from_execution_queue(internal_order_id)
+
+    if send_user_notification:
+        try:
+            lang = await users.get_user_lang(user_id)
+            await bot.send_message(
+                user_id,
+                messages.order_was_canceled[lang].format(
+                    internal_order_id=internal_order_id,
+                    amount=amount,
+                    currency='RUB',
+                )
+            )
+        except Exception:
+            pass
+
+    return True, amount

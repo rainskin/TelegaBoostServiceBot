@@ -40,3 +40,7 @@ def pay_unpaid_order_template():
 
 def delete_unpaid_order_template():
     return 'delete_unpaid_order_'
+
+
+def admin_cancel_broken_order():
+    return 'admin_cancel_broken_order_'

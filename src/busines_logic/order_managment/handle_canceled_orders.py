@@ -319,6 +319,7 @@ async def update_statuses(user_id: int, order_statuses: dict):
         'Awaiting': OrderStatus.AWAITING,
         'Canceled': OrderStatus.CANCELED,
         'Fail': OrderStatus.FAIL,
+        'Error': OrderStatus.FAIL,
         'Partial': OrderStatus.PARTIAL
 
     }

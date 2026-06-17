@@ -5,8 +5,7 @@ from aiogram.types import CallbackQuery
 from aiogram.types import Message, User, SuccessfulPayment
 
 from core.localisation.texts import messages
-from handlers.payment_processing.from_telegram_stars import handle_payment, successful_payment_handler, template # поправь путь и имя
-from utils.currencies import telegram_stars
+from handlers.payment_processing.from_telegram_stars import handle_payment, successful_payment_handler, template
 
 pytestmark = pytest.mark.asyncio  # включаем для всех тестов в модуле
 
@@ -16,7 +15,7 @@ async def test_stars_callback_creates_payment():
     mock_user_id = 42
     amount = 100.0
     amount_with_commission = 105.0
-    amount_in_starts = await telegram_stars.convert_to_stars(amount)  # пусть ваша реализация
+    amount_in_stars = 150
 
     # Мокаем CallbackQuery
     query = MagicMock(spec=CallbackQuery)
@@ -29,20 +28,23 @@ async def test_stars_callback_creates_payment():
     with patch('handlers.payment_processing.from_telegram_stars.storage.get_data', return_value=fake_data), \
             patch('handlers.payment_processing.from_telegram_stars.users.get_user_lang', return_value='ru'), \
             patch('handlers.payment_processing.from_telegram_stars.get_internal_order_id', new=AsyncMock(return_value=123)), \
+            patch('handlers.payment_processing.from_telegram_stars.convert_to_stars',
+                  new=AsyncMock(return_value=amount_in_stars)), \
             patch('handlers.payment_processing.from_telegram_stars.send_invoice',
                   new=AsyncMock(return_value=MagicMock(message_id=999))), \
-            patch('handlers.payment_processing.from_telegram_stars.admin.save_payment') as mock_save, \
+            patch('handlers.payment_processing.from_telegram_stars.admin.save_payment',
+                  new=AsyncMock()) as mock_save, \
             patch.object(query, 'answer', new=AsyncMock()) as mock_answer, \
             patch.object(query.message, 'delete', new=AsyncMock()) as mock_delete:
         # Выполняем хендлер
         await handle_payment(query)
 
         # Проверяем вызовы
-        mock_save.assert_called_once()
+        mock_save.assert_awaited_once()
         pid, info = mock_save.call_args[0]
         assert pid == 'S123'
         assert info['amount_rub'] == amount_with_commission
-        assert info['amount_original'] == amount_in_starts
+        assert info['amount_original'] == amount_in_stars
         assert info['currency'] == 'XTR'
         assert info['payment_url'] == 999
 
@@ -79,9 +81,11 @@ async def test_successful_payment_handler_flow():
                return_value=payment_info) as mock_get_info, \
          patch('handlers.payment_processing.from_telegram_stars.users.get_user_lang',
                return_value='ru'), \
-         patch('handlers.payment_processing.from_telegram_stars.add_balance', new=AsyncMock()) as mock_add_balance, \
-         patch('handlers.payment_processing.from_telegram_stars.admin.update_payment_status') as mock_update_status, \
-         patch('handlers.payment_processing.from_telegram_stars.admin.move_to_successful_payments') as mock_move, \
+         patch('handlers.payment_processing.from_telegram_stars._add_balance', new=AsyncMock()) as mock_add_balance, \
+         patch('handlers.payment_processing.from_telegram_stars.admin.update_payment_status',
+               new=AsyncMock()) as mock_update_status, \
+         patch('handlers.payment_processing.from_telegram_stars.admin.move_to_successful_payments',
+               new=AsyncMock()) as mock_move, \
          patch('handlers.payment_processing.from_telegram_stars.return_to_menu', new=AsyncMock()) as mock_return, \
          patch('handlers.payment_processing.from_telegram_stars.bot.delete_message', new=AsyncMock()) as mock_delete, \
          patch.object(msg, 'answer', new=AsyncMock()) as mock_answer:
@@ -91,9 +95,9 @@ async def test_successful_payment_handler_flow():
 
         # 3️⃣ Проверки
         mock_get_info.assert_called_once_with(mock_payment_id)
-        mock_add_balance.assert_awaited_once_with(mock_user_id, mock_amount_rub)
-        mock_update_status.assert_called_once_with(mock_payment_id, 'successful', mock_charge_id)
-        mock_move.assert_called_once_with(mock_payment_id)
+        mock_add_balance.assert_awaited_once_with(mock_user_id, mock_amount_rub, mock_payment_id)
+        mock_update_status.assert_awaited_once_with(mock_payment_id, 'successful', mock_charge_id)
+        mock_move.assert_awaited_once_with(mock_payment_id)
 
         formatted_amount = f'{mock_amount_rub:.2f}'  # форматируем сумму
         msg_text = messages.balance_recharge_successfully_paid[lang].format(amount=formatted_amount, currency='RUB')

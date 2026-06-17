@@ -11,8 +11,8 @@ from core.storage import storage
 from enums.orders.service_type import ServiceType
 from handlers.callback_handlers.orders_navigation_buttons import get_order_statuses_text, get_order_ids, try_get_orders
 from loader import dp, bot
-from utils import navigation
-from utils.api import get_order_statuses
+from utils import api, navigation
+from utils.api import get_order_statuses_for_order_records
 from utils.keyboards import navigation_kb
 from utils.keyboards.navigation_kb import cancel_order
 from utils.methods import safe_delete_callback_message
@@ -43,29 +43,27 @@ async def _(query: types.CallbackQuery, state: FSMContext):
             quantity = _order_info.get('quantity')
             total_amount = _order_info.get('total_amount')
 
-            text = messages.not_accepted_order_status[lang].format(order_id=internal_order_id, url=url,
-                                                                   quantity=quantity, total_amount=total_amount)
+            if _order_info.get('provider_service_type') == api.SUBSCRIPTIONS_PROVIDER_SERVICE_TYPE:
+                text = messages.not_accepted_subscription_order_status[lang].format(
+                    order_id=internal_order_id,
+                    url=url,
+                    posts=_order_info.get('subscription_posts'),
+                    min_views=_order_info.get('subscription_min'),
+                    max_views=_order_info.get('subscription_max'),
+                    quantity=quantity,
+                    total_amount=total_amount,
+                )
+            else:
+                text = messages.not_accepted_order_status[lang].format(order_id=internal_order_id, url=url,
+                                                                       quantity=quantity, total_amount=total_amount)
             kb = cancel_order(lang, internal_order_id)
             await query.message.answer(text, reply_markup=kb.as_markup())
-
-    await query.answer()
-    return
-
-    # пока что выходим из функции здесь
-
-    ##############
-    # TODO
-    #  Активные и архивные заказы надо брать теперь из main_orders_queue по возможности,
-    #  но предусмотреть вариант отсутствия в ней.
-    #  Также необходимо делать срез последних заказов, не отправляя пользователю огромный список и не нагружая апи
-    ##############
 
     current_orders = True
     _orders = await try_get_orders(user_id, lang, current_orders=current_orders)
 
     if not _orders:
-        await query.message.answer(messages.no_active_orders[lang],
-                                   reply_markup=navigation_kb.orders(lang, current_orders=current_orders).as_markup())
+        await query.answer()
         return
     order_ids = get_order_ids(_orders)
 
@@ -83,8 +81,9 @@ async def _(query: types.CallbackQuery, state: FSMContext):
 
         if len(order_ids) > 50:
             print('Получаю первую пачку заказов из 50 штук')
-            print(len(order_ids[:50]))
-            order_ids_part = await get_orders_without_tg_stars_orders(order_ids[:50])
+            current_batch = order_ids[:50]
+            order_ids = order_ids[50:]
+            order_ids_part = await get_orders_without_tg_stars_orders(current_batch)
             print('получил отфильтрованные заказы')
             if not order_ids_part:
                 continue
@@ -99,7 +98,9 @@ async def _(query: types.CallbackQuery, state: FSMContext):
             order_ids = []
 
         # Получаем текущие статусы заказов
-        current_order_statuses = await get_order_statuses(order_ids_part)
+        current_order_statuses = await get_order_statuses_for_order_records(
+            {order_id: _orders[order_id] for order_id in order_ids_part if order_id in _orders}
+        )
         print('Проверяю статусы')
         await update_statuses(user_id, current_order_statuses)
         await remove_orders_to_history_and_return_money_for_canceled_orders(user_id, current_order_statuses)

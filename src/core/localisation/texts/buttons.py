@@ -49,6 +49,11 @@ cancel_order = {
     'en': 'Cancel'
 }
 
+admin_cancel_broken_order = {
+    'ru': 'Отменить заказ и вернуть средства',
+    'en': 'Cancel order and refund',
+}
+
 change_language = {'callbacks': ['change_language'],
                    'ru': ['🇷🇺 Поменять язык'],
                    'en': ['🇬🇧 Change language']}

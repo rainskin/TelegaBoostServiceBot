@@ -5,7 +5,7 @@ from aiogram.fsm.storage.base import StorageKey
 
 from core.db import users, orders
 from core.db.models.order_item import OrderItem
-from core.localisation.texts.unpaid_order_summary import STANDARD_ORDER
+from core.localisation.texts.unpaid_order_summary import STANDARD_ORDER, SUBSCRIPTION_ORDER
 from core.storage import storage
 from enums.orders.service_type import ServiceType
 from handlers.new_order.create import save_unpaid_order
@@ -43,6 +43,10 @@ async def _(query: types.CallbackQuery, state: FSMContext):
         service_type=ServiceType.STANDARD,
         service_id=data.get('service_id'),
         service_name=data.get('service_name'),
+        provider_service_type=data.get('provider_service_type'),
+        subscription_posts=data.get('subscription_posts'),
+        subscription_min=data.get('subscription_min'),
+        subscription_max=data.get('subscription_max'),
         url=data.get('url'),
         quantity=data.get('quantity'),
         amount_without_commission=data.get('amount_without_commission'),
@@ -131,13 +135,26 @@ async def get_internal_order_id(user_id: int):
 
 
 def get_order_summary_text(lang: str, order_data: dict, currency: str) -> str:
-    text = STANDARD_ORDER[lang].format(
-        internal_order_id=order_data.get('internal_order_id'),
-        service_name=order_data.get('service_name'),
-        quantity=order_data.get('quantity'),
-        url=order_data.get('url'),
-        total_amount=order_data.get('total_amount'),
-        currency=currency
-    )
+    if order_data.get('provider_service_type') == 'Subscriptions':
+        text = SUBSCRIPTION_ORDER[lang].format(
+            internal_order_id=order_data.get('internal_order_id'),
+            service_name=order_data.get('service_name'),
+            posts=order_data.get('subscription_posts'),
+            min_views=order_data.get('subscription_min'),
+            max_views=order_data.get('subscription_max'),
+            quantity=order_data.get('quantity'),
+            url=order_data.get('url'),
+            total_amount=order_data.get('total_amount'),
+            currency=currency
+        )
+    else:
+        text = STANDARD_ORDER[lang].format(
+            internal_order_id=order_data.get('internal_order_id'),
+            service_name=order_data.get('service_name'),
+            quantity=order_data.get('quantity'),
+            url=order_data.get('url'),
+            total_amount=order_data.get('total_amount'),
+            currency=currency
+        )
 
     return text

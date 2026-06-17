@@ -1,11 +1,13 @@
-import config
-from busines_logic.process_orders.tg_stars_order import InsufficientBalanceError, OrderProcessingError
+from busines_logic.process_orders.tg_stars_order import InsufficientBalanceError
 from core.db import admin, orders as orders_db, users
 from core.db.main_orders_queue import orders_queue
 from core.db.models.order_item import OrderItem
 from enums.orders.order_status import OrderStatus
-from loader import bot
 from utils import api
+
+
+class OrderProcessingAlreadyLoggedError(Exception):
+    pass
 
 
 async def process_standard_order(order_item: OrderItem):
@@ -18,7 +20,7 @@ async def process_standard_order(order_item: OrderItem):
 
     backend_order_id = await create_order(order_item)
     if not backend_order_id:
-        raise OrderProcessingError(f'Не удалось оформить заказ{order_item.internal_order_id}. Ошибка API')
+        raise OrderProcessingAlreadyLoggedError(order_item.internal_order_id)
 
     order_item.backend_order_id = backend_order_id
     order_item.order_status = OrderStatus.IN_PROGRESS
@@ -40,15 +42,19 @@ async def create_order(order_item: OrderItem):
     url = order_item.url
     quantity = order_item.quantity
 
-
-
-    backend_order_id = await api.create_new_order(str(service_id), url, quantity)
-
-    if backend_order_id is None:
-        await bot.send_message(config.ADMIN_ID,
-                               f"Не удалось создать заказ {order_item.internal_order_id}. backend_order_id is None")
-        return
-
-
-
-    return backend_order_id
+    try:
+        return await api.create_new_order(
+            str(service_id),
+            url,
+            quantity,
+            provider_service_type=order_item.provider_service_type or api.DEFAULT_PROVIDER_SERVICE_TYPE,
+            subscription_posts=order_item.subscription_posts,
+            subscription_min=order_item.subscription_min,
+            subscription_max=order_item.subscription_max,
+        )
+    except api.ProviderOrderCreateError as exc:
+        order_item.provider_http_status = exc.status_code
+        order_item.provider_error_message = exc.provider_message
+        order_item.order_status = OrderStatus.FAIL
+        await orders_queue.update(order_item)
+        raise
