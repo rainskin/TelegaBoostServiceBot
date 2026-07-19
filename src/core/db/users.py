@@ -40,6 +40,10 @@ class Users:
         doc = await self.collection.find_one({'id': user_id}, {'lang': 1})
         return doc.get('lang') if doc else None
 
+    async def get_username(self, user_id: int) -> str | None:
+        doc = await self.collection.find_one({'id': user_id}, {'username': 1})
+        return doc.get('username') if doc else None
+
     async def switch_lang(self, user_id: int, lang: str):
         current_lang = await self.get_user_lang(user_id)
         if current_lang == lang:
